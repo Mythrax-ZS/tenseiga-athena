@@ -28,7 +28,7 @@ prontera,164,179,4	script	Samurai Mentor	4_M_NINJA_RED,{
 	mes "I will give you one training katana.";
 	if (select("Become a Samurai:Keep my current job") != 1)
 		close;
-	if (!SamuraiKatanaClaimed && !checkweight(Samurai_Katana,1)) {
+	if (!SamuraiKatanaClaimed && !checkweight("Samurai_Katana",1)) {
 		mes "Make room in your inventory and reduce your carried weight first.";
 		close;
 	}
@@ -41,11 +41,11 @@ prontera,164,179,4	script	Samurai Mentor	4_M_NINJA_RED,{
 	if (SamuraiKatanaClaimed)
 		close;
 L_Katana:
-	if (!checkweight(Samurai_Katana,1)) {
+	if (!checkweight("Samurai_Katana",1)) {
 		mes "Make room in your inventory and reduce your carried weight, then return for your katana.";
 		close;
 	}
-	getitem Samurai_Katana,1;
+	getitem "Samurai_Katana",1;
 	SamuraiKatanaClaimed = 1;
 	mes "Take this katana. You can refine it as your training advances.";
 	close;

@@ -42,15 +42,22 @@ character state, run `stop`, then `setup`, `run-once` and `start` again. Setup
 resets only fixture character `150000` and account `2000001` inside that
 container. Do not run setup while the harness is connected.
 
-`fixture.sql` creates a male Samurai with base 99/job 70, the inherited basic
-skills, 49 unused skill points, two starter katanas and a dagger. The eight
-custom skills begin unlearned. The admin group can issue commands but cannot
+`fixture.sql` creates a male Assassin Cross with base 99/job 70, the inherited
+basic skills, 49 unused skill points, and an empty inventory at Prontera 161,179.
+The harness completes the real Samurai Mentor dialogue, checks job level 1 and
+one starter katana, and revisits to verify that the reward cannot be duplicated.
+It also clears the claim flag and katana in this isolated fixture to verify
+the already-Samurai reward path and its repeat-claim protection.
+It then creates one test dagger with `@item 1201 1` for the dual-wield checks.
+The eight custom skills begin unlearned. The admin group can issue commands but cannot
 bypass skill or equipment rules.
 
 `fixture_npc.txt` is loaded only by the copied runtime and defines:
 
 | Command | Purpose |
 | --- | --- |
+| `@samuraimentor` | Report the production mentor GID if its name was not present in the spawn packet. |
+| `@samurairewardreset` | Delete the isolated tester's katana and clear its claim flag to exercise the unclaimed reward branch. |
 | `@samuraidummy` | Create a stationary, nonaggressive target with 100 million HP; report its GID. |
 | `@samuraihit` | Make that target cast Bash 5 at the tester. |
 | `@samurailowhp` | Set HP to one quarter of maximum. |

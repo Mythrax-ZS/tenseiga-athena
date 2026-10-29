@@ -1,11 +1,22 @@
 // Isolated test fixture only; this file is never loaded by the live server.
 -	script	SamuraiTestFixture	-1,{
 OnInit:
+	bindatcmd "samuraimentor","SamuraiTestFixture::OnMentor",99,99;
+	bindatcmd "samurairewardreset","SamuraiTestFixture::OnRewardReset",99,99;
 	bindatcmd "samuraidummy","SamuraiTestFixture::OnDummy",99,99;
 	bindatcmd "samurailowhp","SamuraiTestFixture::OnLowHP",99,99;
 	bindatcmd "samurai30hp","SamuraiTestFixture::OnThirtyHP",99,99;
 	bindatcmd "samuraihit","SamuraiTestFixture::OnHit",99,99;
 	bindatcmd "samuraireset","SamuraiTestFixture::OnReset",99,99;
+	end;
+OnMentor:
+	dispbottom "SAMURAI_MENTOR "+getnpcid(0,"Samurai Mentor");
+	end;
+OnRewardReset:
+	if (countitem(900000))
+		delitem 900000,countitem(900000);
+	SamuraiKatanaClaimed = 0;
+	dispbottom "SAMURAI_REWARD_RESET";
 	end;
 OnDummy:
 	if (unitexists($SamuraiTestDummy))

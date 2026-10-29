@@ -93,7 +93,9 @@ eight skills, five statuses and trainer, reaches ready, and exits with zero
 errors or warnings. Its logs are under `build/samurai-test`.
 
 The companion headless client harness logs into a separate three-server
-stack and verifies job 4500, learning the eight skills, dual equipment,
+stack as an eligible Assassin Cross with an empty inventory and zero weight.
+It completes the real mentor dialogue, checks job 4500 and the starter katana,
+and verifies both reward paths reject repeat claims. It then tests learning the eight skills, dual equipment,
 buff activation/expiry, HIT/ASPD updates, HP/SP effects, three Covenant
 attacks, damage and Wrath's strict HP boundary. This tests network and
 combat behavior without opening the game GUI or using a production account.
