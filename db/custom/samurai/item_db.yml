@@ -1,0 +1,22 @@
+Header:
+  Type: ITEM_DB
+  Version: 3
+
+Body:
+  - Id: 900000
+    AegisName: Samurai_Katana
+    Name: Samurai Initiate's Katana
+    Type: Weapon
+    SubType: 1hSword
+    Buy: 20
+    Weight: 1000
+    Attack: 160
+    Range: 1
+    Jobs:
+      Samurai: true
+    Locations:
+      Right_Hand: true
+    WeaponLevel: 3
+    EquipLevelMin: 99
+    Refineable: true
+    View: 2

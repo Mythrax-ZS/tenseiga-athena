@@ -1772,6 +1772,32 @@ static bool pc_job_can_use_item( const map_session_data* sd, const item_data* it
 	nullpo_retr( false, sd );
 	nullpo_retr( false, item );
 
+	if( sd->status.class_ == JOB_SAMURAI ){
+		if( item->type == IT_WEAPON ){
+			switch( item->subtype ){
+				case W_DAGGER:
+				case W_1HSWORD:
+				case W_2HSWORD:
+				case W_KATAR:
+					break;
+				default:
+					return false;
+			}
+		}
+
+		// Samurai-only items use a separate bit from inherited Assassin gear.
+		if( ( item->class_base[1] & ITEMJOB_SAMURAI ) != 0 )
+			return true;
+
+		// Swords may also come from the Swordman family. Class tier, level,
+		// gender and other equipment restrictions are still checked normally.
+		if( item->type == IT_WEAPON && ( item->subtype == W_1HSWORD || item->subtype == W_2HSWORD ) ){
+			const uint64 swordman = 1ULL << MAPID_SWORDMAN;
+			if( ( ( item->class_base[0] | item->class_base[1] | item->class_base[2] ) & swordman ) != 0 )
+				return true;
+		}
+	}
+
 	// Calculate the required bit to check
 	uint64 job = 1ULL << ( sd->class_ & MAPID_FIRSTMASK );
 
@@ -7578,6 +7604,7 @@ uint64 pc_jobid2mapid(uint16 b_class)
 		case JOB_HIGH_PRIEST:           return MAPID_HIGH_PRIEST;
 		case JOB_WHITESMITH:            return MAPID_WHITESMITH;
 		case JOB_ASSASSIN_CROSS:        return MAPID_ASSASSIN_CROSS;
+		case JOB_SAMURAI:               return MAPID_SAMURAI;
 	//Trans 2-2 Jobs
 		case JOB_PALADIN:               return MAPID_PALADIN;
 		case JOB_PROFESSOR:             return MAPID_PROFESSOR;
@@ -7757,6 +7784,7 @@ int32 pc_mapid2jobid(uint64 class_, int32 sex)
 		case MAPID_HIGH_PRIEST:           return JOB_HIGH_PRIEST;
 		case MAPID_WHITESMITH:            return JOB_WHITESMITH;
 		case MAPID_ASSASSIN_CROSS:        return JOB_ASSASSIN_CROSS;
+		case MAPID_SAMURAI:               return JOB_SAMURAI;
 	//Trans 2-2 Jobs
 		case MAPID_PALADIN:               return JOB_PALADIN;
 		case MAPID_PROFESSOR:             return JOB_PROFESSOR;
@@ -7874,6 +7902,8 @@ int32 pc_mapid2jobid(uint64 class_, int32 sex)
 const char* job_name(int32 class_)
 {
 	switch (class_) {
+	case JOB_SAMURAI:
+		return "Samurai";
 	case JOB_NOVICE:
 	case JOB_SWORDMAN:
 	case JOB_MAGE:

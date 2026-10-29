@@ -1,0 +1,165 @@
+# Samurai custom skills. Combat formulas live in skills/custom and status/battle hooks.
+Header:
+  Type: SKILL_DB
+  Version: 4
+
+Body:
+  - Id: 7001
+    Name: SAM_HEAVENS_SEVERANCE
+    Description: "Heaven's Severance"
+    MaxLevel: 5
+    Type: Weapon
+    TargetType: Attack
+    Hit: Single
+    HitCount: 1
+    Element: Weapon
+    DamageFlags:
+      Critical: true
+    Range: 2
+    AfterCastActDelay: 300
+    Cooldown: 2000
+    Requires:
+      SpCost: 25
+      Weapon:
+        Dagger: true
+        1hSword: true
+        2hSword: true
+        Katar: true
+  - Id: 7002
+    Name: SAM_KUSANAGI_GUARD
+    Description: "Kusanagi Guard"
+    MaxLevel: 5
+    Type: Weapon
+    TargetType: Self
+    DamageFlags:
+      NoDamage: true
+    Duration1: 12000
+    Status: Sam_KUSANAGI_GUARD
+    AfterCastActDelay: 300
+    Cooldown: 20000
+    Requires:
+      SpCost: 30
+      Weapon:
+        Dagger: true
+        1hSword: true
+        2hSword: true
+        Katar: true
+  - Id: 7003
+    Name: SAM_MOONLIT_REFLECTION
+    Description: "Moonlit Reflection"
+    MaxLevel: 5
+    Type: Weapon
+    TargetType: Self
+    DamageFlags:
+      NoDamage: true
+    Duration1: 8000
+    Status: Sam_MOONLIT_REFLECTION
+    AfterCastActDelay: 300
+    Cooldown: 18000
+    Requires:
+      SpCost: 35
+      Weapon:
+        Dagger: true
+        1hSword: true
+        2hSword: true
+        Katar: true
+  - Id: 7004
+    Name: SAM_BLADE_HARMONY
+    Description: "Blade Harmony"
+    MaxLevel: 5
+    Type: Weapon
+    TargetType: Self
+    DamageFlags:
+      NoDamage: true
+    Duration1: 20000
+    Status: Sam_BLADE_HARMONY
+    AfterCastActDelay: 300
+    Cooldown: 25000
+    Requires:
+      SpCost: 30
+      Weapon:
+        Dagger: true
+        1hSword: true
+        2hSword: true
+        Katar: true
+  - Id: 7005
+    Name: SAM_BLOOD_COVENANT
+    Description: "Blood Covenant"
+    MaxLevel: 5
+    Type: Weapon
+    TargetType: Self
+    DamageFlags:
+      NoDamage: true
+    Duration1: 30000
+    Status: Sam_BLOOD_COVENANT
+    AfterCastActDelay: 300
+    Cooldown: 12000
+    Requires:
+      SpCost: 20
+      HpRateCost: -10
+      Weapon:
+        Dagger: true
+        1hSword: true
+        2hSword: true
+        Katar: true
+  - Id: 7006
+    Name: SAM_MURAMASAS_CURSE
+    Description: "Muramasa's Curse"
+    MaxLevel: 5
+    Type: Weapon
+    TargetType: Self
+    DamageFlags:
+      NoDamage: true
+    Duration1: 20000
+    Status: Sam_MURAMASAS_CURSE
+    AfterCastActDelay: 300
+    Cooldown: 25000
+    Requires:
+      SpCost: 35
+      Weapon:
+        Dagger: true
+        1hSword: true
+        2hSword: true
+        Katar: true
+  - Id: 7007
+    Name: SAM_ASHEN_WIND_SLASH
+    Description: "Ashen Wind Slash"
+    MaxLevel: 5
+    Type: Weapon
+    TargetType: Self
+    Hit: Single
+    HitCount: 1
+    Element: Weapon
+    DamageFlags:
+      Splash: true
+    SplashArea: 3
+    Duration2: 10000
+    AfterCastActDelay: 300
+    Cooldown: 4000
+    Requires:
+      SpCost: 30
+      Weapon:
+        Dagger: true
+        1hSword: true
+        2hSword: true
+        Katar: true
+  - Id: 7008
+    Name: SAM_WRATH_UNBOUND
+    Description: "Wrath Unbound"
+    MaxLevel: 5
+    Type: Weapon
+    TargetType: Attack
+    Hit: Single
+    HitCount: 1
+    Element: Weapon
+    Range: 2
+    AfterCastActDelay: 300
+    Cooldown: 15000
+    Requires:
+      SpCost: 50
+      MaxHpTrigger: 30
+      Weapon:
+        Dagger: true
+        1hSword: true
+        2hSword: true
+        Katar: true

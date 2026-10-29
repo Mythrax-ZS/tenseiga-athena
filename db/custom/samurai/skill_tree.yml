@@ -1,0 +1,47 @@
+# Samurai inherits each ancestor explicitly; skill-tree inheritance is not recursive.
+Header:
+  Type: SKILL_TREE_DB
+  Version: 1
+
+Body:
+  - Job: Samurai
+    Inherit:
+      Novice: true
+      Thief: true
+      Assassin: true
+      Assassin_Cross: true
+    Tree:
+      - Name: SAM_HEAVENS_SEVERANCE
+        MaxLevel: 5
+      - Name: SAM_KUSANAGI_GUARD
+        MaxLevel: 5
+        Requires:
+          - Name: SAM_HEAVENS_SEVERANCE
+            Level: 3
+      - Name: SAM_MOONLIT_REFLECTION
+        MaxLevel: 5
+        Requires:
+          - Name: SAM_KUSANAGI_GUARD
+            Level: 3
+      - Name: SAM_BLADE_HARMONY
+        MaxLevel: 5
+        Requires:
+          - Name: SAM_MOONLIT_REFLECTION
+            Level: 3
+      - Name: SAM_BLOOD_COVENANT
+        MaxLevel: 5
+      - Name: SAM_MURAMASAS_CURSE
+        MaxLevel: 5
+        Requires:
+          - Name: SAM_BLOOD_COVENANT
+            Level: 3
+      - Name: SAM_ASHEN_WIND_SLASH
+        MaxLevel: 5
+        Requires:
+          - Name: SAM_MURAMASAS_CURSE
+            Level: 3
+      - Name: SAM_WRATH_UNBOUND
+        MaxLevel: 5
+        Requires:
+          - Name: SAM_ASHEN_WIND_SLASH
+            Level: 3

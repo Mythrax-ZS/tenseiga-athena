@@ -51,4 +51,5 @@ Footer:
     Mode: Prerenewal
   - Path: db/re/status.yml
     Mode: Renewal
+  - Path: db/custom/samurai/status.yml
   - Path: db/import/status.yml

@@ -75,7 +75,7 @@ void map_msg_reload(void);
 #define NATURAL_HEAL_INTERVAL 500
 #define MIN_FLOORITEM 2
 #define MAX_FLOORITEM START_ACCOUNT_NUM
-#define MAX_LEVEL 275
+#define MAX_LEVEL 999
 #define MAX_DROP_PER_MAP 48
 #define MAX_IGNORE_LIST 20 	// official is 14
 #define MAX_VENDING 12
@@ -265,6 +265,8 @@ enum e_mapid : uint64{
 	MAPID_BIOLO,
 	MAPID_ABYSS_CHASER,
 	MAPID_SOUL_ASCETIC,
+// Custom branch: retain Assassin Cross ancestry without aliasing its job ID.
+	MAPID_SAMURAI = 0x400000 | MAPID_ASSASSIN_CROSS,
 // Additional constants
 	MAPID_ALL = UINT64_MAX
 };

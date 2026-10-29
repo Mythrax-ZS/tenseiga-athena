@@ -94,4 +94,5 @@ Footer:
     Mode: Prerenewal
   - Path: db/re/item_db.yml
     Mode: Renewal
+  - Path: db/custom/samurai/item_db.yml
   - Path: db/import/item_db.yml

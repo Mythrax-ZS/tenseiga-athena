@@ -1,0 +1,46 @@
+// Isolated test fixture only; this file is never loaded by the live server.
+-	script	SamuraiTestFixture	-1,{
+OnInit:
+	bindatcmd "samuraidummy","SamuraiTestFixture::OnDummy",99,99;
+	bindatcmd "samurailowhp","SamuraiTestFixture::OnLowHP",99,99;
+	bindatcmd "samurai30hp","SamuraiTestFixture::OnThirtyHP",99,99;
+	bindatcmd "samuraihit","SamuraiTestFixture::OnHit",99,99;
+	bindatcmd "samuraireset","SamuraiTestFixture::OnReset",99,99;
+	end;
+OnDummy:
+	if (unitexists($SamuraiTestDummy))
+		unitkill $SamuraiTestDummy;
+	getmapxy(.@map$,.@x,.@y,BL_PC);
+	monster .@map$,.@x+1,.@y,"Samurai Training Dummy",1002,1;
+	$SamuraiTestDummy = $@mobid[0];
+	setunitdata $SamuraiTestDummy,UMOB_MODE,0;
+	setunitdata $SamuraiTestDummy,UMOB_MAXHP,100000000;
+	setunitdata $SamuraiTestDummy,UMOB_HP,100000000;
+	setunitdata $SamuraiTestDummy,UMOB_ATKMIN,300;
+	setunitdata $SamuraiTestDummy,UMOB_ATKMAX,300;
+	setunitdata $SamuraiTestDummy,UMOB_HIT,1000;
+	setunitdata $SamuraiTestDummy,UMOB_FLEE,1;
+	dispbottom "SAMURAI_DUMMY "+$SamuraiTestDummy;
+	end;
+OnLowHP:
+	heal (MaxHp/4)-Hp,0;
+	dispbottom "SAMURAI_HP "+Hp+" / "+MaxHp;
+	end;
+OnThirtyHP:
+	heal ((MaxHp*30+99)/100)-Hp,0;
+	dispbottom "SAMURAI_HP "+Hp+" / "+MaxHp;
+	end;
+OnHit:
+	if (unitexists($SamuraiTestDummy))
+		unitskilluseid $SamuraiTestDummy,"SM_BASH",5,getcharid(3),0,false,0,true;
+	end;
+OnReset:
+	sc_end SC_SAM_KUSANAGI_GUARD;
+	sc_end SC_SAM_MOONLIT_REFLECTION;
+	sc_end SC_SAM_BLADE_HARMONY;
+	sc_end SC_SAM_BLOOD_COVENANT;
+	sc_end SC_SAM_MURAMASAS_CURSE;
+	percentheal 100,100;
+	dispbottom "SAMURAI_RESET";
+	end;
+}

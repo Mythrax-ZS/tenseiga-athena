@@ -1,0 +1,12 @@
+UPDATE login SET userid='samurai_validation',user_pass='samurai_validation_only' WHERE account_id=1;
+INSERT INTO login(account_id,userid,user_pass,sex,email,group_id,character_slots,birthdate) VALUES(2000001,'samurai_test','samurai-test-only','M','samurai@example.invalid',99,9,'2000-01-01');
+INSERT INTO `char`(char_id,account_id,char_num,name,class,base_level,job_level,zeny,str,agi,vit,`int`,dex,luk,max_hp,hp,max_sp,sp,skill_point,last_map,last_x,last_y,save_map,save_x,save_y,sex) VALUES(150000,2000001,0,'SamuraiTest',4500,99,70,1000000,90,60,50,30,90,30,50000,50000,5000,5000,49,'prontera',156,179,'prontera',156,179,'M');
+INSERT INTO inventory(char_id,nameid,amount,identify) VALUES(150000,900000,1,1),(150000,900000,1,1),(150000,1201,1,1);
+INSERT INTO skill(char_id,id,lv,flag) VALUES(150000,1,9,0);
+INSERT INTO skill(char_id,id,lv,flag) VALUES(150000,48,10,0);
+INSERT INTO skill(char_id,id,lv,flag) VALUES(150000,49,10,0);
+INSERT INTO skill(char_id,id,lv,flag) VALUES(150000,50,10,0);
+INSERT INTO skill(char_id,id,lv,flag) VALUES(150000,51,10,0);
+INSERT INTO skill(char_id,id,lv,flag) VALUES(150000,52,10,0);
+INSERT INTO skill(char_id,id,lv,flag) VALUES(150000,132,5,0);
+INSERT INTO skill(char_id,id,lv,flag) VALUES(150000,133,5,0);

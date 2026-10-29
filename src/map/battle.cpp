@@ -1587,6 +1587,26 @@ bool battle_status_block_damage(block_list *src, block_list *target, status_chan
 		(sc->getSCE(SC_MEIKYOUSISUI) && rnd() % 100 < 40)) // custom value
 		return false;
 
+	if (damage > 0 && skill_id != 0 && (flag & BF_WEAPON) && (flag & BF_SKILL) && src != target &&
+		(sce = sc->getSCE(SC_SAM_MOONLIT_REFLECTION))) {
+		const int32 level = sce->val1;
+		const int32 sp_percent = sce->val3;
+		const int64 reflected = std::max<int64>(1, damage * sce->val2 / 100);
+		// Consume before dealing damage: reflections cannot bounce recursively.
+		status_change_end(target, SC_SAM_MOONLIT_REFLECTION);
+		status_heal(target, 0, static_cast<int64>(status_get_max_sp(target)) * sp_percent / 100, 0);
+		clif_skill_damage(*target, *src, gettick(), 0, 0, reflected, 1, SAM_MOONLIT_REFLECTION, level, DMG_SINGLE);
+		battle_fix_damage(target, src, reflected, 0, SAM_MOONLIT_REFLECTION);
+		d->dmg_lv = ATK_BLOCK;
+		return false;
+	}
+
+	if (damage > 0 && (flag & BF_WEAPON) && (sce = sc->getSCE(SC_SAM_KUSANAGI_GUARD)) && rnd() % 100 < sce->val2) {
+		clif_skill_nodamage(target, *target, SAM_KUSANAGI_GUARD, sce->val1);
+		d->dmg_lv = ATK_BLOCK;
+		return false;
+	}
+
 	if ((sce = sc->getSCE(SC_PARRYING)) && flag&BF_WEAPON && skill_id != WS_CARTTERMINATION && rnd() % 100 < sce->val2) {
 		clif_skill_nodamage(target, *target, LK_PARRYING, sce->val1);
 		unit_set_attackdelay(*target, gettick(), DELAY_EVENT_PARRY);
@@ -3027,7 +3047,7 @@ static bool is_attack_critical(struct Damage* wd, block_list *src, const block_l
 
 	status_data* sstatus = status_get_status_data(*src);
 
-	if( sstatus->cri )
+	if( sstatus->cri || skill_id == SAM_HEAVENS_SEVERANCE )
 	{
 		map_session_data *sd = BL_CAST(BL_PC, src);
 
@@ -3087,6 +3107,9 @@ static bool is_attack_critical(struct Damage* wd, block_list *src, const block_l
 				break;
 			case NJ_KIRIKAGE:
 				cri += 250 + 50*skill_lv;
+				break;
+			case SAM_HEAVENS_SEVERANCE:
+				cri += 200 + 50 * skill_lv;
 				break;
 #ifdef RENEWAL
 			case ASC_BREAKER:
@@ -4379,6 +4402,8 @@ static uint16 battle_get_atkpercent( const block_list& bl, uint16 skill_id, cons
 		atkpercent += 300;
 	if (sc.getSCE(SC_BLOODLUST))
 		atkpercent += sc.getSCE(SC_BLOODLUST)->val2;
+	if (sc.getSCE(SC_SAM_MURAMASAS_CURSE))
+		atkpercent += sc.getSCE(SC_SAM_MURAMASAS_CURSE)->val2;
 	if (sc.getSCE(SC_FLEET))
 		atkpercent += sc.getSCE(SC_FLEET)->val3;
 	if (sc.getSCE(SC_INVINCIBLE))
@@ -5403,6 +5428,15 @@ static struct Damage battle_calc_weapon_attack(block_list *src, block_list *targ
 	}
 
 	wd = initialize_weapon_data(src, target, skill_id, skill_lv, wflag);
+	int32 covenant_bonus = 0;
+	// Splash follow-ups (e.g. Baphomet) use skill_id 0 but carry BF_SKILL.
+	if (skill_id == 0 && (wd.flag & BF_NORMAL) && sc != nullptr) {
+		if (auto* covenant = sc->getSCE(SC_SAM_BLOOD_COVENANT)) {
+			covenant_bonus = covenant->val2;
+			if (--covenant->val3 <= 0)
+				status_change_end(src, SC_SAM_BLOOD_COVENANT);
+		}
+	}
 
 	// Update Damage data based on skill
 	if (std::shared_ptr<s_skill_db> skill = skill_db.find(skill_id); skill != nullptr && skill->impl != nullptr) {
@@ -5768,6 +5802,10 @@ static struct Damage battle_calc_weapon_attack(block_list *src, block_list *targ
 	battle_apply_div_fix(&wd, skill_id);
 
 	battle_calc_attack_left_right_hands(&wd, src, target, skill_id, skill_lv);
+	if (covenant_bonus > 0) {
+		wd.damage += wd.damage * covenant_bonus / 100;
+		wd.damage2 += wd.damage2 * covenant_bonus / 100;
+	}
 
 #ifdef RENEWAL
 	switch (skill_id) {

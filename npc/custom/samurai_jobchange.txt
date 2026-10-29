@@ -1,0 +1,52 @@
+// Male Samurai release. Normal entry: Assassin Cross, base 99 / job 70.
+// @jobchange 4500 remains available to administrators for testing.
+prontera,164,179,4	script	Samurai Mentor	4_M_NINJA_RED,{
+	mes "[Samurai Mentor]";
+	if (Sex != SEX_MALE) {
+		mes "This school currently trains male Samurai. Training for female Samurai will open with the next uniform release.";
+		close;
+	}
+	if (Class == JOB_SAMURAI) {
+		mes "Walk with discipline. Heaven's Severance begins the defensive path; Blood Covenant begins the sacrifice path.";
+		if (!SamuraiKatanaClaimed) {
+			next;
+			mes "[Samurai Mentor]";
+			mes "Your first training katana is waiting for you.";
+			if (select("Claim my katana:Not now") == 1)
+				goto L_Katana;
+		}
+		close;
+	}
+	mes "An experienced Assassin Cross may learn the way of the Samurai.";
+	mes "You must reach base level 99 and job level 70.";
+	if (Class != JOB_ASSASSIN_CROSS || BaseLevel < 99 || JobLevel < 70)
+		close;
+	next;
+	mes "[Samurai Mentor]";
+	mes "You keep your base level, assigned stats, learned skills and unused skill points. Your Samurai job level starts at 1, with no job experience.";
+	mes "Samurai can wield daggers, one-handed and two-handed swords, and katars. Daggers and one-handed swords can be paired.";
+	mes "I will give you one training katana.";
+	if (select("Become a Samurai:Keep my current job") != 1)
+		close;
+	if (!SamuraiKatanaClaimed && !checkweight(Samurai_Katana,1)) {
+		mes "Make room in your inventory and reduce your carried weight first.";
+		close;
+	}
+	jobchange JOB_SAMURAI;
+	if (Class != JOB_SAMURAI) {
+		mes "Your training could not begin. Please speak to an administrator.";
+		close;
+	}
+	mes "Your training begins now.";
+	if (SamuraiKatanaClaimed)
+		close;
+L_Katana:
+	if (!checkweight(Samurai_Katana,1)) {
+		mes "Make room in your inventory and reduce your carried weight, then return for your katana.";
+		close;
+	}
+	getitem Samurai_Katana,1;
+	SamuraiKatanaClaimed = 1;
+	mes "Take this katana. You can refine it as your training advances.";
+	close;
+}

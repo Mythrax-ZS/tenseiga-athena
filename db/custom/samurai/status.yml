@@ -1,0 +1,48 @@
+Header:
+  Type: STATUS_DB
+  Version: 4
+
+Body:
+  - Status: Sam_KUSANAGI_GUARD
+    Icon: EFST_SAM_KUSANAGI_GUARD
+    DurationLookup: SAM_KUSANAGI_GUARD
+    Flags:
+      NoSave: true
+      RequireWeapon: true
+      RemoveOnUnequipWeapon: true
+      RemoveOnHermode: true
+  - Status: Sam_MOONLIT_REFLECTION
+    Icon: EFST_SAM_MOONLIT_REFLECTION
+    DurationLookup: SAM_MOONLIT_REFLECTION
+    Flags:
+      NoSave: true
+      RequireWeapon: true
+      RemoveOnUnequipWeapon: true
+      RemoveOnHermode: true
+  - Status: Sam_BLADE_HARMONY
+    Icon: EFST_SAM_BLADE_HARMONY
+    DurationLookup: SAM_BLADE_HARMONY
+    CalcFlags:
+      Hit: true
+      Aspd: true
+    Flags:
+      NoSave: true
+      RequireWeapon: true
+      RemoveOnUnequipWeapon: true
+      RemoveOnHermode: true
+  - Status: Sam_BLOOD_COVENANT
+    Icon: EFST_SAM_BLOOD_COVENANT
+    DurationLookup: SAM_BLOOD_COVENANT
+    Flags:
+      NoSave: true
+      RequireWeapon: true
+      RemoveOnUnequipWeapon: true
+      RemoveOnHermode: true
+  - Status: Sam_MURAMASAS_CURSE
+    Icon: EFST_SAM_MURAMASAS_CURSE
+    DurationLookup: SAM_MURAMASAS_CURSE
+    Flags:
+      NoSave: true
+      RequireWeapon: true
+      RemoveOnUnequipWeapon: true
+      RemoveOnHermode: true

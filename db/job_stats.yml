@@ -116,4 +116,5 @@ Footer:
     Mode: Renewal
 
   # Finally, import custom information
+  - Path: db/custom/samurai/job_stats.yml
   - Path: db/import/job_stats.yml

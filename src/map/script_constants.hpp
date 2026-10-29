@@ -262,6 +262,7 @@
 	export_constant(JOB_SURA_2ND);
 	export_constant(JOB_MINSTREL_2ND);
 	export_constant(JOB_WANDERER_2ND);
+	export_constant(JOB_SAMURAI);
 
 	/* EA jobs */
 	export_constant2("EAJL_2_1",JOBL_2_1);
@@ -437,6 +438,7 @@
 	export_constant2("EAJ_BIOLO",MAPID_BIOLO);
 	export_constant2("EAJ_ABYSS_CHASER",MAPID_ABYSS_CHASER);
 	export_constant2("EAJ_SOUL_ASCETIC",MAPID_SOUL_ASCETIC);
+	export_constant2("EAJ_SAMURAI",MAPID_SAMURAI);
 
 	/* sex */
 	export_constant(SEX_FEMALE);
@@ -11081,6 +11083,18 @@
 	export_constant(GUILDINFO_NEXTEXP);
 	export_constant(GUILDINFO_MASTERID);
 	export_constant(GUILDINFO_MASTERNAME);
+
+	// Standalone Samurai status database identifiers.
+	export_constant(SC_SAM_KUSANAGI_GUARD);
+	export_constant(SC_SAM_MOONLIT_REFLECTION);
+	export_constant(SC_SAM_BLADE_HARMONY);
+	export_constant(SC_SAM_BLOOD_COVENANT);
+	export_constant(SC_SAM_MURAMASAS_CURSE);
+	export_constant(EFST_SAM_KUSANAGI_GUARD);
+	export_constant(EFST_SAM_MOONLIT_REFLECTION);
+	export_constant(EFST_SAM_BLADE_HARMONY);
+	export_constant(EFST_SAM_BLOOD_COVENANT);
+	export_constant(EFST_SAM_MURAMASAS_CURSE);
 
 	#undef export_constant
 	#undef export_constant2

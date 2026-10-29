@@ -367,6 +367,8 @@ const char* job_name(int32 class_) {
 
 		case JOB_SKY_EMPEROR2:
 			return msg_txt( 135 );
+		case JOB_SAMURAI:
+			return "Samurai";
 
 		default:
 			return msg_txt(199);

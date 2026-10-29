@@ -7548,6 +7548,8 @@ static int16 status_calc_hit(block_list *bl, status_change *sc, int32 hit)
 
 	if(sc->getSCE(SC_INCHIT))
 		hit += sc->getSCE(SC_INCHIT)->val1;
+	if (sc->getSCE(SC_SAM_BLADE_HARMONY))
+		hit += 10 * sc->getSCE(SC_SAM_BLADE_HARMONY)->val1;
 	if(sc->getSCE(SC_TRUESIGHT))
 		hit += sc->getSCE(SC_TRUESIGHT)->val3;
 	if(sc->getSCE(SC_HUMMING))
@@ -8384,6 +8386,8 @@ static int16 status_calc_fix_aspd(block_list *bl, status_change *sc, int32 aspd)
 		aspd -= 50; // +5 ASPD
 	if (sc->getSCE(SC_FIGHTINGSPIRIT))
 		aspd -= sc->getSCE(SC_FIGHTINGSPIRIT)->val2;
+	if (sc->getSCE(SC_SAM_BLADE_HARMONY))
+		aspd -= 10 * sc->getSCE(SC_SAM_BLADE_HARMONY)->val1;
 	if (sc->getSCE(SC_SOULSHADOW))
 		aspd -= 10 * sc->getSCE(SC_SOULSHADOW)->val2;
 	if (sc->getSCE(SC_HEAT_BARREL))
@@ -11343,6 +11347,22 @@ static bool status_change_start_post_delay(block_list* src, block_list* bl, sc_t
 		case SC_PARRYING:
 		    val2 = 20 + val1*3; // Block Chance
 			break;
+		case SC_SAM_KUSANAGI_GUARD:
+			val2 = 20 + 5 * val1; // Physical parry chance.
+			break;
+		case SC_SAM_MOONLIT_REFLECTION:
+			val2 = 40 + 10 * val1; // Damage returned, percent.
+			val3 = 1 + val1; // Maximum SP restored, percent.
+			break;
+		case SC_SAM_BLOOD_COVENANT:
+			val2 = 20 + 10 * val1; // Normal attack damage bonus, percent.
+			val3 = 3; // Consume once per attack, including dual wield/multi-hit.
+			break;
+		case SC_SAM_MURAMASAS_CURSE:
+			val2 = 10 + 5 * val1; // Attack bonus, percent.
+			val4 = tick / 1000;
+			tick_time = 1000;
+			break;
 
 		case SC_WINDWALK:
 			val2 = (val1+1)/2; // Flee bonus is 1/1/2/2/3/3/4/4/5/5
@@ -14168,6 +14188,15 @@ TIMER_FUNC(status_change_timer){
 	FreeBlockLock freeLock(false);
 
 	switch(type) {
+	case SC_SAM_MURAMASAS_CURSE:
+		// A failed nonlethal HP charge ends the curse. Never kill the caster.
+		if (!status_charge(bl, std::max<int64>(1, status->max_hp / 100), 0))
+			break;
+		if (--sce->val4 > 0) {
+			sc_timer_next(1000 + tick);
+			return 0;
+		}
+		break;
 	case SC_MAXIMIZEPOWER:
 	case SC_CLOAKING:
 		if(!status_damage(nullptr, bl, 0, 1, 0, 3, 0))

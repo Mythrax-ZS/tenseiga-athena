@@ -208,6 +208,9 @@ enum poison_item_list : t_itemid
 };
 
 ///Item job
+// Reserved class_base bit for Samurai-only items; normal ancestry remains Assassin.
+constexpr uint64 ITEMJOB_SAMURAI = 1ULL << 63;
+
 enum e_item_job : uint16
 {
 	ITEMJ_NONE        = 0x00,

@@ -8241,6 +8241,13 @@ bool skill_check_condition_castbegin( map_session_data& sd, uint16 skill_id, uin
 	if (sd.chatID)
 		return false;
 
+	// Exact comparison avoids integer-percent rounding at the 30% boundary.
+	if (skill_id == SAM_WRATH_UNBOUND &&
+		static_cast<uint64>(sd.battle_status.hp) * 100 >= static_cast<uint64>(sd.battle_status.max_hp) * 30) {
+		clif_skill_fail(sd, skill_id, USESKILL_FAIL_HP_INSUFFICIENT);
+		return false;
+	}
+
 	if( pc_has_permission(&sd, PC_PERM_SKILL_UNCONDITIONAL) && sd.skillitem != skill_id )
 	{	//GMs don't override the skillItem check, otherwise they can use items without them being consumed! [Skotlex]
 		sd.state.arrow_atk = skill_get_ammotype(skill_id)?1:0; //Need to do arrow state check.
@@ -9330,6 +9337,11 @@ bool skill_check_condition_castend( map_session_data& sd, uint16 skill_id, uint1
 
 	if( sd.chatID )
 		return false;
+	if (skill_id == SAM_WRATH_UNBOUND &&
+		static_cast<uint64>(sd.battle_status.hp) * 100 >= static_cast<uint64>(sd.battle_status.max_hp) * 30) {
+		clif_skill_fail(sd, skill_id, USESKILL_FAIL_HP_INSUFFICIENT);
+		return false;
+	}
 
 	if( pc_has_permission(&sd, PC_PERM_SKILL_UNCONDITIONAL) && sd.skillitem != skill_id ) {
 		//GMs don't override the skillItem check, otherwise they can use items without them being consumed! [Skotlex]
