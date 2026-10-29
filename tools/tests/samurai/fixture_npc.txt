@@ -8,9 +8,20 @@ OnInit:
 	bindatcmd "samurai30hp","SamuraiTestFixture::OnThirtyHP",99,99;
 	bindatcmd "samuraihit","SamuraiTestFixture::OnHit",99,99;
 	bindatcmd "samuraireset","SamuraiTestFixture::OnReset",99,99;
+	bindatcmd "samuraiblades","SamuraiTestFixture::OnBlades",99,99;
 	end;
 OnMentor:
 	dispbottom "SAMURAI_MENTOR "+getnpcid(0,"Samurai Mentor");
+	end;
+OnBlades:
+	// Deterministic SP-cost checks must not race natural regeneration.
+	bonus_script "{ bonus bNoRegen,3; }",600,8;
+	if (!countitem(900001))
+		getitem 900001,1;
+	if (!countitem(900002))
+		getitem 900002,1;
+	percentheal 100,100;
+	dispbottom "SAMURAI_BLADES_READY";
 	end;
 OnRewardReset:
 	if (countitem(900000))

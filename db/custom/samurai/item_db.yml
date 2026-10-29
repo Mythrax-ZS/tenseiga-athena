@@ -20,3 +20,52 @@ Body:
     EquipLevelMin: 99
     Refineable: true
     View: 2
+  - Id: 900001
+    AegisName: Samurai_Kusanagi
+    Name: Kusanagi
+    Type: Weapon
+    SubType: 1hSword
+    Buy: 20
+    Weight: 1000
+    Attack: 190
+    Range: 1
+    Slots: 1
+    Jobs:
+      Samurai: true
+    Locations:
+      Right_Hand: true
+    WeaponLevel: 4
+    EquipLevelMin: 99
+    Refineable: true
+    View: 9001
+    Script: |
+      bonus bHit,15;
+      bonus bCritical,8;
+      bonus bMaxSPrate,5;
+      bonus2 bSkillAtk,"SAM_HEAVENS_SEVERANCE",10;
+      bonus2 bSkillUseSPrate,"SAM_KUSANAGI_GUARD",15;
+      bonus2 bSkillUseSPrate,"SAM_MOONLIT_REFLECTION",15;
+  - Id: 900002
+    AegisName: Samurai_Muramasa
+    Name: Muramasa
+    Type: Weapon
+    SubType: 1hSword
+    Buy: 20
+    Weight: 1200
+    Attack: 210
+    Range: 1
+    Slots: 1
+    Jobs:
+      Samurai: true
+    Locations:
+      Right_Hand: true
+    WeaponLevel: 4
+    EquipLevelMin: 99
+    Refineable: true
+    View: 9002
+    Script: |
+      bonus bCritical,5;
+      bonus bMaxHPrate,-5;
+      bonus2 bSkillAtk,"SAM_ASHEN_WIND_SLASH",10;
+      bonus2 bSkillAtk,"SAM_WRATH_UNBOUND",10;
+      bonus4 bAddEff,Eff_Bleeding,300,ATF_SHORT|ATF_WEAPON|ATF_TARGET,5000;

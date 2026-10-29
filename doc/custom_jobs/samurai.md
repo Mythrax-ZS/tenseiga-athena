@@ -60,6 +60,37 @@ minimum base level 99, refineable, no slots, Samurai only. Its client view is
 2. A separate item job-mask bit keeps Samurai-only equipment from being
 usable by Assassin Cross characters.
 
+## Kusanagi and Muramasa
+
+Two additional Samurai-only one-handed swords implement the **Divinity /
+Kusanagi** and **Cursed / Muramasa** themes from the
+[shared Samurai design conversation](https://chatgpt.com/share/6ae32624-5d04-83ea-97ca-d6037adb630c).
+That conversation establishes precision, critical attacks and defensive SP
+techniques for Kusanagi, and bloodletting, risk and low-HP attacks for Muramasa.
+The deeper project backstory was unavailable; these are initial gameplay
+interpretations of those themes, not additional canon.
+
+| Item | ID / Aegis name | ATK | Weight | Effects |
+| --- | --- | --- | --- | --- |
+| Kusanagi | 900001 / `Samurai_Kusanagi` | 190 | 100 | HIT +15, CRIT +8, Max SP +5%; Heaven's Severance damage +10%; Kusanagi Guard and Moonlit Reflection SP costs -15%. |
+| Muramasa | 900002 / `Samurai_Muramasa` | 210 | 120 | CRIT +5, Max HP -5%; Ashen Wind Slash and Wrath Unbound damage +10%; melee physical hits have a 3% chance to inflict Bleeding for up to 5 seconds. |
+
+Both are neutral, weapon level 4, require base level 99, have one card slot,
+and can be refined. They can be equipped in either hand or paired together.
+Bleeding can be resisted or shortened by the target's normal status defenses;
+the proc includes melee weapon skills as well as normal attacks. Multiple
+copies add their bonuses and penalties. No extra pair bonus, life-steal or
+recurring weapon HP drain is applied. They use the existing Samurai skills
+without changing those skills' HP requirements or cooldowns.
+
+Administrators can create them with `@item 900001 1` and `@item 900002 1`.
+No quest or drop acquisition is assigned yet. Their unique Aegis names avoid
+the existing two-handed stock Muramasa items (1164, 1173 and 21003), which
+remain unchanged. Client appearance aliases are 9001 and 9002; the modern
+server packets send the actual 900001/900002 item IDs, and client item metadata
+selects the corresponding custom appearance. These are first playable balance
+values, including for the local base-999 progression, pending playtesting.
+
 ## Skills and balance
 
 All eight skills have five levels, require an allowed weapon, and have a
@@ -99,6 +130,12 @@ and verifies both reward paths reject repeat claims. It then tests learning the 
 buff activation/expiry, HIT/ASPD updates, HP/SP effects, three Covenant
 attacks, damage and Wrath's strict HP boundary. This tests network and
 combat behavior without opening the game GUI or using a production account.
+The legendary-weapon extension verifies Kusanagi's HIT, CRIT and Max SP,
+Muramasa's CRIT and Max HP penalty, both orders of dual equipment, and exact
+restoration after unequipping. Actual Guard/Reflection SP deductions with
+Kusanagi are 25/29, down from 30/35. The randomized Bleeding frequency and
+skill-specific percentage damage bonuses are not statistically measured by
+this fixture; their item scripts load successfully through the normal engine.
 Reproduction and fixture details are in
 [`tools/tests/samurai/README.md`](../../tools/tests/samurai/README.md).
 

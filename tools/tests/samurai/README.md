@@ -52,6 +52,14 @@ It then creates one test dagger with `@item 1201 1` for the dual-wield checks.
 The eight custom skills begin unlearned. The admin group can issue commands but cannot
 bypass skill or equipment rules.
 
+After the existing eight-skill checks, the harness creates Kusanagi (900001)
+and Muramasa (900002) inside this fixture. It verifies each weapon's HIT,
+CRIT, Max HP and Max SP effects, both orders of dual equipment, and removal
+of bonuses after unequipping. It casts Guard and Reflection with Kusanagi
+to check their actual reduced SP costs. Natural HP/SP regeneration is disabled
+for this section by a fixture-only bonus that expires or ends at logout.
+Random Bleeding proc frequency and a full PvP/PvE balance pass are not asserted.
+
 `fixture_npc.txt` is loaded only by the copied runtime and defines:
 
 | Command | Purpose |
@@ -63,6 +71,7 @@ bypass skill or equipment rules.
 | `@samurailowhp` | Set HP to one quarter of maximum. |
 | `@samurai30hp` | Set HP to the ceiling of 30% of maximum, testing the strict boundary. |
 | `@samuraireset` | Remove the five Samurai buffs and restore HP/SP; cooldowns remain. |
+| `@samuraiblades` | Create the two legendary test weapons if absent, suppress natural regeneration for 10 minutes or until logout, and heal the isolated tester. |
 
 Logs are `build/samurai-test/map-run-once.log` and
 `build/samurai-test/{login-server,char-server,map-server}.log`.
