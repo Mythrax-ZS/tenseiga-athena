@@ -4404,6 +4404,8 @@ static uint16 battle_get_atkpercent( const block_list& bl, uint16 skill_id, cons
 		atkpercent += sc.getSCE(SC_BLOODLUST)->val2;
 	if (sc.getSCE(SC_SAM_MURAMASAS_CURSE))
 		atkpercent += sc.getSCE(SC_SAM_MURAMASAS_CURSE)->val2;
+	if (sc.getSCE(SC_SAM_BLADE_HARMONY))
+		atkpercent += 4 * sc.getSCE(SC_SAM_BLADE_HARMONY)->val1; // 4-20%.
 	if (sc.getSCE(SC_FLEET))
 		atkpercent += sc.getSCE(SC_FLEET)->val3;
 	if (sc.getSCE(SC_INVINCIBLE))

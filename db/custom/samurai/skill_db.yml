@@ -17,9 +17,9 @@ Body:
       Critical: true
     Range: 2
     AfterCastActDelay: 300
-    Cooldown: 2000
+    Cooldown: 700
     Requires:
-      SpCost: 25
+      SpCost: 60
       Weapon:
         Dagger: true
         1hSword: true
@@ -33,12 +33,12 @@ Body:
     TargetType: Self
     DamageFlags:
       NoDamage: true
-    Duration1: 12000
+    Duration1: 30000
     Status: Sam_KUSANAGI_GUARD
     AfterCastActDelay: 300
-    Cooldown: 20000
+    Cooldown: 30000
     Requires:
-      SpCost: 30
+      SpCost: 40
       Weapon:
         Dagger: true
         1hSword: true
@@ -52,12 +52,12 @@ Body:
     TargetType: Self
     DamageFlags:
       NoDamage: true
-    Duration1: 8000
+    Duration1: 15000
     Status: Sam_MOONLIT_REFLECTION
     AfterCastActDelay: 300
-    Cooldown: 18000
+    Cooldown: 15000
     Requires:
-      SpCost: 35
+      SpCost: 45
       Weapon:
         Dagger: true
         1hSword: true
@@ -71,12 +71,12 @@ Body:
     TargetType: Self
     DamageFlags:
       NoDamage: true
-    Duration1: 20000
+    Duration1: 60000
     Status: Sam_BLADE_HARMONY
     AfterCastActDelay: 300
-    Cooldown: 25000
+    Cooldown: 60000
     Requires:
-      SpCost: 30
+      SpCost: 50
       Weapon:
         Dagger: true
         1hSword: true
@@ -95,7 +95,7 @@ Body:
     AfterCastActDelay: 300
     Cooldown: 12000
     Requires:
-      SpCost: 20
+      SpCost: 30
       HpRateCost: -10
       Weapon:
         Dagger: true
@@ -110,12 +110,12 @@ Body:
     TargetType: Self
     DamageFlags:
       NoDamage: true
-    Duration1: 20000
+    Duration1: 30000
     Status: Sam_MURAMASAS_CURSE
     AfterCastActDelay: 300
-    Cooldown: 25000
+    Cooldown: 30000
     Requires:
-      SpCost: 35
+      SpCost: 50
       Weapon:
         Dagger: true
         1hSword: true
@@ -135,9 +135,9 @@ Body:
     SplashArea: 3
     Duration2: 10000
     AfterCastActDelay: 300
-    Cooldown: 4000
+    Cooldown: 1000
     Requires:
-      SpCost: 30
+      SpCost: 70
       Weapon:
         Dagger: true
         1hSword: true
@@ -156,7 +156,7 @@ Body:
     AfterCastActDelay: 300
     Cooldown: 15000
     Requires:
-      SpCost: 50
+      SpCost: 100
       MaxHpTrigger: 30
       Weapon:
         Dagger: true
@@ -183,9 +183,9 @@ Body:
     Element: Weapon
     Range: 2
     AfterCastActDelay: 300
-    Cooldown: 3000
+    Cooldown: 1000
     Requires:
-      SpCost: 40
+      SpCost: 70
       Weapon:
         2hSword: true
   - Id: 7011
@@ -199,9 +199,9 @@ Body:
     Element: Weapon
     Range: 2
     AfterCastActDelay: 500
-    Cooldown: 5000
+    Cooldown: 1500
     Requires:
-      SpCost: 50
+      SpCost: 80
       Weapon:
         2hSword: true
   - Id: 7012
@@ -214,20 +214,20 @@ Body:
       NoDamage: true
     Duration1:
       - Level: 1
-        Time: 15000
+        Time: 40000
       - Level: 2
-        Time: 20000
+        Time: 50000
       - Level: 3
-        Time: 25000
+        Time: 60000
       - Level: 4
-        Time: 30000
+        Time: 70000
       - Level: 5
-        Time: 35000
+        Time: 80000
     Status: Sam_UNCHAINED_WILL
     AfterCastActDelay: 300
     Cooldown: 60000
     Requires:
-      SpCost: 40
+      SpCost: 60
       Weapon:
         2hSword: true
   - Id: 7013
@@ -240,12 +240,12 @@ Body:
       NoDamage: true
       Splash: true
     SplashArea: 7
-    Duration1: 60000
+    Duration1: 90000
     Status: Sam_FORGE_OF_TEN_SOULS
     AfterCastActDelay: 1000
     Cooldown: 120000
     Requires:
-      SpCost: 80
+      SpCost: 100
       Weapon:
         2hSword: true
   - Id: 7014
@@ -262,8 +262,8 @@ Body:
     Range: 2
     CastTime: 1000
     AfterCastActDelay: 1000
-    Cooldown: 30000
+    Cooldown: 20000
     Requires:
-      SpCost: 100
+      SpCost: 150
       Weapon:
         2hSword: true

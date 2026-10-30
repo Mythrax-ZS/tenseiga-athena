@@ -7553,7 +7553,7 @@ static int16 status_calc_hit(block_list *bl, status_change *sc, int32 hit)
 	if(sc->getSCE(SC_INCHIT))
 		hit += sc->getSCE(SC_INCHIT)->val1;
 	if (sc->getSCE(SC_SAM_BLADE_HARMONY))
-		hit += 10 * sc->getSCE(SC_SAM_BLADE_HARMONY)->val1;
+		hit += 20 * sc->getSCE(SC_SAM_BLADE_HARMONY)->val1;
 	if(sc->getSCE(SC_TRUESIGHT))
 		hit += sc->getSCE(SC_TRUESIGHT)->val3;
 	if(sc->getSCE(SC_HUMMING))
@@ -11363,18 +11363,18 @@ static bool status_change_start_post_delay(block_list* src, block_list* bl, sc_t
 		    val2 = 20 + val1*3; // Block Chance
 			break;
 		case SC_SAM_KUSANAGI_GUARD:
-			val2 = 20 + 5 * val1; // Physical parry chance.
+			val2 = 25 + 5 * val1; // Physical parry chance: 30-50%.
 			break;
 		case SC_SAM_MOONLIT_REFLECTION:
-			val2 = 40 + 10 * val1; // Damage returned, percent.
-			val3 = 1 + val1; // Maximum SP restored, percent.
+			val2 = 50 + 50 * val1; // Damage returned: 100-300%.
+			val3 = 4 + val1; // Maximum SP restored: 5-9%.
 			break;
 		case SC_SAM_BLOOD_COVENANT:
-			val2 = 20 + 10 * val1; // Normal attack damage bonus, percent.
+			val2 = 60 * val1; // Normal attack damage bonus: 60-300%.
 			val3 = 3; // Consume once per attack, including dual wield/multi-hit.
 			break;
 		case SC_SAM_MURAMASAS_CURSE:
-			val2 = 10 + 5 * val1; // Attack bonus, percent.
+			val2 = 12 * val1; // Attack bonus: 12-60%.
 			val4 = tick / 1000;
 			tick_time = 1000;
 			break;

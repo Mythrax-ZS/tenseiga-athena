@@ -164,16 +164,26 @@ skill. Novice, Thief, Assassin and Assassin Cross skills are inherited.
 Values below show skill levels 1 through 5. Damage is an ATK ratio before
 the normal combat pipeline applies defenses and modifiers.
 
+The skills are balanced against 4th-job skills. Damage takes the 4th-job shape:
+the ratio replaces the base 100% and is multiplied by base level / 100 above
+level 99, as `RE_LVL_DMOD(100)` does for 4th jobs (×9.99 at level 999). Samurai
+is not a trait job (no POW, P.ATK or C.RATE), so its ratios are set higher to
+carry what those add to a 4th job's skills. At level 999 the spammable
+Heaven's Severance sits between Eternal Slash and Abyss Dagger, and Wrath
+Unbound and Destiny's Severance sit near Madness Crusher and Rush Quake.
+Measured on Dummy 150 (DEF 120) at level 999: Heaven's Severance Lv 5 hits for
+about 2.57 million, Destiny's Severance Lv 5 for about 18.7 million.
+
 | ID | Skill | Effect | SP / cooldown |
 | --- | --- | --- | --- |
-| 7001 | Heaven's Severance | One target, 400/500/600/700/800% damage; +25/30/35/40/45 percentage points of critical chance. | 25 / 2 s |
-| 7002 | Kusanagi Guard | 25/30/35/40/45% physical parry chance for 12 seconds. | 30 / 20 s |
-| 7003 | Moonlit Reflection | For 8 seconds, block the next physical skill; return 50/60/70/80/90% damage and restore 2/3/4/5/6% max SP. A positive incoming hit returns at least 1 damage. | 35 / 18 s |
-| 7004 | Blade Harmony | +10/20/30/40/50 HIT and +1/2/3/4/5 ASPD for 20 seconds. | 30 / 25 s |
-| 7005 | Blood Covenant | Pay 10% max HP; next three normal attack attempts gain 30/40/50/60/70% damage. Charges expire after 30 seconds. | 20 / 12 s |
-| 7006 | Muramasa's Curse | +15/20/25/30/35% attack for 20 seconds; drains 1% max HP per second and ends before a drain would kill the caster. | 35 / 25 s |
-| 7007 | Ashen Wind Slash | Radius 3, 300/400/500/600/700% damage; 15/20/25/30/35% chance of 10-second Bleeding. | 30 / 4 s |
-| 7008 | Wrath Unbound | One target, 800/1000/1200/1400/1600% damage; HP must be strictly below 30% of maximum. | 50 / 15 s |
+| 7001 | Heaven's Severance | One target, 1700/2600/3500/4400/5300% × base level / 100; +25/30/35/40/45 percentage points of critical chance. | 60 / 0.7 s |
+| 7002 | Kusanagi Guard | 30/35/40/45/50% physical parry chance for 30 seconds. | 40 / 30 s |
+| 7003 | Moonlit Reflection | For 15 seconds, block the next physical skill; return 100/150/200/250/300% damage and restore 5/6/7/8/9% max SP. A positive incoming hit returns at least 1 damage. | 45 / 15 s |
+| 7004 | Blade Harmony | +20/40/60/80/100 HIT, +1/2/3/4/5 ASPD and +4/8/12/16/20% ATK for 60 seconds. | 50 / 60 s |
+| 7005 | Blood Covenant | Pay 10% max HP; next three normal attack attempts gain 60/120/180/240/300% damage. Charges expire after 30 seconds. | 30 / 12 s |
+| 7006 | Muramasa's Curse | +12/24/36/48/60% attack for 30 seconds; drains 1% max HP per second and ends before a drain would kill the caster. | 50 / 30 s |
+| 7007 | Ashen Wind Slash | Radius 3, 1300/2000/2700/3400/4100% × base level / 100; 15/20/25/30/35% chance of 10-second Bleeding. | 70 / 1 s |
+| 7008 | Wrath Unbound | One target, 7000/11000/15000/19000/23000% × base level / 100; HP must be strictly below 30% of maximum. | 100 / 15 s |
 
 Client buff IDs **2000–2004** correspond to Guard, Reflection, Harmony,
 Covenant and Curse. These temporary effects are not saved through logout
@@ -198,12 +208,12 @@ the same questline as Tenseiga:
 
 | ID | Skill | Story | Effect (levels 1–5) | SP / cooldown |
 | --- | --- | --- | --- | --- |
-| 7009 | Mortal Flame | "powered by mortal will rather than divine essence" | Passive, 1 level. While wielding Tenseiga: ATK +5%, 10% less damage from Holy and Shadow (in Tenseiga's item script). | — |
-| 7010 | Severing Heaven's Lies | "its edge cut through illusions and divine lies" | One target, 500/600/700/800/900%; 30/40/50/60/70% chance to strip its buffs. | 40 / 3 s |
-| 7011 | Light and Shadow | "cut through both light and shadow" | Two hits of 300/350/400/450/500% each, as Holy or Shadow, whichever element the target takes more damage from. | 50 / 5 s |
-| 7012 | Unchained Will | "Balance is not obedience. Balance is freedom." | Cures Stun, Freeze, Stone, Sleep, Silence, Curse, Blind and Confusion, then blocks them for 15/20/25/30/35 s. | 40 / 60 s |
-| 7013 | Forge of Ten Souls | every companion's will lit the First Forge | Party members within 7 cells: ATK and MATK +1/2/3/4/5% per party member there (at most 10) for 60 s. | 80 / 120 s |
-| 7014 | Destiny's Severance | "severed the bond between divinity and mortal destiny" | One target, 1000/1250/1500/1750/2000%, ignoring DEF; +50% against boss monsters. 1 s cast. | 100 / 30 s |
+| 7009 | Mortal Flame | "powered by mortal will rather than divine essence" | Passive, 1 level. While wielding Tenseiga: ATK +10%, 15% less damage from Holy and Shadow (in Tenseiga's item script). | — |
+| 7010 | Severing Heaven's Lies | "its edge cut through illusions and divine lies" | One target, 2000/3000/4000/5000/6000% × base level / 100; 30/40/50/60/70% chance to strip its buffs. | 70 / 1 s |
+| 7011 | Light and Shadow | "cut through both light and shadow" | Two hits of 1900/2800/3700/4600/5500% each × base level / 100, as Holy or Shadow, whichever element the target takes more damage from. | 80 / 1.5 s |
+| 7012 | Unchained Will | "Balance is not obedience. Balance is freedom." | Cures Stun, Freeze, Stone, Sleep, Silence, Curse, Blind and Confusion, then blocks them for 40/50/60/70/80 s. | 60 / 60 s |
+| 7013 | Forge of Ten Souls | every companion's will lit the First Forge | Party members within 7 cells: ATK and MATK +5/10/15/20/25%, and 1/2/3/4/5% more per party member there (at most 10), for 90 s. | 100 / 120 s |
+| 7014 | Destiny's Severance | "severed the bond between divinity and mortal destiny" | One target, 8000/12000/16000/20000/24000% × base level / 100, ignoring DEF; +50% against boss monsters. 1 s cast. | 150 / 20 s |
 
 Client buff IDs **2005** and **2006** are Unchained Will and Forge of Ten
 Souls. Like the other Samurai buffs, they are not saved through logout.

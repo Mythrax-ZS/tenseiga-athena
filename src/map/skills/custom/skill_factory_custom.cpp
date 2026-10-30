@@ -12,12 +12,22 @@
 #include "map/status.hpp"
 
 namespace {
+/// Samurai damage takes the 4th-job shape: `percent` of weapon damage in place of the base
+/// 100%, multiplied by base level / 100 above level 99 (as RE_LVL_DMOD(100) does for 4th-job
+/// skills). Samurai has no trait stats, so `percent` also carries what POW and P.ATK add to a
+/// 4th job's skills.
+void samurai_ratio(const block_list* src, int32& ratio, int32 percent) {
+    ratio += percent - 100;
+    if (int32 lv = src != nullptr ? status_get_lv(src) : 0; lv > 99)
+        ratio = static_cast<int32>(static_cast<int64>(ratio) * lv / 100);
+}
+
 class SamuraiStrike final : public WeaponSkillImpl {
 public:
     explicit SamuraiStrike(e_skill id) : WeaponSkillImpl(id) {}
-    void calculateSkillRatio(const Damage*, const block_list*, const block_list*, uint16 lv, int32& ratio, int32) const override {
-        // Severance: 400-800%; Wrath: 800-1600% of weapon damage.
-        ratio += getSkillId() == SAM_WRATH_UNBOUND ? 500 + 200 * lv : 200 + 100 * lv;
+    void calculateSkillRatio(const Damage*, const block_list* src, const block_list*, uint16 lv, int32& ratio, int32) const override {
+        // Severance: 1700-5300%; Wrath: 7000-23000%; both x base level / 100.
+        samurai_ratio(src, ratio, getSkillId() == SAM_WRATH_UNBOUND ? 3000 + 4000 * lv : 800 + 900 * lv);
     }
 };
 
@@ -28,8 +38,8 @@ public:
         clif_skill_nodamage(src, *target, getSkillId(), lv);
         skill_castend_damage_id(src, target, getSkillId(), lv, tick, flag);
     }
-    void calculateSkillRatio(const Damage*, const block_list*, const block_list*, uint16 lv, int32& ratio, int32) const override {
-        ratio += 100 + 100 * lv; // 300-700%.
+    void calculateSkillRatio(const Damage*, const block_list* src, const block_list*, uint16 lv, int32& ratio, int32) const override {
+        samurai_ratio(src, ratio, 600 + 700 * lv); // 1300-4100% x base level / 100.
     }
     void applyAdditionalEffects(block_list* src, block_list* target, uint16 lv, t_tick, int32, damage_lv) const override {
         sc_start2(src, target, SC_BLEEDING, 10 + 5 * lv, lv, src->id, skill_get_time2(getSkillId(), lv));
@@ -42,8 +52,8 @@ public:
 class SamuraiSeverLies final : public WeaponSkillImpl {
 public:
     SamuraiSeverLies() : WeaponSkillImpl(SAM_SEVER_HEAVENS_LIES) {}
-    void calculateSkillRatio(const Damage*, const block_list*, const block_list*, uint16 lv, int32& ratio, int32) const override {
-        ratio += 400 + 100 * lv; // 500-900%.
+    void calculateSkillRatio(const Damage*, const block_list* src, const block_list*, uint16 lv, int32& ratio, int32) const override {
+        samurai_ratio(src, ratio, 1000 + 1000 * lv); // 2000-6000% x base level / 100.
     }
     void applyAdditionalEffects(block_list*, block_list* target, uint16 lv, t_tick, int32, damage_lv) const override {
         if (rnd() % 100 < 20 + 10 * lv) // 30-70%: strip the target's buffs.
@@ -55,8 +65,8 @@ public:
 class SamuraiLightAndShadow final : public WeaponSkillImpl {
 public:
     SamuraiLightAndShadow() : WeaponSkillImpl(SAM_LIGHT_AND_SHADOW) {}
-    void calculateSkillRatio(const Damage*, const block_list*, const block_list*, uint16 lv, int32& ratio, int32) const override {
-        ratio += 150 + 50 * lv; // 300-500% per hit, two hits.
+    void calculateSkillRatio(const Damage*, const block_list* src, const block_list*, uint16 lv, int32& ratio, int32) const override {
+        samurai_ratio(src, ratio, 1000 + 900 * lv); // 1900-5500% per hit, two hits, x base level / 100.
     }
     void modifyElement(const Damage&, const block_list&, const block_list& target, uint16, int32& element, int32) const override {
         const status_data* tstatus = status_get_status_data(target);
@@ -79,7 +89,8 @@ public:
 };
 
 // Forge of Ten Souls: the companions' will that lit the First Forge. Every party member in
-// range gains ATK and MATK for each of them there (counting at most ten).
+// range gains ATK and MATK: 5% per level for the forge's own fire, and 1% per level more for
+// each of them there (counting at most ten).
 class SamuraiForgeOfTenSouls final : public SkillImpl {
     // Souls counted when the caster casts, for the members it then reaches.
     inline static int32 souls = 1;
@@ -93,7 +104,7 @@ public:
                 souls = 1; // Alone: only the caster's own.
             if (check_distance_bl(src, target, AREA_SIZE))
                 clif_skill_nodamage(target, *target, getSkillId(), lv);
-            sc_start2(src, target, SC_SAM_FORGE_OF_TEN_SOULS, 100, lv, lv * souls, skill_get_time(getSkillId(), lv));
+            sc_start2(src, target, SC_SAM_FORGE_OF_TEN_SOULS, 100, lv, lv * (5 + souls), skill_get_time(getSkillId(), lv));
             return;
         }
         int32 range = skill_get_splash(getSkillId(), lv);
@@ -107,8 +118,8 @@ public:
 class SamuraiDestinysSeverance final : public WeaponSkillImpl {
 public:
     SamuraiDestinysSeverance() : WeaponSkillImpl(SAM_DESTINYS_SEVERANCE) {}
-    void calculateSkillRatio(const Damage*, const block_list*, const block_list* target, uint16 lv, int32& ratio, int32) const override {
-        ratio += 650 + 250 * lv; // 1000-2000%.
+    void calculateSkillRatio(const Damage*, const block_list* src, const block_list* target, uint16 lv, int32& ratio, int32) const override {
+        samurai_ratio(src, ratio, 4000 + 4000 * lv); // 8000-24000% x base level / 100.
         if (target != nullptr && status_get_class_(target) == CLASS_BOSS)
             ratio = ratio * 3 / 2;
     }
