@@ -90,8 +90,8 @@ amatsu,192,163,4	script	Tetsuya Takahashi#tf	4_EXJOB_NINJA2,{
 		next;
 		mes "[Tetsuya]";
 		.@b = TF_BOND;
-		mes ((.@b & 1) ? "^777777Kiyoshi Takeda, the disgraced general: done.^000000" : "^0000FFKiyoshi Takeda^000000, a disgraced general, near the east gate.");
-		mes ((.@b & 2) ? "^777777Brother Renga, the monk: done.^000000" : "^0000FFBrother Renga^000000, a monk, south of here.");
+		mes ((.@b & 1) ? "^777777Kiyoshi Takeda, the disgraced general: done.^000000" : "^0000FFKiyoshi Takeda^000000, a disgraced general, out in the square just south of here.");
+		mes ((.@b & 2) ? "^777777Brother Renga, the monk: done.^000000" : "^0000FFBrother Renga^000000, a monk, further south.");
 		mes ((.@b & 4) ? "^777777Ayame of the Hidden Leaf: done.^000000" : "^0000FFAyame of the Hidden Leaf^000000, a kunoichi, southeast.");
 		if ((.@b & 7) != 7)
 			close;

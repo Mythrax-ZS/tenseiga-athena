@@ -83,7 +83,7 @@ OnInit:
 }
 
 // Kiyoshi Takeda, the disgraced general: his betrayer, General Mibu, holds the Frozen Citadel.
-amatsu,210,150,4	script	Kiyoshi Takeda#tf	8_M_JPNMASTER,{
+amatsu,198,151,4	script	Kiyoshi Takeda#tf	8_M_JPNMASTER,{
 	mes "[Kiyoshi Takeda]";
 	if (Class != JOB_SAMURAI || TF_STEP < 40) {
 		mes "Once I commanded ten thousand spears. Now I command a cup of cold tea.";

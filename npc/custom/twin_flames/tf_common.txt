@@ -230,7 +230,7 @@ OnMark:
 			break;
 		}
 		if (!(TF_BOND & 1)) {
-			callsub L_Mark, "amatsu", 210, 150;
+			callsub L_Mark, "amatsu", 198, 151;
 			if (isbegin_quest(900132) == 1 && checkquest(900132, HUNTING) != 2)
 				callsub L_Mark, "ice_dun02", 150, 155;
 		}
