@@ -274,6 +274,26 @@ OnInit:
 	end;
 }
 
+// Tetsuya in the Celestial Veil: he comes up with the player (shown as they arrive, by
+// TF_Marks).
+valkyrie,45,60,7	script	Tetsuya Takahashi#veil	4_EXJOB_NINJA2,{
+	mes "[Tetsuya]";
+	if (TF_STEP == 110) {
+		mes "There's the throne. Light, then shadow, then both at once, if the Sarugami are right.";
+		mes "Keep Tenseiga in your hands. I'll keep my tail out of the way.";
+		close;
+	}
+	mes "It's still raining. In heaven. I think I like it.";
+	next;
+	if (select("Back to Amatsu:Stay a while") == 1)
+		warp "amatsu", 192, 160;
+	close;
+
+OnInit:
+	cloakonnpc strnpcinfo(0);
+	end;
+}
+
 // The Celestial Veil, where light and shadow fuse into the goddess's true form.
 valkyrie,48,64,4	script	Weaver's Throne#tf	4_BOARD3,{
 	mes "[Weaver's Throne]";

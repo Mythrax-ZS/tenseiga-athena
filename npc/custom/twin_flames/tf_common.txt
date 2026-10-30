@@ -183,6 +183,11 @@ OnInit:
 	end;
 
 OnPCLoadMapEvent:
+	// Tetsuya comes along into the Shrine of Seals and the Celestial Veil.
+	if (Class == JOB_SAMURAI && strcharinfo(3) == "ama_dun03" && (TF_STEP == 51 || TF_STEP == 52))
+		cloakoffnpcself "Tetsuya Takahashi#seal";
+	if (Class == JOB_SAMURAI && strcharinfo(3) == "valkyrie" && TF_STEP >= 110)
+		cloakoffnpcself "Tetsuya Takahashi#veil";
 OnMark:
 	if (Class != JOB_SAMURAI)
 		end;

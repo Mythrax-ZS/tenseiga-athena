@@ -41,6 +41,8 @@ ama_fild01,200,291,4	script	Battle Standard#tf	4_BOARD3,{
 	next;
 	mes "^777777You try to throw the blade away. Your fingers will not open.^000000";
 	next;
+	cloakoffnpcself "Tetsuya Takahashi#crimson";
+	specialeffect EF_TELEPORTATION, SELF, "Tetsuya Takahashi#crimson";
 	mes "[Tetsuya]";
 	mes "Hey! HEY! Look at me, not at the sword!";
 	mes "^777777A tail snaps around your wrist and wrenches your arm down. The whisper breaks.^000000";
@@ -61,6 +63,22 @@ ama_fild01,200,291,4	script	Battle Standard#tf	4_BOARD3,{
 
 OnInit:
 	questinfo QTYPE_QUEST, QMARK_YELLOW, "Class == JOB_SAMURAI && TF_STEP == 31";
+	end;
+}
+
+// Tetsuya in the Crimson Fields: he drops in as Yami's whisper takes hold (Battle Standard),
+// seen only by that player, until they leave the fields.
+ama_fild01,197,293,6	script	Tetsuya Takahashi#crimson	4_EXJOB_NINJA2,{
+	mes "[Tetsuya]";
+	if (TF_STEP == 31) {
+		mes "Still with me? Good. Don't listen to it. Whatever it says, it's hungry, and it's lying.";
+		close;
+	}
+	mes "Back to Amatsu. I'll catch up; I want one more look at this place. And at you, without that sword talking.";
+	close;
+
+OnInit:
+	cloakonnpc strnpcinfo(0);
 	end;
 }
 
@@ -324,6 +342,27 @@ ama_dun03,120,30,4	script	Sealed Gate#tf	4_BOARD3,{
 
 OnInit:
 	questinfo QTYPE_QUEST, QMARK_YELLOW, "Class == JOB_SAMURAI && TF_STEP == 51";
+	end;
+}
+
+// Tetsuya at the Shrine of Seals: he comes down with the player (shown as they arrive, by
+// TF_Marks), for the gate and Chiyo's fight.
+ama_dun03,123,29,2	script	Tetsuya Takahashi#seal	4_EXJOB_NINJA2,{
+	mes "[Tetsuya]";
+	if (TF_STEP == 51 && checkquest(900141, HUNTING) != 2) {
+		mes "Hear that? The Sarugami are awake. Whatever guards that gate wants a fight before it lets us through.";
+		mes "Muramasa in hand. I'll be right here. Cheering.";
+	} else if (TF_STEP == 51) {
+		mes "The guardian's down. Now the gate: my blood, your curse. Go on, touch it. I'll bleed when you're ready.";
+	} else if (TF_STEP == 52) {
+		mes "The shrine maiden by the gate, Chiyo. She looks like she's about to do something brave and stupid. I like her already.";
+	} else {
+		mes "Let's get out of here. This place makes my tail itch.";
+	}
+	close;
+
+OnInit:
+	cloakonnpc strnpcinfo(0);
 	end;
 }
 

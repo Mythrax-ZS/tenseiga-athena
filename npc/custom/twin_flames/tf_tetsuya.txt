@@ -105,13 +105,14 @@ amatsu,192,163,4	script	Tetsuya Takahashi#tf	4_EXJOB_NINJA2,{
 		next;
 		mes "[Tetsuya]";
 		mes "Take the deepest floor of the Amatsu dungeon. Keep Muramasa in your hand; the gate won't wake for anything else.";
+		mes "I'll meet you at the gate. It needs my blood, after all.";
 		setquest 900141;
 		TF_STEP = 51;
 		callfunc "F_TF_Moved";
 		close;
 	case 51:
 	case 52:
-		mes "The Shrine of Seals is on the deepest floor of the Amatsu dungeon, just past the stairs.";
+		mes "The Shrine of Seals is on the deepest floor of the Amatsu dungeon, just past the stairs. I'll be waiting by the gate.";
 		mes "Muramasa in hand. And try not to touch anything glowing. That usually ends badly.";
 		close;
 	case 60:
