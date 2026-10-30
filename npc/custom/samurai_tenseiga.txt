@@ -2,7 +2,7 @@
 // A Samurai dual wielding Kusanagi and Muramasa (Twin Flames) brings Masaru the steel and the
 // fire; both blades are shattered and reforged into Tenseiga-no-Hayate (900003).
 // Cards must be removed first; the new blade keeps the lower of the two refine levels.
-prontera,161,179,4	script	Masaru#tenseiga	4_M_JOB_BLACKSMITH,{
+prontera,161,179,4	script	Masaru#tenseiga	4_M_KAGE_OLD,{
 	mes "[Masaru]";
 	if (Class != JOB_SAMURAI) {
 		mes "My ancestor's hammer birthed a cursed blade. I carry his guilt, and his craft.";
