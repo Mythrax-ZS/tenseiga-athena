@@ -103,12 +103,46 @@ Tenseiga. It uses only bonuses that apply regardless of which hand runs the scri
 without changing those skills' HP requirements or cooldowns.
 
 Administrators can create them with `@item 900001 1` and `@item 900002 1`.
-No quest or drop acquisition is assigned yet. Their unique Aegis names avoid
+No drop is assigned; Masaru reforges the pair into Tenseiga (below). Their unique Aegis names avoid
 the existing two-handed stock Muramasa items (1164, 1173 and 21003), which
 remain unchanged. Client appearance aliases are 9001 and 9002; the modern
 server packets send the actual 900001/900002 item IDs, and client item metadata
 selects the corresponding custom appearance. These are first playable balance
 values, including for the local base-999 progression, pending playtesting.
+
+## Tenseiga-no-Hayate
+
+In the saga's secret thirteenth chapter, Hayate defies both the goddess and
+Yami: at the First Forge he shatters Kusanagi and Muramasa and reforges them into
+**Tenseiga-no-Hayate, the Mortal Flame**, "not a relic of gods, but the first
+true sword of men". Masaru, descendant of the smith who forged Muramasa, works
+the forge; Kohaku's foxfire lights it, Tetsuya adds his Sarugami blood, and each
+companion adds a relic.
+
+Tenseiga is item **900003**, `Samurai_Tenseiga`: Samurai-only **two-handed**
+sword, 420 ATK, weapon level 4, weight 150, two slots, minimum base level 99,
+refineable, Neutral. Client view 9003. Its script maps the forging to bonuses:
+
+| Effect | Story |
+| --- | --- |
+| HIT +20, CRIT +15; Heaven's Severance, Ashen Wind Slash and Wrath Unbound damage +20%; Kusanagi Guard and Moonlit Reflection SP costs -15%; 3% Bleeding on melee hits | Both blades live on in it: Kusanagi's precision, Muramasa's bite |
+| Max HP +5%, Max SP +5% | Tetsuya's Sarugami essence: balance |
+| +20% damage to Angel and Demon; ignore 50% of their DEF | Kohaku's foxfire: an edge that severs divine essence |
+| 15% less damage from Angel monsters and Holy attacks | Brother Renga's prayer beads: resistance to divine influence |
+| 15% less damage from Demon monsters; immune to Curse and Bleeding | Kiyoshi's crest: clarity against corruption; Muramasa's toll is gone |
+| Immune to Blind and Confusion | Ayame's purified kunai (deception) and Lady Hanae's jade (manipulation) |
+| 20% perfect hit (ignores Flee) | Chiyo's broken talisman: it cuts through illusions |
+| 10% less damage from Fire and Water attacks | Taro and Jiro's twin sigils of fire and water |
+| Physical damage +1% per refine level | Masaru's forge technique |
+| Mortal Flame: 5% on a weapon hit, 8 s of ASPD +15%, critical damage +30%, ignore 30% DEF of all races (Izayoi effect) | Human will burns hotter than any god's fire |
+
+**Masaru** (`npc/custom/samurai_tenseiga.txt`) stands in **Prontera, 161,179**,
+beside the Samurai Mentor. A Samurai dual wielding Kusanagi and Muramasa (either
+hand order) with **10 Oridecon** and **10 Burning Hearts** can have them forged.
+Cards must be removed first; the new blade takes the lower of the two refine
+levels. After a short forging scene both equipped blades and the materials are
+consumed, Tenseiga is given, `SamuraiTenseigaForged` is set and the forging is
+announced server-wide. Administrators can also use `@item 900003 1`.
 
 ## Skills and balance
 

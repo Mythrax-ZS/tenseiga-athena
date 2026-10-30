@@ -1,0 +1,96 @@
+// The Forging of Tenseiga, from the Twin Flames Saga (doc/custom_jobs/samurai.md).
+// A Samurai dual wielding Kusanagi and Muramasa (Twin Flames) brings Masaru the steel and the
+// fire; both blades are shattered and reforged into Tenseiga-no-Hayate (900003).
+// Cards must be removed first; the new blade keeps the lower of the two refine levels.
+prontera,161,179,4	script	Masaru#tenseiga	4_M_JOB_BLACKSMITH,{
+	mes "[Masaru]";
+	if (Class != JOB_SAMURAI) {
+		mes "My ancestor's hammer birthed a cursed blade. I carry his guilt, and his craft.";
+		mes "Come back when you walk the way of the Samurai.";
+		close;
+	}
+	if (getequipid(EQI_HAND_R) == 900003) {
+		mes "Tenseiga. No god's gift, no curse's chain.";
+		mes "Whatever my family broke, you and that blade have mended.";
+		close;
+	}
+	.@r = getequipid(EQI_HAND_R);
+	.@l = getequipid(EQI_HAND_L);
+	if (!((.@r == 900001 && .@l == 900002) || (.@r == 900002 && .@l == 900001))) {
+		mes "Kusanagi and Muramasa were never opposites. They are the two halves of one goddess's divided flame.";
+		next;
+		mes "[Masaru]";
+		mes "My ancestor forged Muramasa at the First Forge, with Yami whispering over his anvil. I can undo that work, and make something new.";
+		mes "Hold both blades as one, Kusanagi in one hand and Muramasa in the other, and I will light the forge.";
+		next;
+		mes "[Masaru]";
+		mes "Bring ^0000FF10 Oridecon^000000 for the steel and ^0000FF10 Burning Hearts^000000 to feed the fire.";
+		close;
+	}
+	mes "You hold them both, and neither god's chain holds you. So it is time.";
+	mes "Bring ^0000FF10 Oridecon^000000 and ^0000FF10 Burning Hearts^000000, and the forge will take both blades.";
+	next;
+	mes "[Masaru]";
+	for (.@i = 0; .@i < 4; .@i++) {
+		if (getequipcardid(EQI_HAND_R,.@i) || getequipcardid(EQI_HAND_L,.@i)) {
+			mes "Pull the cards from your blades first. The fire would only burn them.";
+			close;
+		}
+	}
+	if (countitem("Oridecon") < 10 || countitem("Burning_Heart") < 10) {
+		mes "The forge is cold without the steel and the fire. Come back with ^0000FF10 Oridecon^000000 and ^0000FF10 Burning Hearts^000000.";
+		close;
+	}
+	.@refine = min(getequiprefinerycnt(EQI_HAND_R), getequiprefinerycnt(EQI_HAND_L));
+	mes "Kusanagi and Muramasa will be gone for good. The new blade will be refined to ^0000FF+" + .@refine + "^000000, the lower of the two.";
+	if (select("Light the forge:Not yet") != 1) {
+		mes "The fire will wait. So will they.";
+		close;
+	}
+	if (!checkweight("Samurai_Tenseiga",1)) {
+		mes "Make room in your inventory and lighten your load first.";
+		close;
+	}
+	mes "Then we begin.";
+	next;
+	mes "[Masaru]";
+	mes "Kohaku's foxfire lights the First Forge, freed from the goddess's contract.";
+	specialeffect EF_FIREPILLARBOMB;
+	next;
+	mes "[Masaru]";
+	mes "Ayame's kunai, purified in sacred water. Brother Renga's prayer beads. Kiyoshi's family crest.";
+	mes "Chiyo's broken talisman. Taro and Jiro's twin sigils of fire and water. Lady Hanae's jade.";
+	mes "One by one, they go into the fire.";
+	specialeffect EF_MAGNUMBREAK;
+	next;
+	mes "[Tetsuya]";
+	mes "Sarugami blood broke Kusanagi's seal. Let it seal nothing ever again. Balance is not obedience. Balance is freedom.";
+	specialeffect2 EF_HOLYHIT;
+	next;
+	mes "[Masaru]";
+	mes "Now, Samurai. Clash them together.";
+	next;
+	// Re-check: the blades must still be in hand when the forge takes them.
+	.@r = getequipid(EQI_HAND_R);
+	.@l = getequipid(EQI_HAND_L);
+	if (!((.@r == 900001 && .@l == 900002) || (.@r == 900002 && .@l == 900001)) || countitem("Oridecon") < 10 || countitem("Burning_Heart") < 10) {
+		mes "[Masaru]";
+		mes "The fire died down. Come back with both blades in hand and the steel and fire ready.";
+		close;
+	}
+	delequip EQI_HAND_R;
+	delequip EQI_HAND_L;
+	delitem "Oridecon",10;
+	delitem "Burning_Heart",10;
+	specialeffect2 EF_KO_IZAYOI;
+	mes "[" + strcharinfo(0) + "]";
+	mes "No god's gift, no curse's chain. This is the blade of men, and with it, I sever heaven's lies.";
+	getitem2 "Samurai_Tenseiga",1,1,.@refine,0,0,0,0,0;
+	SamuraiTenseigaForged = 1;
+	announce strcharinfo(0) + " has forged Tenseiga-no-Hayate, the Mortal Flame.",bc_all;
+	next;
+	mes "[Masaru]";
+	mes "Tenseiga-no-Hayate. Not a relic of gods, but the first true sword of men.";
+	mes "It takes both hands. It is two blades made one.";
+	close;
+}

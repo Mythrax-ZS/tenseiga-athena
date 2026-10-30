@@ -92,3 +92,61 @@ Body:
       bonus2 bSkillAtk,"SAM_ASHEN_WIND_SLASH",10;
       bonus2 bSkillAtk,"SAM_WRATH_UNBOUND",10;
       bonus4 bAddEff,Eff_Bleeding,300,ATF_SHORT|ATF_WEAPON|ATF_TARGET,5000;
+  - Id: 900003
+    AegisName: Samurai_Tenseiga
+    Name: Tenseiga-no-Hayate
+    Type: Weapon
+    SubType: 2hSword
+    Buy: 20
+    Weight: 1500
+    Attack: 420
+    Range: 1
+    Slots: 2
+    Jobs:
+      Samurai: true
+    Locations:
+      Both_Hand: true
+    WeaponLevel: 4
+    EquipLevelMin: 99
+    Refineable: true
+    View: 9003
+    Script: |
+      // Tenseiga-no-Hayate, the Mortal Flame. At the First Forge Hayate shattered Kusanagi and
+      // Muramasa and reforged them as one blade that answers to no god: Masaru's craft, Kohaku's
+      // foxfire, Tetsuya's Sarugami blood and each companion's relic went into the steel.
+      // Both blades live on in it: Kusanagi's precision and Muramasa's bite, without its toll.
+      bonus bHit,20;
+      bonus bCritical,15;
+      bonus2 bSkillAtk,"SAM_HEAVENS_SEVERANCE",20;
+      bonus2 bSkillAtk,"SAM_ASHEN_WIND_SLASH",20;
+      bonus2 bSkillAtk,"SAM_WRATH_UNBOUND",20;
+      bonus2 bSkillUseSPrate,"SAM_KUSANAGI_GUARD",15;
+      bonus2 bSkillUseSPrate,"SAM_MOONLIT_REFLECTION",15;
+      bonus4 bAddEff,Eff_Bleeding,300,ATF_SHORT|ATF_WEAPON|ATF_TARGET,5000;
+      // Tetsuya's Sarugami essence: balance of body and spirit.
+      bonus bMaxHPrate,5;
+      bonus bMaxSPrate,5;
+      // Kohaku's foxfire: an edge that severs divine essence, the goddess's host and Yami's demons.
+      bonus2 bAddRace,RC_Angel,20;
+      bonus2 bAddRace,RC_Demon,20;
+      bonus2 bIgnoreDefRaceRate,RC_Angel,50;
+      bonus2 bIgnoreDefRaceRate,RC_Demon,50;
+      // Renga's prayer beads: resistance to divine influence.
+      bonus2 bSubRace,RC_Angel,15;
+      bonus2 bSubEle,Ele_Holy,15;
+      // Kiyoshi's family crest: clarity of purpose against corruption.
+      bonus2 bSubRace,RC_Demon,15;
+      bonus2 bResEff,Eff_Curse,10000;
+      bonus2 bResEff,Eff_Bleeding,10000;
+      // Ayame's purified kunai sees through deception; Lady Hanae's jade, through manipulation.
+      bonus2 bResEff,Eff_Blind,10000;
+      bonus2 bResEff,Eff_Confusion,10000;
+      // Chiyo's broken talisman: it cuts through illusions.
+      bonus bPerfectHitRate,20;
+      // Taro and Jiro's twin sigils: fire and water in balance.
+      bonus2 bSubEle,Ele_Fire,10;
+      bonus2 bSubEle,Ele_Water,10;
+      // Masaru's forge technique: the blade grows with every refine.
+      bonus2 bAddClass,Class_All,getrefine();
+      // Mortal Flame: 5% on a weapon hit, human will burns hotter than any god's fire for 8 seconds.
+      autobonus "{ bonus bAspdRate,15; bonus bCritAtkRate,30; bonus2 bIgnoreDefRaceRate,RC_All,30; }",50,8000,BF_WEAPON,"{ specialeffect2 EF_KO_IZAYOI; }";
