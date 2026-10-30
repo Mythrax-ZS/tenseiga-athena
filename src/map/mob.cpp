@@ -7174,6 +7174,8 @@ static void mob_load(void)
 	const char* dbsubpath[] = {
 		"",
 		"/" DBIMPORT,
+		// The Samurai job's custom monsters (the Twin Flames Saga), as their mob_db is imported.
+		"/custom/samurai",
 	};
 
 	// First we parse all the possible monsters to add additional data in the second loop

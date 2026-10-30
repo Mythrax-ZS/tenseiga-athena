@@ -1,0 +1,248 @@
+//===== rAthena Script =======================================
+//= The Twin Flames Saga: Tetsuya Takahashi, the Simian-Blooded Samurai
+//===== Description: =========================================
+//= Tetsuya opens most chapters from Amatsu: his wager (III), the Crimson Fields (IV), the
+//= Shrine of Seals (V), the goddess's chains (VI), the cult's return (VII), Kohaku (VIII)
+//= and the Weaver's unmasking (IX). See tf_common.txt for the variables.
+//============================================================
+
+amatsu,192,163,4	script	Tetsuya Takahashi#tf	4_EXJOB_NINJA2,{
+	mes "[Tetsuya]";
+	if (Class != JOB_SAMURAI || TF_STEP < 20) {
+		mes "Hm? Don't mind me. I'm just a man with a tail, enjoying the view.";
+		emotion ET_SMILE;
+		close;
+	}
+	switch (TF_STEP) {
+	case 20:
+		mes "So you're the ronin with the red sword. I've been watching you from the rooftops. Very dramatic.";
+		next;
+		mes "[Tetsuya]";
+		mes "Tetsuya Takahashi. Yes, it's a real tail. Yes, it works. My mother's people, the Yamabiko, say it's a Sarugami blessing.";
+		mes "They also threw me out for it, so make of that what you will.";
+		next;
+		mes "[Tetsuya]";
+		mes "Here's a wager. Answer my riddle, and I'll tell you who paid the raiders who burned your lord's house.";
+		setquest 900121;
+		TF_STEP = 21;
+		next;
+		// Fall through to the riddle.
+	case 21:
+		if (isbegin_quest(900121) == 1) {
+			mes "[Tetsuya]";
+			mes "Riddle me this: I am given in prayer and taken in battle. A god offers me, a blade feeds on me, and a mortal must choose to keep me.";
+			next;
+			switch (select("Strength:Honour:A soul")) {
+			case 3:
+				mes "[Tetsuya]";
+				mes "A soul! Ha, you're quicker than you look.";
+				mes "And mind that blade of yours. It looks at me the way a cat looks at a fish.";
+				next;
+				mes "[Tetsuya]";
+				mes "The raiders were paid by ^0000FFWarlord Kurogane^000000. His fortress is the Battle Fortress, beneath the Tatami Maze.";
+				mes "Find his war banner on the second floor of the dungeon. He'll come running to defend it. Kurogane loves his banners.";
+				completequest 900121;
+				setquest 900122;
+				close;
+			default:
+				mes "[Tetsuya]";
+				mes "Wrong! But you looked very serious saying it. Try again.";
+				close;
+			}
+		}
+		if (checkquest(900122, HUNTING) != 2) {
+			mes "[Tetsuya]";
+			mes "Kurogane's banner hangs on the second floor of the Amatsu dungeon. I'll watch your back. From a distance. A safe distance.";
+			close;
+		}
+		mes "[Tetsuya]";
+		mes "Kurogane's dead. And you... you didn't stop when he begged. Did you notice that?";
+		next;
+		mes "[Tetsuya]";
+		mes "We fought well together, though. I think I'll stay around. Somebody has to keep you honest.";
+		completequest 900122;
+		TF_STEP = 30;
+		callfunc "F_TF_Reward", 5000000, 3500000, 150000;
+		next;
+		mes "^777777Chapter III, The Trickster's Tail, is complete.^000000";
+		close;
+	case 30:
+		mes "Bad news. Kurogane's death broke the truce in the north. His captains and the clan lords are tearing the fields apart.";
+		mes "They're calling it the ^FF0000Crimson Fields^000000 already.";
+		next;
+		mes "[Tetsuya]";
+		mes "Villagers are caught between the armies. We could hold the line for them. Find the battle standard in the fields north of town, past the stone path.";
+		setquest 900131;
+		TF_STEP = 31;
+		close;
+	case 31:
+		mes "The Crimson Fields are north of town. Cut through the soldiers, ^0000FFforty^000000 of them, and find their standard.";
+		mes "And whatever you hear out there... remember it's only a sword.";
+		close;
+	case 40:
+		mes "If gods made you their pawn, then let us break their game together.";
+		mes "But we can't do it alone. Three people in Amatsu have reasons to hate the dark god as much as we do.";
+		next;
+		mes "[Tetsuya]";
+		.@b = TF_BOND;
+		mes ((.@b & 1) ? "^777777Kiyoshi Takeda, the disgraced general: done.^000000" : "^0000FFKiyoshi Takeda^000000, a disgraced general, near the east gate.");
+		mes ((.@b & 2) ? "^777777Brother Renga, the monk: done.^000000" : "^0000FFBrother Renga^000000, a monk, south of here.");
+		mes ((.@b & 4) ? "^777777Ayame of the Hidden Leaf: done.^000000" : "^0000FFAyame of the Hidden Leaf^000000, a kunoichi, southeast.");
+		if ((.@b & 7) != 7)
+			close;
+		next;
+		mes "[Tetsuya]";
+		mes "A general, a monk and a kunoichi. Now we're a proper band of fools.";
+		next;
+		mes "[Tetsuya]";
+		mes "My mother's people keep a shrine deep beneath Amatsu: the ^0000FFShrine of Seals^000000. The Sarugami spirits have been screaming about it in my dreams.";
+		mes "Whatever is sealed there wants your cursed blade and my blood. I'd like to know why before something else finds out.";
+		next;
+		mes "[Tetsuya]";
+		mes "Take the deepest floor of the Amatsu dungeon. Keep Muramasa in your hand; the gate won't wake for anything else.";
+		setquest 900141;
+		TF_STEP = 51;
+		close;
+	case 51:
+	case 52:
+		mes "The Shrine of Seals is on the deepest floor of the Amatsu dungeon, just past the stairs.";
+		mes "Muramasa in hand. And try not to touch anything glowing. That usually ends badly.";
+		close;
+	case 60:
+		mes "So. A goddess appears, hands you a holy sword, and promises your curse will end.";
+		mes "Doesn't that sound a little too convenient?";
+		next;
+		mes "[Tetsuya]";
+		mes "Light can be another chain, you know. A shinier one.";
+		next;
+		switch (select("The goddess saved me:I trust you, not her")) {
+		case 1:
+			TF_TRUST = 1;
+			mes "[Tetsuya]";
+			mes "...Then I'll trust you. Even if I don't trust her.";
+			mes "Draw on me if you must. I won't draw back.";
+			emotion ET_SCRATCH;
+			break;
+		case 2:
+			TF_TRUST = 0;
+			mes "[Tetsuya]";
+			mes "Good. Then let's be tools that break in their hands.";
+			emotion ET_BEST;
+			break;
+		}
+		next;
+		mes "[Tetsuya]";
+		mes "The goddess's cult has friends in high places, and Yami's cultists are hiding in the cold.";
+		mes "Two pairs of hands could use ours: the twin exorcists ^0000FFTaro and Jiro^000000, east of here, and ^0000FFLady Hanae^000000, an exile at the Amatsu palace.";
+		setquest 900151;
+		setquest 900152;
+		TF_STEP = 61;
+		close;
+	case 61:
+		.@b = TF_BOND;
+		if ((.@b & 24) != 24) {
+			mes ((.@b & 8) ? "^777777Taro and Jiro: done.^000000" : "^0000FFTaro and Jiro^000000 are east of here, arguing as usual.");
+			mes ((.@b & 16) ? "^777777Lady Hanae: done.^000000" : "^0000FFLady Hanae^000000 waits beside the lord of the Amatsu palace.");
+			close;
+		}
+		mes "Exorcists, an exiled lady, a general, a monk, a kunoichi, a shrine maiden. We're nearly an army.";
+		next;
+		mes "[Tetsuya]";
+		mes "And the army has a problem. Yami's cult is marching openly now. Their Herald waits in Thor's volcano, at an altar of ashes on the second level.";
+		mes "Cut down ^0000FFthirty cultists^000000 on the way, then face him with both blades at once. Kusanagi in one hand, Muramasa in the other.";
+		next;
+		mes "[Tetsuya]";
+		mes "And one more thing. There's a blacksmith in Prontera named ^0000FFMasaru^000000, beside the Samurai Mentor. His family forged Muramasa. He sent word: he wants to meet you.";
+		setquest 900161;
+		setquest 900162;
+		TF_STEP = 71;
+		close;
+	case 71:
+		.@b = TF_BOND;
+		if ((.@b & 96) != 96) {
+			mes ((.@b & 32) ? "^777777The Herald of Ashes: done.^000000" : "The ^0000FFHerald of Ashes^000000 waits at the altar on Thor's volcano, second level. Both blades.");
+			mes ((.@b & 64) ? "^777777Masaru: done.^000000" : "^0000FFMasaru^000000 is in Prontera, next to the Samurai Mentor.");
+			close;
+		}
+		mes "The Herald's dead, and the blacksmith's son knows the way to the First Forge. Good.";
+		next;
+		mes "[Tetsuya]";
+		mes "Now, don't laugh, but a fox has been following us since the volcano. A white fox, with fire in its tails.";
+		mes "It's waiting in the woods east of Payon. I think it wants to talk.";
+		setquest 900171;
+		TF_STEP = 81;
+		callfunc "F_TF_Reward", 15000000, 10000000, 300000;
+		next;
+		mes "^777777Chapter VII, Return of the Ashes, is complete.^000000";
+		close;
+	case 81:
+		mes "The fox waits in the woods east of Payon, close to where the road leaves town.";
+		close;
+	case 82:
+		mes "The Abyssal Pit is at the bottom of Thor's volcano. Kagutsuchi-no-Yami waits there. Both blades, and all your courage.";
+		close;
+	case 90:
+		mes "...You felt it too, didn't you? That blessing. Something in it cracked.";
+		next;
+		mes "[Tetsuya]";
+		mes "I dreamed of the Sarugami last night. They showed me the goddess, and behind her, wearing her like a mask, Yami's fire.";
+		mes "They were never enemies. Two halves of one divine being, testing us from both ends. Mother and jailer.";
+		next;
+		mes "[Tetsuya]";
+		mes "There's only one way to cut both. Kusanagi and Muramasa, forged into a blade that answers to no god.";
+		mes "Masaru can do it at the First Forge, but the forge needs more than steel. It needs what each of us carries.";
+		if (isbegin_quest(900181) == 0)
+			setquest 900181;
+		next;
+		mes "[Tetsuya]";
+		if (callfunc("F_TF_Relics") < 8) {
+			mes "Bring every companion's relic: Ayame's kunai, Renga's beads, Kiyoshi's crest, Chiyo's talisman, the twins' sigils, Hanae's jade, Masaru's ember and Kohaku's foxfire.";
+			mes "^777777You carry " + callfunc("F_TF_Relics") + " of the eight relics.^000000";
+			close;
+		}
+		mes "All eight. Then take the last piece, mine.";
+		specialeffect2 EF_HOLYHIT;
+		next;
+		mes "[Tetsuya]";
+		mes "Sarugami blood broke Kusanagi's seal. Let it seal nothing ever again.";
+		mes "Balance is not obedience. Balance is freedom.";
+		if (!checkweight(900018, 1)) {
+			next;
+			mes "[Tetsuya]";
+			mes "Your pack's too full for even a little essence. Make some room.";
+			close;
+		}
+		getitem 900018, 1;
+		completequest 900181;
+		setquest 900191;
+		TF_STEP = 100;
+		next;
+		mes "[Tetsuya]";
+		mes "Masaru waits at the First Forge, on the second level of the Magma Dungeon. Bring both blades in hand, ^0000FF10 Oridecon^000000 and ^0000FF10 Burning Hearts^000000.";
+		next;
+		mes "^777777Chapter IX, The Weaver Unmasked, is complete.^000000";
+		close;
+	case 100:
+	case 110:
+		mes "The First Forge is on the second level of the Magma Dungeon. I'll meet you there.";
+		close;
+	case 120:
+		mes "Hayate's story, or yours? I can never tell anymore.";
+		mes "Either way, the gods are quiet. That's a nice change.";
+		emotion ET_SMILE;
+		close;
+	default:
+		if (TF_STEP < 30) {
+			mes "Kurogane's banner is on the second floor of the Amatsu dungeon.";
+		} else if (TF_STEP < 40) {
+			mes "The Crimson Fields are north of town.";
+		} else {
+			mes "Keep going. I'm right behind you.";
+		}
+		close;
+	}
+
+OnInit:
+	questinfo QTYPE_QUEST, QMARK_YELLOW, "Class == JOB_SAMURAI && (TF_STEP == 20 || TF_STEP == 30 || TF_STEP == 60 || TF_STEP == 90 || (TF_STEP == 21 && checkquest(900122,HUNTING) == 2) || (TF_STEP == 40 && (TF_BOND & 7) == 7) || (TF_STEP == 61 && (TF_BOND & 24) == 24) || (TF_STEP == 71 && (TF_BOND & 96) == 96))";
+	end;
+}

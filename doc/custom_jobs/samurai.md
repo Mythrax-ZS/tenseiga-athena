@@ -104,7 +104,9 @@ Tenseiga. It uses only bonuses that apply regardless of which hand runs the scri
 without changing those skills' HP requirements or cooldowns.
 
 Administrators can create them with `@item 900001 1` and `@item 900002 1`.
-No drop is assigned; Masaru reforges the pair into Tenseiga (below). Their unique Aegis names avoid
+No drop is assigned: the Twin Flames Saga gives them, Muramasa in Chapter I and Kusanagi in
+Chapter V ([twin_flames.md](twin_flames.md)), and Masaru reforges the pair into Tenseiga
+(below). Their unique Aegis names avoid
 the existing two-handed stock Muramasa items (1164, 1173 and 21003), which
 remain unchanged. Client appearance aliases are 9001 and 9002; the modern
 server packets send the actual 900001/900002 item IDs, and client item metadata
@@ -146,13 +148,15 @@ equip and unequip scripts turn on custom hat effect `HAT_EF_SAMURAI_TENSEIGA`
 shows it to everyone nearby and restores it on login. roclient draws it in code;
 clients that don't know the id show nothing.
 
-**Masaru** (`npc/custom/samurai_tenseiga.txt`) stands in **Prontera, 161,179**,
-beside the Samurai Mentor. A Samurai dual wielding Kusanagi and Muramasa (either
-hand order) with **10 Oridecon** and **10 Burning Hearts** can have them forged.
-Cards must be removed first; the new blade takes the lower of the two refine
-levels. After a short forging scene both equipped blades and the materials are
-consumed, Tenseiga is given, `SamuraiTenseigaForged` is set and the forging is
-announced server-wide. Administrators can also use `@item 900003 1`.
+Tenseiga is forged in Chapter X of the Twin Flames Saga ([twin_flames.md](twin_flames.md)),
+at the First Forge (Magma Dungeon 2, `Masaru#forge` in `npc/custom/twin_flames/tf_ch07_10.txt`).
+A Samurai dual wielding Kusanagi and Muramasa (either hand order) brings the eight companions'
+relics, Tetsuya's Sarugami Essence, **10 Oridecon** and **10 Burning Hearts**. Cards must be
+removed first; the new blade takes the lower of the two refine levels. After the forging scene
+the blades, relics and materials are consumed, Tenseiga is given, `SamuraiTenseigaForged` is set
+and the forging is announced server-wide. **Masaru** in **Prontera, 161,179**, beside the Samurai
+Mentor (`npc/custom/samurai_tenseiga.txt`), is the saga's Chapter VII smith; he no longer forges
+on request. Administrators can also use `@item 900003 1`.
 
 ## Skills and balance
 
@@ -197,9 +201,9 @@ the same questline as Tenseiga:
 
 - **Mortal Flame** (7009) is a quest skill (`IsQuest`): skill points cannot
   raise it, since `quest_skill_learn` stays off. The questline grants it with
-  `skill "SAM_MORTAL_FLAME",1,SKILL_PERM;`. Until those quests are written,
-  Masaru grants it when he forges Tenseiga, and to anyone who already did
-  (`SamuraiTenseigaForged`) or who wields it.
+  `skill "SAM_MORTAL_FLAME",1,SKILL_PERM;` when Tenseiga is forged in Chapter X. Masaru in
+  Prontera also grants it to anyone who forged Tenseiga before the saga existed
+  (`SamuraiTenseigaForged`).
 - The other five need Mortal Flame in the skill tree, and can be used only
   while **Tenseiga** (900003) is wielded (`skill_check_samurai_tenseiga` in
   `src/map/skill.cpp`). Otherwise they fail with "wrong weapon".

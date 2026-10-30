@@ -1,0 +1,255 @@
+//===== rAthena Script =======================================
+//= The Twin Flames Saga, Chapters I-III
+//===== Description: =========================================
+//= I   Ashes of Honor: the house the Samurai served is burned; a "kami of justice" answers
+//=     their prayer with Muramasa.            TF_STEP 0 -> 10
+//= II  The Wandering Ronin: protecting Amatsu, and a captured raider's fate.  10 -> 20
+//= III The Trickster's Tail: Tetsuya Takahashi, and Warlord Kurogane.        20 -> 30
+//= Tetsuya himself is in tf_tetsuya.txt.
+//============================================================
+
+// ---------------------------------------------------------------- I. Ashes of Honor
+
+prontera,158,179,4	script	Ashigaru Courier#tf	8_M_JPNSOLDIER,{
+	mes "[Ashigaru Courier]";
+	if (Class != JOB_SAMURAI) {
+		mes "I carry word from Amatsu, for a samurai who served a lord there.";
+		mes "It is not for you, traveller.";
+		close;
+	}
+	if (TF_STEP > 0) {
+		mes "Amatsu, samurai. The old servant Oharu waits by the guides at the town's heart.";
+		close;
+	}
+	mes "Samurai! At last. I have run from Amatsu with the worst of news.";
+	next;
+	mes "[Ashigaru Courier]";
+	mes "The house you served is ash. Raiders of a rival warlord came by night while you were away.";
+	mes "Your lord... your kin... none of them lived.";
+	next;
+	mes "[Ashigaru Courier]";
+	mes "Only old Oharu, who kept the kitchen, hid and survived. She asked for you by name.";
+	if (select("Go to Amatsu at once:I need a moment") != 1) {
+		mes "Of course. Grief does not wait for anyone, but it will wait for you.";
+		close;
+	}
+	TF_STEP = 1;
+	setquest 900101;
+	mes "She waits by the town guides in Amatsu. Go swiftly, and may the kami walk with you.";
+	close;
+
+OnInit:
+	questinfo QTYPE_QUEST, QMARK_YELLOW, "Class == JOB_SAMURAI && TF_STEP == 0";
+	end;
+}
+
+amatsu,192,94,4	script	Old Servant Oharu#tf	4_F_JPNOBA,{
+	mes "[Oharu]";
+	if (Class != JOB_SAMURAI || TF_STEP == 0) {
+		mes "Forgive an old woman. I am waiting for someone.";
+		close;
+	}
+	switch (TF_STEP) {
+	case 1:
+		mes "You came. Oh, you came...";
+		mes "I hid in the rice store while they burned everything. I heard it all.";
+		next;
+		mes "[Oharu]";
+		mes "They wore no crest. Ashigaru, hired spears, and they still roam the fields north of town.";
+		next;
+		mes "[Oharu]";
+		mes "But do not go to them yet, not with grief in your hands. There is a shrine in the fields, a forgotten one.";
+		mes "Our lord prayed there once. Pray there for the strength to protect what is left.";
+		next;
+		mes "[Oharu]";
+		mes "Go up the stone path at the northern edge of the fields. The shrine sits behind it.";
+		TF_STEP = 2;
+		close;
+	case 2:
+		mes "The forgotten shrine is in the fields north of town, at the top of the stone path.";
+		mes "Pray there. Strength first, then justice.";
+		close;
+	case 3:
+		if (checkquest(900102, HUNTING) != 2) {
+			mes "That blade... it is beautiful. Where did you find it?";
+			mes "The raiders are still out in the fields. ^0000FFTwenty^000000 of them would be justice enough for one night.";
+			close;
+		}
+		mes "They are gone? Then our lord can rest.";
+		next;
+		mes "[Oharu]";
+		mes "But your eyes... you look at me as if I were one more raider. Is it the blade?";
+		mes "No. Forgive me. I am old and frightened.";
+		next;
+		mes "[Oharu]";
+		mes "Elder Genzo asked for you. Amatsu has troubles of its own, and you are a samurai without a master now.";
+		mes "Perhaps the town could be your house.";
+		completequest 900102;
+		TF_STEP = 10;
+		callfunc "F_TF_Reward", 3000000, 2000000, 100000;
+		next;
+		mes "[Oharu]";
+		mes "^777777Chapter I, Ashes of Honor, is complete.^000000";
+		close;
+	default:
+		mes "Elder Genzo waits north of the town square, near the gate. Be well, young master.";
+		close;
+	}
+
+OnInit:
+	questinfo QTYPE_QUEST, QMARK_YELLOW, "Class == JOB_SAMURAI && (TF_STEP == 1 || (TF_STEP == 3 && checkquest(900102,HUNTING) == 2))";
+	end;
+}
+
+// The shrine's "kami of justice" is Kagutsuchi-no-Yami in disguise.
+ama_in01,175,176,4	script	Hooded Kami#tf	4_M_SOULREAPER,{
+	if (Class != JOB_SAMURAI || TF_STEP != 2) {
+		mes "^777777A hooded figure kneels at the altar, unmoving. Is it even breathing?^000000";
+		close;
+	}
+	mes "^777777You kneel before the forgotten altar. You do not pray for revenge.^000000";
+	mes "^777777You pray for strength, to protect what is left.^000000";
+	next;
+	specialeffect2 EF_DARKCASTING;
+	mes "[Hooded Kami]";
+	mes "I hear you. Few still come to this place.";
+	mes "I am a kami of justice, and you prayed to me truly.";
+	next;
+	mes "[Hooded Kami]";
+	mes "Your lord's murderers walk free. Is that justice? No.";
+	mes "Take this blade. It was forged for a hand like yours: grieving, honest, and strong.";
+	next;
+	if (!countitem(900002) && !checkweight(900002, 1)) {
+		mes "[Hooded Kami]";
+		mes "Your burdens are too heavy to receive it. Lighten them, and pray again.";
+		close;
+	}
+	specialeffect2 EF_CURSEATTACK;
+	if (!countitem(900002))
+		getitem 900002, 1;
+	mes "^777777You wake on the shrine floor. The figure is gone, but a sword lies across your knees.^000000";
+	mes "^777777Its steel is red as a coal. A faint whisper seems to come from it, or from your own heart.^000000";
+	next;
+	mes "^FF0000...feed me...^000000";
+	next;
+	mes "^777777You must have imagined it. You hold ^0000FFMuramasa^000000, a gift of the gods.^000000";
+	mes "^777777The raiders still roam the fields. Hunt ^0000FFtwenty^000000 of them, then return to Oharu.^000000";
+	completequest 900101;
+	setquest 900102;
+	TF_STEP = 3;
+	close;
+
+OnInit:
+	questinfo QTYPE_QUEST, QMARK_YELLOW, "Class == JOB_SAMURAI && TF_STEP == 2";
+	end;
+}
+
+// ---------------------------------------------------------------- II. The Wandering Ronin
+
+amatsu,185,160,4	script	Elder Genzo#tf	4_M_JPNOJI,{
+	mes "[Elder Genzo]";
+	if (Class != JOB_SAMURAI || TF_STEP < 10) {
+		mes "The river has grown dangerous. Even the fishermen stay home.";
+		close;
+	}
+	switch (TF_STEP) {
+	case 10:
+		mes "So you are the one who cut down the raiders. The whole town speaks of it.";
+		next;
+		mes "[Elder Genzo]";
+		mes "Then hear our trouble. The Kapha of the river have grown bold, dragging children toward the water.";
+		mes "Drive them back: ^0000FFthirty^000000 should teach the rest to fear us again.";
+		next;
+		mes "[Elder Genzo]";
+		mes "We cannot pay a lord's stipend. But Amatsu remembers those who protect it.";
+		setquest 900111;
+		TF_STEP = 11;
+		close;
+	case 11:
+		if (checkquest(900111, HUNTING) != 2) {
+			mes "The Kapha haunt the fields and the river banks. ^0000FFThirty^000000, samurai.";
+			close;
+		}
+		mes "The children played by the water today. You have given us that.";
+		next;
+		mes "[Elder Genzo]";
+		mes "One thing more. The watch caught one of the raiders who burned your lord's house.";
+		mes "He is bound just south of here, under guard. The town leaves his fate to you.";
+		completequest 900111;
+		setquest 900112;
+		TF_STEP = 12;
+		callfunc "F_TF_Reward", 3000000, 2000000, 100000;
+		close;
+	case 12:
+		mes "The raider is bound just south of here. His fate is yours to decide.";
+		close;
+	default:
+		mes "Amatsu is grateful, samurai. Walk with honour.";
+		close;
+	}
+
+OnInit:
+	questinfo QTYPE_QUEST, QMARK_YELLOW, "Class == JOB_SAMURAI && (TF_STEP == 10 || (TF_STEP == 11 && checkquest(900111,HUNTING) == 2))";
+	end;
+}
+
+amatsu,180,150,6	script	Captured Raider#tf	8_M_JPNSOLDIER,{
+	if (Class != JOB_SAMURAI || TF_STEP != 12) {
+		mes "^777777A bound man stares at the ground.^000000";
+		close;
+	}
+	mes "[Captured Raider]";
+	mes "I know you. The house in the hills... please. I only carried a torch. I was paid in rice.";
+	mes "I have a daughter. Please.";
+	next;
+	mes "^FF0000...he burned them. Feed me. Feed me, and you will be whole again...^000000";
+	next;
+	switch (select("Spare him:Cut him down")) {
+	case 1:
+		mes "^777777You lower the blade. It fights you, heavier than it has ever been.^000000";
+		mes "^777777Then the whisper falls silent, sullen.^000000";
+		next;
+		mes "[Captured Raider]";
+		mes "...Thank you. I will not forget this. I swear it on my daughter.";
+		TF_MERCY++;
+		break;
+	case 2:
+		specialeffect EF_BLOODDRAIN;
+		mes "^777777Muramasa moves almost before you do. The man falls without a sound.^000000";
+		mes "^777777The blade feels warm, satisfied. You feel nothing at all, and that frightens you.^000000";
+		break;
+	}
+	next;
+	mes "^777777Chapter II, The Wandering Ronin, is complete.^000000";
+	mes "^777777Someone has been watching from the rooftops all along...^000000";
+	completequest 900112;
+	TF_STEP = 20;
+	callfunc "F_TF_Reward", 2000000, 1500000, 50000;
+	close;
+
+OnInit:
+	questinfo QTYPE_QUEST, QMARK_YELLOW, "Class == JOB_SAMURAI && TF_STEP == 12";
+	end;
+}
+
+// ---------------------------------------------------------------- III. The Trickster's Tail
+
+ama_dun02,45,50,4	script	War Banner of Kurogane#tf	4_BOARD3,{
+	mes "[War Banner]";
+	if (Class != JOB_SAMURAI || isbegin_quest(900122) != 1 || checkquest(900122, HUNTING) == 2) {
+		mes "^777777A torn war banner bearing a black iron crest: the house of Warlord Kurogane.^000000";
+		close;
+	}
+	mes "^777777Kurogane's crest. The warlord who sold villages to raiders, and fears no god or law.^000000";
+	mes "^777777Strike his banner, and he will come to defend it.^000000";
+	next;
+	if (callfunc("F_TF_Arena", 1)) {
+		mes "[Warlord Kurogane]";
+		mes "Who dares? A ronin, with a cursed sword and a monkey for a friend? Die, then!";
+	}
+	close;
+
+OnInit:
+	questinfo QTYPE_QUEST, QMARK_YELLOW, "Class == JOB_SAMURAI && isbegin_quest(900122) == 1 && checkquest(900122,HUNTING) != 2";
+	end;
+}

@@ -88,4 +88,5 @@ Footer:
     Mode: Prerenewal
   - Path: db/re/mob_db.yml
     Mode: Renewal
+  - Path: db/custom/samurai/mob_db.yml
   - Path: db/import/mob_db.yml

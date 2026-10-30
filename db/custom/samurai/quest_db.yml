@@ -1,0 +1,113 @@
+# The Twin Flames Saga's quests (doc/custom_jobs/twin_flames.md). Titles and descriptions
+# for the client's quest log are in roclient overlays/samurai/System/samurai_questinfo.lua.
+
+Header:
+  Type: QUEST_DB
+  Version: 3
+
+Body:
+  - Id: 900101
+    Title: "Twin Flames I: Ashes of Honor"
+  - Id: 900102
+    Title: "Twin Flames I: Ash on the Wind"
+    Targets:
+      - Mob: TF_ASHIGARU
+        Count: 20
+  - Id: 900111
+    Title: "Twin Flames II: Yokai of the River"
+    Targets:
+      - Mob: KAPHA
+        Count: 30
+  - Id: 900112
+    Title: "Twin Flames II: The Captured Raider"
+  - Id: 900121
+    Title: "Twin Flames III: The Trickster's Tail"
+  - Id: 900122
+    Title: "Twin Flames III: Warlord Kurogane"
+    Targets:
+      - Mob: TF_KUROGANE
+        Count: 1
+  - Id: 900131
+    Title: "Twin Flames IV: Whispers in Steel"
+    Targets:
+      - Mob: TF_CRIMSON_SOLDIER
+        Count: 40
+      - Mob: TF_SHADE_OF_YAMI
+        Count: 1
+  - Id: 900132
+    Title: "Twin Flames IV: The Disgraced General"
+    Targets:
+      - Mob: TF_GENERAL_MIBU
+        Count: 1
+  - Id: 900133
+    Title: "Twin Flames IV: The Fallen Monk"
+    Targets:
+      - Mob: TF_GENKAI
+        Count: 1
+  - Id: 900134
+    Title: "Twin Flames IV: The Hidden Leaf"
+    Targets:
+      - Mob: TF_KAGE
+        Count: 1
+  - Id: 900141
+    Title: "Twin Flames V: The Shrine of Seals"
+    Targets:
+      - Mob: TF_SEAL_GUARDIAN
+        Count: 1
+  - Id: 900142
+    Title: "Twin Flames V: The Shrine Maiden"
+    Targets:
+      - Mob: TF_SAYO
+        Count: 1
+  - Id: 900151
+    Title: "Twin Flames VI: The Twin Exorcists"
+    Targets:
+      - Mob: TF_GLACIAL_YOKAI
+        Count: 1
+  - Id: 900152
+    Title: "Twin Flames VI: The Palace of Masks"
+    Drops:
+      - Mob: SHINOBI
+        Item: TF_Sealed_Letter
+        Rate: 2500
+      - Mob: MIYABI_NINGYO
+        Item: TF_Sealed_Letter
+        Rate: 2500
+    Targets:
+      - Mob: TF_KUROZANE
+        Count: 1
+  - Id: 900161
+    Title: "Twin Flames VII: Return of the Ashes"
+    Targets:
+      - Mob: TF_YAMI_CULTIST
+        Count: 30
+      - Mob: TF_HERALD
+        Count: 1
+  - Id: 900162
+    Title: "Twin Flames VII: The Blacksmith's Son"
+    Drops:
+      - Mob: KASA
+        Item: TF_Ledger_Page
+        Rate: 2000
+      - Mob: SALAMANDER
+        Item: TF_Ledger_Page
+        Rate: 2000
+  - Id: 900171
+    Title: "Twin Flames VIII: The Fox and the Contract"
+    Targets:
+      - Mob: TF_CONTRACT_BINDER
+        Count: 1
+  - Id: 900172
+    Title: "Twin Flames VIII: The Fall of Yami"
+    Targets:
+      - Mob: TF_YAMI
+        Count: 1
+  - Id: 900181
+    Title: "Twin Flames IX: The Weaver Unmasked"
+  - Id: 900191
+    Title: "Twin Flames X: The First Forge"
+  - Id: 900192
+    Title: "Twin Flames X: The Celestial Veil"
+    Targets:
+      - Mob: TF_WEAVER
+        Count: 1

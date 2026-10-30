@@ -1,0 +1,159 @@
+//===== rAthena Script =======================================
+//= The Twin Flames Saga: shared pieces
+//===== Description: =========================================
+//= The Samurai's quest line (doc/custom_jobs/twin_flames.md): the arenas where the saga's
+//= bosses are called, the checks on the blades in hand, and the saga's field monsters.
+//=
+//= Character variables:
+//=   TF_STEP   progress through the ten chapters (see the doc for each value)
+//=   TF_BOND   companions whose trials are done, as bits:
+//=             1 Kiyoshi, 2 Renga, 4 Ayame, 8 Taro & Jiro, 16 Hanae, 32 the Herald, 64 Masaru
+//=   TF_MERCY  times mercy was shown (the captured raider, General Mibu); colours the ending
+//=   TF_TRUST  1 if the goddess was trusted over Tetsuya in Chapter VI
+//============================================================
+
+// The saga's arenas. Each boss is called by a player on its quest step (F_TF_Arena) and
+// leaves again after 15 minutes if it still stands. Quest kill credit (db/custom/samurai/
+// quest_db.yml) goes to the killer and the party members on the map.
+-	script	TF_Arenas	-1,{
+	end;
+
+OnInit:
+	// arena: quest, monster, blade needed (0 none, 1 Muramasa, 2 Twin Flames, 3 Tenseiga), where it appears
+	setarray .quest[1],  900122, 900131, 900132, 900133, 900134, 900141, 900142, 900151, 900152, 900161, 900171, 900172, 900192, 900192, 900192;
+	setarray .mob[1],    31903,  31904,  31905,  31906,  31907,  31908,  31909,  31910,  31911,  31912,  31913,  31914,  31915,  31916,  31917;
+	setarray .need[1],   1,      1,      0,      0,      0,      1,      0,      0,      0,      2,      0,      2,      3,      3,      3;
+	setarray .map$[1],   "ama_dun02", "ama_fild01", "ice_dun02", "prt_monk", "ama_dun02", "ama_dun03", "ama_dun03", "ice_dun03", "ama_in02", "thor_v02", "pay_fild08", "thor_v03", "valkyrie", "valkyrie", "valkyrie";
+	setarray .x[1],      47,     200,    150,    225,    42,     120,    110,    149,    204,    90,     42,     49,     48,     48,     48;
+	setarray .y[1],      53,     294,    158,    143,    52,     33,     33,     48,     165,    202,    82,     253,    67,     67,     67;
+	initnpctimer;
+	end;
+
+// Bosses that stood 15 minutes leave (the next player may call them again).
+OnTimer60000:
+	for (.@a = 1; .@a <= 15; .@a++) {
+		if (.gid[.@a] && (!unitexists(.gid[.@a]) || gettimetick(2) - .since[.@a] > 900)) {
+			killmonster .map$[.@a], "TF_Arenas::OnDead" + .@a;
+			.gid[.@a] = 0;
+		}
+	}
+	initnpctimer;
+	end;
+
+OnDead1:  .gid[1] = 0;  end;
+OnDead2:  .gid[2] = 0;  end;
+OnDead3:  .gid[3] = 0;  end;
+OnDead4:  .gid[4] = 0;  end;
+OnDead5:  .gid[5] = 0;  end;
+OnDead6:  .gid[6] = 0;  end;
+OnDead7:  .gid[7] = 0;  end;
+OnDead8:  .gid[8] = 0;  end;
+OnDead9:  .gid[9] = 0;  end;
+OnDead10: .gid[10] = 0; end;
+OnDead11: .gid[11] = 0; end;
+OnDead12:
+	.gid[12] = 0;
+	// The false ending: the god of ashes falls, and the goddess blesses it.
+	mapannounce "thor_v03", "Kagutsuchi-no-Yami has fallen. A pale golden light pours into the Abyssal Pit...", bc_map, "0xFFD27F";
+	end;
+
+// The Weaver: radiance, then eclipse, then both. Each falls into the next.
+OnDead13:
+	.gid[13] = 0;
+	mapannounce "valkyrie", "Amaterasu-no-Mikazuki: Light alone cannot hold you? Then be swallowed by my shadow.", bc_map, "0xC8A0FF";
+	monster .map$[14], .x[14], .y[14], "Eclipsed Amaterasu", .mob[14], 1, "TF_Arenas::OnDead14";
+	.gid[14] = $@mobid[0];
+	.since[14] = gettimetick(2);
+	end;
+OnDead14:
+	.gid[14] = 0;
+	mapannounce "valkyrie", "Amaterasu-no-Mikazuki: Moon and sun, mother and jailer. I am both, and you are nothing!", bc_map, "0xFFD27F";
+	monster .map$[15], .x[15], .y[15], "Amaterasu-no-Mikazuki", .mob[15], 1, "TF_Arenas::OnDead15";
+	.gid[15] = $@mobid[0];
+	.since[15] = gettimetick(2);
+	end;
+OnDead15:
+	.gid[15] = 0;
+	mapannounce "valkyrie", "Amaterasu-no-Mikazuki: Perhaps mortals need no gods... perhaps that is freedom.", bc_map, "0xFFFFFF";
+	end;
+}
+
+// Calls arena getarg(0)'s boss for the attached player, if their quest is on that step and
+// they hold the blade it needs. Returns 1 when the boss appears.
+function	script	F_TF_Arena	{
+	.@a = getarg(0);
+	.@quest = getvariableofnpc(.quest[.@a], "TF_Arenas");
+	if (Class != JOB_SAMURAI || isbegin_quest(.@quest) != 1 || checkquest(.@quest, HUNTING) == 2)
+		return 0;
+	// The Weaver's arena is busy while any of her three forms stands.
+	for (.@i = .@a; .@i <= (.@a == 13 ? 15 : .@a); .@i++) {
+		.@gid = getvariableofnpc(.gid[.@i], "TF_Arenas");
+		if (.@gid && unitexists(.@gid)) {
+			mes "^777777The battle here has already begun. Wait for it to end.^000000";
+			return 0;
+		}
+	}
+	if (!callfunc("F_TF_Need", getvariableofnpc(.need[.@a], "TF_Arenas")))
+		return 0;
+	if (select("Draw your blade:Not yet") != 1)
+		return 0;
+	.@map$ = getvariableofnpc(.map$[.@a], "TF_Arenas");
+	monster .@map$, getvariableofnpc(.x[.@a], "TF_Arenas"), getvariableofnpc(.y[.@a], "TF_Arenas"), "--ja--", getvariableofnpc(.mob[.@a], "TF_Arenas"), 1, "TF_Arenas::OnDead" + .@a;
+	set getvariableofnpc(.gid[.@a], "TF_Arenas"), $@mobid[0];
+	set getvariableofnpc(.since[.@a], "TF_Arenas"), gettimetick(2);
+	specialeffect2 EF_KO_IZAYOI;
+	return 1;
+}
+
+// Whether the attached player holds the blade a step needs (0 none, 1 Muramasa,
+// 2 Kusanagi and Muramasa together, 3 Tenseiga); says what is missing.
+function	script	F_TF_Need	{
+	.@r = getequipid(EQI_HAND_R);
+	.@l = getequipid(EQI_HAND_L);
+	switch (getarg(0)) {
+	case 1:
+		if (.@r == 900002 || .@l == 900002)
+			return 1;
+		mes "^777777Muramasa is not in your hand. Whatever waits here answers only to that blade.^000000";
+		return 0;
+	case 2:
+		if (callfunc("F_TF_Twin"))
+			return 1;
+		mes "^777777Only the Twin Flames can face this: Kusanagi in one hand, Muramasa in the other.^000000";
+		return 0;
+	case 3:
+		if (.@r == 900003)
+			return 1;
+		mes "^777777Only a blade that answers to no god can reach her. Hold Tenseiga-no-Hayate.^000000";
+		return 0;
+	}
+	return 1;
+}
+
+// 1 if Kusanagi and Muramasa are dual wielded (either hand).
+function	script	F_TF_Twin	{
+	.@r = getequipid(EQI_HAND_R);
+	.@l = getequipid(EQI_HAND_L);
+	return (.@r == 900001 && .@l == 900002) || (.@r == 900002 && .@l == 900001);
+}
+
+// How many of the eight companions' relics the attached player carries.
+function	script	F_TF_Relics	{
+	setarray .@relic[0], 900010, 900011, 900012, 900013, 900014, 900015, 900016, 900017;
+	for (.@i = 0; .@i < getarraysize(.@relic); .@i++)
+		if (countitem(.@relic[.@i]))
+			.@n++;
+	return .@n;
+}
+
+// A chapter's reward: base and job experience, and zeny.
+function	script	F_TF_Reward	{
+	getexp getarg(0), getarg(1);
+	Zeny += getarg(2);
+	return;
+}
+
+// The saga's field monsters.
+ama_fild01,0,0	monster	Ashigaru Raider	31900,25,5000
+ama_fild01,200,260,35,30	monster	Crimson Fields Soldier	31901,30,5000
+thor_v01,0,0	monster	Cultist of Ashes	31902,20,5000

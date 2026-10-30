@@ -1,7 +1,7 @@
-// The Forging of Tenseiga, from the Twin Flames Saga (doc/custom_jobs/samurai.md).
-// A Samurai dual wielding Kusanagi and Muramasa (Twin Flames) brings Masaru the steel and the
-// fire; both blades are shattered and reforged into Tenseiga-no-Hayate (900003).
-// Cards must be removed first; the new blade keeps the lower of the two refine levels.
+// Masaru, the blacksmith's son, from the Twin Flames Saga (doc/custom_jobs/twin_flames.md).
+// His ancestor forged Muramasa at the First Forge with Yami whispering over the anvil. In
+// Chapter VII he reads that ancestor's ledger and finds the way back there; the forging of
+// Tenseiga-no-Hayate itself is Chapter X, at the First Forge (Masaru#forge, tf_ch07_10.txt).
 prontera,161,179,4	script	Masaru#tenseiga	4_M_KAGE_OLD,{
 	mes "[Masaru]";
 	if (Class != JOB_SAMURAI) {
@@ -9,102 +9,64 @@ prontera,161,179,4	script	Masaru#tenseiga	4_M_KAGE_OLD,{
 		mes "Come back when you walk the way of the Samurai.";
 		close;
 	}
-	// Until the Tenseiga questline is written, its reward is given here: the Mortal Flame
-	// line opens to whoever forged (or wields) Tenseiga.
-	if ((SamuraiTenseigaForged || getequipid(EQI_HAND_R) == 900003) && !getskilllv("SAM_MORTAL_FLAME")) {
-		mes "Wait. The blade is only half of what the First Forge made. The other half is in you.";
+	// Samurai who forged Tenseiga before the saga existed keep its flame.
+	if (SamuraiTenseigaForged && !getskilllv("SAM_MORTAL_FLAME")) {
 		mes "Tenseiga burns with mortal will, not a god's flame. Let that flame burn in your own hands as well.";
-		skill "SAM_MORTAL_FLAME",1,SKILL_PERM;
+		skill "SAM_MORTAL_FLAME", 1, SKILL_PERM;
 		specialeffect2 EF_KO_IZAYOI;
 		next;
 		mes "[Masaru]";
 		mes "You have learned ^FF0000Mortal Flame^000000. Tenseiga's own techniques are yours to master now.";
 		close;
 	}
-	if (getequipid(EQI_HAND_R) == 900003) {
+	if (TF_STEP >= 120 || getequipid(EQI_HAND_R) == 900003) {
 		mes "Tenseiga. No god's gift, no curse's chain.";
 		mes "Whatever my family broke, you and that blade have mended.";
 		close;
 	}
-	.@r = getequipid(EQI_HAND_R);
-	.@l = getequipid(EQI_HAND_L);
-	if (!((.@r == 900001 && .@l == 900002) || (.@r == 900002 && .@l == 900001))) {
+	if (TF_STEP < 71) {
 		mes "Kusanagi and Muramasa were never opposites. They are the two halves of one goddess's divided flame.";
+		mes "But that is a long story, and you have only begun yours.";
+		close;
+	}
+	if (TF_BOND & 64) {
+		mes "The First Forge lies on the second level of the Magma Dungeon. When the time comes, I will be there.";
+		close;
+	}
+	if (countitem(900021) < 5) {
+		mes "So you are the one who carries Muramasa. My family made that blade. I have spent my life wishing we had not.";
 		next;
 		mes "[Masaru]";
-		mes "My ancestor forged Muramasa at the First Forge, with Yami whispering over his anvil. I can undo that work, and make something new.";
-		mes "Hold both blades as one, Kusanagi in one hand and Muramasa in the other, and I will light the forge.";
+		mes "My ancestor kept a ledger of every blade he forged. When he went mad, he tore it apart and scattered the pages into the fire of Thor's volcano.";
+		mes "The Kasa and Salamanders there swallowed them. Bring me ^0000FFfive pages^000000 of the smith's ledger.";
+		close;
+	}
+	delitem 900021, 5;
+	mes "His hand. I would know it anywhere.";
+	next;
+	mes "[Masaru]";
+	mes "'The First Forge, beneath the mountain of fire in the north. Two flames from one tear: the light to Kusanagi, the dark to Muramasa.'";
+	next;
+	mes "[Masaru]";
+	mes "Two flames from one tear... Then Kusanagi was born at the same forge. They are halves of one fire.";
+	mes "And what one forge split, another forging could join.";
+	next;
+	mes "[Masaru]";
+	mes "Take this ember. My family has kept it burning since the First Forge went cold. It is the only fire that remembers how.";
+	if (!checkweight(900016, 1)) {
 		next;
 		mes "[Masaru]";
-		mes "Bring ^0000FF10 Oridecon^000000 for the steel and ^0000FF10 Burning Hearts^000000 to feed the fire.";
+		mes "Your pack is full. Make room for it.";
 		close;
 	}
-	mes "You hold them both, and neither god's chain holds you. So it is time.";
-	mes "Bring ^0000FF10 Oridecon^000000 and ^0000FF10 Burning Hearts^000000, and the forge will take both blades.";
-	next;
-	mes "[Masaru]";
-	for (.@i = 0; .@i < 4; .@i++) {
-		if (getequipcardid(EQI_HAND_R,.@i) || getequipcardid(EQI_HAND_L,.@i)) {
-			mes "Pull the cards from your blades first. The fire would only burn them.";
-			close;
-		}
-	}
-	if (countitem("Oridecon") < 10 || countitem("Burning_Heart") < 10) {
-		mes "The forge is cold without the steel and the fire. Come back with ^0000FF10 Oridecon^000000 and ^0000FF10 Burning Hearts^000000.";
-		close;
-	}
-	.@refine = min(getequiprefinerycnt(EQI_HAND_R), getequiprefinerycnt(EQI_HAND_L));
-	mes "Kusanagi and Muramasa will be gone for good. The new blade will be refined to ^0000FF+" + .@refine + "^000000, the lower of the two.";
-	if (select("Light the forge:Not yet") != 1) {
-		mes "The fire will wait. So will they.";
-		close;
-	}
-	if (!checkweight("Samurai_Tenseiga",1)) {
-		mes "Make room in your inventory and lighten your load first.";
-		close;
-	}
-	mes "Then we begin.";
-	next;
-	mes "[Masaru]";
-	mes "Kohaku's foxfire lights the First Forge, freed from the goddess's contract.";
-	specialeffect EF_FIREPILLARBOMB;
-	next;
-	mes "[Masaru]";
-	mes "Ayame's kunai, purified in sacred water. Brother Renga's prayer beads. Kiyoshi's family crest.";
-	mes "Chiyo's broken talisman. Taro and Jiro's twin sigils of fire and water. Lady Hanae's jade.";
-	mes "One by one, they go into the fire.";
-	specialeffect EF_MAGNUMBREAK;
-	next;
-	mes "[Tetsuya]";
-	mes "Sarugami blood broke Kusanagi's seal. Let it seal nothing ever again. Balance is not obedience. Balance is freedom.";
-	specialeffect2 EF_HOLYHIT;
-	next;
-	mes "[Masaru]";
-	mes "Now, Samurai. Clash them together.";
-	next;
-	// Re-check: the blades must still be in hand when the forge takes them.
-	.@r = getequipid(EQI_HAND_R);
-	.@l = getequipid(EQI_HAND_L);
-	if (!((.@r == 900001 && .@l == 900002) || (.@r == 900002 && .@l == 900001)) || countitem("Oridecon") < 10 || countitem("Burning_Heart") < 10) {
-		mes "[Masaru]";
-		mes "The fire died down. Come back with both blades in hand and the steel and fire ready.";
-		close;
-	}
-	delequip EQI_HAND_R;
-	delequip EQI_HAND_L;
-	delitem "Oridecon",10;
-	delitem "Burning_Heart",10;
-	specialeffect2 EF_KO_IZAYOI;
-	mes "[" + strcharinfo(0) + "]";
-	mes "No god's gift, no curse's chain. This is the blade of men, and with it, I sever heaven's lies.";
-	getitem2 "Samurai_Tenseiga",1,1,.@refine,0,0,0,0,0;
-	SamuraiTenseigaForged = 1;
-	skill "SAM_MORTAL_FLAME",1,SKILL_PERM;
-	announce strcharinfo(0) + " has forged Tenseiga-no-Hayate, the Mortal Flame.",bc_all;
-	next;
-	mes "[Masaru]";
-	mes "Tenseiga-no-Hayate. Not a relic of gods, but the first true sword of men.";
-	mes "It takes both hands. It is two blades made one.";
-	mes "And its flame burns in you now: you have learned ^FF0000Mortal Flame^000000.";
+	getitem 900016, 1;
+	TF_BOND |= 64;
+	completequest 900162;
+	callfunc "F_TF_Reward", 6000000, 4000000, 150000;
+	mes "^777777You received the ^0000FFEmber of the First Smith^000000.^000000";
 	close;
+
+OnInit:
+	questinfo QTYPE_QUEST, QMARK_YELLOW, "Class == JOB_SAMURAI && TF_STEP == 71 && !(TF_BOND & 64)";
+	end;
 }

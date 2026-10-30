@@ -161,3 +161,161 @@ Body:
       hateffect HAT_EF_SAMURAI_TENSEIGA,true;
     UnEquipScript: |
       hateffect HAT_EF_SAMURAI_TENSEIGA,false;
+  # The Twin Flames Saga (doc/custom_jobs/twin_flames.md): the companions' relics, which the
+  # First Forge takes to make Tenseiga, and the saga's quest items. Bound to the character.
+  - Id: 900010
+    AegisName: TF_Purified_Kunai
+    Name: Ayame's Purified Kunai
+    Type: Etc
+    Weight: 10
+    Trade:
+      NoDrop: true
+      NoTrade: true
+      NoSell: true
+      NoCart: true
+      NoGuildStorage: true
+      NoMail: true
+      NoAuction: true
+  - Id: 900011
+    AegisName: TF_Prayer_Beads
+    Name: Brother Renga's Prayer Beads
+    Type: Etc
+    Weight: 10
+    Trade:
+      NoDrop: true
+      NoTrade: true
+      NoSell: true
+      NoCart: true
+      NoGuildStorage: true
+      NoMail: true
+      NoAuction: true
+  - Id: 900012
+    AegisName: TF_Takeda_Crest
+    Name: Takeda Family Crest
+    Type: Etc
+    Weight: 10
+    Trade:
+      NoDrop: true
+      NoTrade: true
+      NoSell: true
+      NoCart: true
+      NoGuildStorage: true
+      NoMail: true
+      NoAuction: true
+  - Id: 900013
+    AegisName: TF_Carved_Talisman
+    Name: Chiyo's Carved Talisman
+    Type: Etc
+    Weight: 10
+    Trade:
+      NoDrop: true
+      NoTrade: true
+      NoSell: true
+      NoCart: true
+      NoGuildStorage: true
+      NoMail: true
+      NoAuction: true
+  - Id: 900014
+    AegisName: TF_Twin_Sigils
+    Name: Twin Sigils of Fire and Water
+    Type: Etc
+    Weight: 10
+    Trade:
+      NoDrop: true
+      NoTrade: true
+      NoSell: true
+      NoCart: true
+      NoGuildStorage: true
+      NoMail: true
+      NoAuction: true
+  - Id: 900015
+    AegisName: TF_Exile_Jade
+    Name: Jade of the Exile's Fan
+    Type: Etc
+    Weight: 10
+    Trade:
+      NoDrop: true
+      NoTrade: true
+      NoSell: true
+      NoCart: true
+      NoGuildStorage: true
+      NoMail: true
+      NoAuction: true
+  - Id: 900016
+    AegisName: TF_Bloodline_Ember
+    Name: Ember of the First Smith
+    Type: Etc
+    Weight: 10
+    Trade:
+      NoDrop: true
+      NoTrade: true
+      NoSell: true
+      NoCart: true
+      NoGuildStorage: true
+      NoMail: true
+      NoAuction: true
+  - Id: 900017
+    AegisName: TF_Foxfire
+    Name: Kohaku's Foxfire
+    Type: Etc
+    Weight: 10
+    Trade:
+      NoDrop: true
+      NoTrade: true
+      NoSell: true
+      NoCart: true
+      NoGuildStorage: true
+      NoMail: true
+      NoAuction: true
+  - Id: 900018
+    AegisName: TF_Sarugami_Essence
+    Name: Sarugami Essence
+    Type: Etc
+    Weight: 10
+    Trade:
+      NoDrop: true
+      NoTrade: true
+      NoSell: true
+      NoCart: true
+      NoGuildStorage: true
+      NoMail: true
+      NoAuction: true
+  - Id: 900019
+    AegisName: TF_Clan_Kunai
+    Name: Ayame's Clan Kunai
+    Type: Etc
+    Weight: 10
+    Trade:
+      NoDrop: true
+      NoTrade: true
+      NoSell: true
+      NoCart: true
+      NoGuildStorage: true
+      NoMail: true
+      NoAuction: true
+  - Id: 900020
+    AegisName: TF_Sealed_Letter
+    Name: Sealed Letter
+    Type: Etc
+    Weight: 10
+    Trade:
+      NoDrop: true
+      NoTrade: true
+      NoSell: true
+      NoCart: true
+      NoGuildStorage: true
+      NoMail: true
+      NoAuction: true
+  - Id: 900021
+    AegisName: TF_Ledger_Page
+    Name: Page of the Smith's Ledger
+    Type: Etc
+    Weight: 10
+    Trade:
+      NoDrop: true
+      NoTrade: true
+      NoSell: true
+      NoCart: true
+      NoGuildStorage: true
+      NoMail: true
+      NoAuction: true
