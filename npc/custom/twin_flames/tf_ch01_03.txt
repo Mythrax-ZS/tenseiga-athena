@@ -246,7 +246,7 @@ OnInit:
 
 // ---------------------------------------------------------------- III. The Trickster's Tail
 
-ama_dun02,45,50,4	script	War Banner of Kurogane#tf	4_BOARD3,{
+ama_dun02,45,50,4	script	War Banner of Kurogane#tf	1_FLAG_EAGLE,{
 	mes "[War Banner]";
 	if (Class != JOB_SAMURAI || isbegin_quest(900122) != 1 || checkquest(900122, HUNTING) == 2) {
 		mes "^777777A torn war banner bearing a black iron crest: the house of Warlord Kurogane.^000000";

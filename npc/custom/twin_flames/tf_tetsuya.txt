@@ -75,13 +75,13 @@ amatsu,192,163,4	script	Tetsuya Takahashi#tf	4_EXJOB_NINJA2,{
 		mes "They're calling it the ^FF0000Crimson Fields^000000 already.";
 		next;
 		mes "[Tetsuya]";
-		mes "Villagers are caught between the armies. We could hold the line for them. Find the battle standard in the fields north of town, past the stone path.";
+		mes "Villagers are caught between the armies. We could hold the line for them. Find the scorched war banner in the fields north of town, past the stone path.";
 		setquest 900131;
 		TF_STEP = 31;
 		callfunc "F_TF_Moved";
 		close;
 	case 31:
-		mes "The Crimson Fields are north of town. Cut through the soldiers, ^0000FFforty^000000 of them, and find their standard.";
+		mes "The Crimson Fields are north of town. Cut through the soldiers, ^0000FFforty^000000 of them, and find their war banner.";
 		mes "And whatever you hear out there... remember it's only a sword.";
 		close;
 	case 40:

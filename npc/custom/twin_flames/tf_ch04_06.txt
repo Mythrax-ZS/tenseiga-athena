@@ -9,17 +9,17 @@
 
 // ---------------------------------------------------------------- IV. Whispers in Steel
 
-ama_fild01,200,291,4	script	Battle Standard#tf	4_BOARD3,{
-	mes "[Battle Standard]";
+ama_fild01,200,291,4	script	Scorched War Banner#tf	1_FLAG_LION,{
+	mes "[Scorched War Banner]";
 	if (Class != JOB_SAMURAI || TF_STEP != 31) {
-		mes "^777777A clan standard, scorched and torn, planted in churned earth.^000000";
+		mes "^777777A clan war banner, scorched and torn, planted in churned earth.^000000";
 		close;
 	}
 	if (checkquest(900131, HUNTING) != 2) {
 		mes "^777777Bodies everywhere. Soldiers of both armies, and villagers who ran the wrong way.^000000";
 		mes "^777777Muramasa hums in your hand. It has been humming since you stepped onto the field.^000000";
 		next;
-		mes "^FF0000...more. More. Something stronger waits beneath the standard. Call it. Feed me.^000000";
+		mes "^FF0000...more. More. Something stronger waits beneath the banner. Call it. Feed me.^000000";
 		next;
 		if (callfunc("F_TF_Arena", 2)) {
 			mes "[Shade of Yami]";
@@ -66,7 +66,7 @@ OnInit:
 	end;
 }
 
-// Tetsuya in the Crimson Fields: he drops in as Yami's whisper takes hold (Battle Standard),
+// Tetsuya in the Crimson Fields: he drops in as Yami's whisper takes hold (Scorched War Banner),
 // seen only by that player, until they leave the fields.
 ama_fild01,197,293,6	script	Tetsuya Takahashi#crimson	4_EXJOB_NINJA2,{
 	mes "[Tetsuya]";
@@ -98,7 +98,7 @@ amatsu,198,151,4	script	Kiyoshi Takeda#tf	8_M_JPNMASTER,{
 		mes "General Mibu sold my army to the cult and took my name for his own. He holds the ^0000FFFrozen Citadel^000000 now.";
 		next;
 		mes "[Kiyoshi Takeda]";
-		mes "Go down to the second floor of the Ice Dungeon. His standard flies by the stairs. Bring him to his knees for me.";
+		mes "Go down to the second floor of the Ice Dungeon. His war banner flies by the stairs. Bring him to his knees for me.";
 		close;
 	}
 	mes "Mibu is beaten? Then hear the end of it.";
@@ -137,10 +137,10 @@ OnInit:
 	end;
 }
 
-ice_dun02,150,155,4	script	Frozen Citadel Standard#tf	4_BOARD3,{
-	mes "[Frozen Citadel]";
+ice_dun02,150,155,4	script	Mibu's War Banner#tf	1_FLAG_EAGLE,{
+	mes "[Mibu's War Banner]";
 	if (Class != JOB_SAMURAI || isbegin_quest(900132) != 1 || checkquest(900132, HUNTING) == 2) {
-		mes "^777777A standard frozen stiff in the wind. Its crest has been scratched out and painted over.^000000";
+		mes "^777777A war banner frozen stiff in the wind. Its crest has been scratched out and painted over.^000000";
 		close;
 	}
 	mes "^777777Kiyoshi's crest, painted over with Mibu's. Tear it down, and the usurper will come.^000000";
