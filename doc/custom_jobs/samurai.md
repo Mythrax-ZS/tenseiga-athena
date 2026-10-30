@@ -67,8 +67,13 @@ Kusanagi** and **Cursed / Muramasa** themes from the
 [shared Samurai design conversation](https://chatgpt.com/share/6ae32624-5d04-83ea-97ca-d6037adb630c).
 That conversation establishes precision, critical attacks and defensive SP
 techniques for Kusanagi, and bloodletting, risk and low-HP attacks for Muramasa.
-The deeper project backstory was unavailable; these are initial gameplay
-interpretations of those themes, not additional canon.
+Their story comes from the user's *Twin Flames Saga*
+([shared conversation](https://chatgpt.com/share/6ae3ebdd-c980-83ea-9535-f1e502f87ea0)):
+Kusanagi-no-Tsurugi and Muramasa are the two halves of the goddess
+Amaterasu-no-Mikazuki's divided flame. Muramasa was forged through the dark god
+Kagutsuchi-no-Yami, who tricked the grieving Hayate Yoshida into wielding it;
+Kusanagi was sealed by the goddess and freed by Tetsuya Takahashi's Sarugami
+blood. Hayate defies both gods by fusing the blades into Tenseiga-no-Hayate.
 
 | Item | ID / Aegis name | ATK | Weight | Effects |
 | --- | --- | --- | --- | --- |
@@ -79,8 +84,22 @@ Both are neutral, weapon level 4, require base level 99, have one card slot,
 and can be refined. They can be equipped in either hand or paired together.
 Bleeding can be resisted or shortened by the target's normal status defenses;
 the proc includes melee weapon skills as well as normal attacks. Multiple
-copies add their bonuses and penalties. No extra pair bonus, life-steal or
-recurring weapon HP drain is applied. They use the existing Samurai skills
+copies add their bonuses and penalties. No life-steal or recurring weapon HP
+drain is applied.
+
+### Twin Flames (Kusanagi and Muramasa dual wielded)
+
+Kusanagi's script adds a pair bonus when one hand holds Kusanagi and the other
+Muramasa, in either order. In the story, the two halves of the goddess's flame
+held together in mortal hands, so that neither god's chain holds: the step before
+Tenseiga. It uses only bonuses that apply regardless of which hand runs the script.
+
+| Effect | Story |
+| --- | --- |
+| Max HP +5% (cancels Muramasa's toll); immune to Curse and Bleeding | Kusanagi's light quiets Muramasa's hunger |
+| Ignore 25% DEF of Angel and Demon; 10% less damage from them | Defiance of the goddess's host and Yami's demons |
+| Heaven's Severance, Ashen Wind Slash and Wrath Unbound damage +15% | Each path feeds the other |
+| Mortal Flame: 3% on a weapon hit, 6 s of ASPD +10%, critical damage +25%, ignore 20% DEF of all races (Izayoi effect) | The blades burn as one, Tenseiga's echo | They use the existing Samurai skills
 without changing those skills' HP requirements or cooldowns.
 
 Administrators can create them with `@item 900001 1` and `@item 900002 1`.

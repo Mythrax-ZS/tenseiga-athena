@@ -45,6 +45,29 @@ Body:
       bonus2 bSkillAtk,"SAM_HEAVENS_SEVERANCE",10;
       bonus2 bSkillUseSPrate,"SAM_KUSANAGI_GUARD",15;
       bonus2 bSkillUseSPrate,"SAM_MOONLIT_REFLECTION",15;
+      // Twin Flames: Kusanagi and Muramasa dual wielded. The two blades are halves of the
+      // Moon-Sun Weaver's divided flame; held together in a mortal's hands, neither god's
+      // chain holds (the step before Hayate forges Tenseiga). Only hand-independent
+      // bonuses are used, so this applies whichever hand Kusanagi is in.
+      .@r = getequipid(EQI_HAND_R);
+      .@l = getequipid(EQI_HAND_L);
+      if ((.@r == 900001 && .@l == 900002) || (.@r == 900002 && .@l == 900001)) {
+        // The light quiets Muramasa's hunger: no Max HP toll, no curse, no bleeding.
+        bonus bMaxHPrate,5;
+        bonus2 bResEff,Eff_Curse,10000;
+        bonus2 bResEff,Eff_Bleeding,10000;
+        // Defiance of both gods: the goddess's divine host and Yami's demons.
+        bonus2 bIgnoreDefRaceRate,RC_Angel,25;
+        bonus2 bIgnoreDefRaceRate,RC_Demon,25;
+        bonus2 bSubRace,RC_Angel,10;
+        bonus2 bSubRace,RC_Demon,10;
+        // Each path feeds the other's strikes.
+        bonus2 bSkillAtk,"SAM_HEAVENS_SEVERANCE",15;
+        bonus2 bSkillAtk,"SAM_ASHEN_WIND_SLASH",15;
+        bonus2 bSkillAtk,"SAM_WRATH_UNBOUND",15;
+        // Mortal Flame: 3% on a weapon hit, the blades burn as one for 6 seconds.
+        autobonus "{ bonus bAspdRate,10; bonus bCritAtkRate,25; bonus2 bIgnoreDefRaceRate,RC_All,20; }",30,6000,BF_WEAPON,"{ specialeffect2 EF_KO_IZAYOI; }";
+      }
   - Id: 900002
     AegisName: Samurai_Muramasa
     Name: Muramasa
