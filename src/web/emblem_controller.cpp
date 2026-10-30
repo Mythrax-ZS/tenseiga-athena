@@ -3,9 +3,12 @@
 
 #include "emblem_controller.hpp"
 
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <ostream>
+#include <string>
+#include <vector>
 
 #include <common/showmsg.hpp>
 #include <common/socket.hpp>
@@ -15,9 +18,47 @@
 #include "sqllock.hpp"
 #include "web.hpp"
 
-// Max size is 50kb for gif
-#define MAX_EMBLEM_SIZE 50000
+// Max size: a 256x256 32-bit BMP is 262,198 bytes; GIF and PNG emblems are smaller
+#define MAX_EMBLEM_SIZE 307200
+// Emblems may be up to 256x256 pixels
+#define MAX_EMBLEM_DIMENSION 256
 #define START_VERSION 1
+
+static const std::string PNG_SIGNATURE( "\x89PNG\r\n\x1a\n", 8 );
+
+/**
+ * Reads an emblem's width and height from its image header.
+ * @param img: file data
+ * @param type: "BMP", "GIF" or "PNG"
+ * @return false when the header is too short or malformed
+ */
+static bool emblem_dimensions( const std::string& img, const std::string& type, uint32& width, uint32& height ){
+	const uint8* p = reinterpret_cast<const uint8*>( img.data() );
+
+	if( type == "BMP" ){
+		// BITMAPINFOHEADER biWidth and biHeight (negative for top-down bitmaps)
+		if( img.length() < 26 )
+			return false;
+		width = std::abs( static_cast<int32>( RBUFL( p, 18 ) ) );
+		height = std::abs( static_cast<int32>( RBUFL( p, 22 ) ) );
+	}else if( type == "GIF" ){
+		// Logical screen width and height
+		if( img.length() < 10 )
+			return false;
+		width = RBUFW( p, 6 );
+		height = RBUFW( p, 8 );
+	}else if( type == "PNG" ){
+		// The IHDR chunk comes first; its width and height are big-endian
+		if( img.length() < 24 || img.compare( 12, 4, "IHDR" ) != 0 )
+			return false;
+		width = ( p[16] << 24 ) | ( p[17] << 16 ) | ( p[18] << 8 ) | p[19];
+		height = ( p[20] << 24 ) | ( p[21] << 16 ) | ( p[22] << 8 ) | p[23];
+	}else{
+		return false;
+	}
+
+	return true;
+}
 
 HANDLER_FUNC(emblem_download) {
 	if (!isAuthorized(req, false)) {
@@ -46,6 +87,8 @@ HANDLER_FUNC(emblem_download) {
 	auto guild_id = std::stoi(req.get_file_value("GDID").content);
 
 	SQLLock sl(WEB_SQL_LOCK);
+	// Held until the handler returns: the statement below must close before another request
+	// uses the shared connection, so there is no early unlock.
 	sl.lock();
 	auto handle = sl.getHandle();
 	SqlStmt stmt{ *handle };
@@ -57,7 +100,6 @@ HANDLER_FUNC(emblem_download) {
 		|| SQL_SUCCESS != stmt.Execute()
 	) {
 		SqlStmt_ShowDebug(stmt);
-		sl.unlock();
 		res.status = HTTP_BAD_REQUEST;
 		res.set_content("Error", "text/plain");
 		return;
@@ -65,12 +107,11 @@ HANDLER_FUNC(emblem_download) {
 
 	uint32 version = 0;
 	char filetype[256];
-	char blob[MAX_EMBLEM_SIZE]; // yikes
+	std::vector<char> blob( MAX_EMBLEM_SIZE );
 	uint32 emblem_size;
 
 	if (stmt.NumRows() <= 0) {
 		ShowError("[GuildID: %d / World: \"%s\"] Not found in table\n", guild_id, world_name);
-		sl.unlock();
 		res.status = HTTP_NOT_FOUND;
 		res.set_content("Error", "text/plain");
 		return;
@@ -79,17 +120,15 @@ HANDLER_FUNC(emblem_download) {
 
 	if (SQL_SUCCESS != stmt.BindColumn( 0, SQLDT_UINT32, &version, sizeof(version))
 		|| SQL_SUCCESS != stmt.BindColumn( 1, SQLDT_STRING, &filetype, sizeof(filetype))
-		|| SQL_SUCCESS != stmt.BindColumn( 2, SQLDT_BLOB, &blob, MAX_EMBLEM_SIZE, &emblem_size)
+		|| SQL_SUCCESS != stmt.BindColumn( 2, SQLDT_BLOB, blob.data(), blob.size(), &emblem_size)
 		|| SQL_SUCCESS != stmt.NextRow()
 	) {
 		SqlStmt_ShowDebug(stmt);
-		sl.unlock();
 		res.status = HTTP_BAD_REQUEST;
 		res.set_content("Error", "text/plain");
 		return;
 	}
 
-	sl.unlock();
 
 	if (emblem_size > MAX_EMBLEM_SIZE) {
 		ShowDebug("Emblem is too big, current size is %d and the max length is %d.\n", emblem_size, MAX_EMBLEM_SIZE);
@@ -102,6 +141,8 @@ HANDLER_FUNC(emblem_download) {
 		content_type = "image/bmp";
 	else if (!strcmp(filetype, "GIF"))
 		content_type = "image/gif";
+	else if (!strcmp(filetype, "PNG"))
+		content_type = "image/png";
 	else {
 		ShowError("Invalid image type %s, rejecting!\n", filetype);
 		res.status = HTTP_NOT_FOUND;
@@ -109,7 +150,7 @@ HANDLER_FUNC(emblem_download) {
 		return;
 	}
 
-	res.body.assign(blob, emblem_size);
+	res.body.assign(blob.data(), emblem_size);
 	res.set_header("Content-Type", content_type);
 }
 
@@ -152,7 +193,7 @@ HANDLER_FUNC(emblem_upload) {
 	auto img = req.get_file_value("Img").content;
 	auto img_cstr = img.c_str();
 	
-	if (imgtype_str != "BMP" && imgtype_str != "GIF") {
+	if (imgtype_str != "BMP" && imgtype_str != "GIF" && imgtype_str != "PNG") {
 		ShowError("Invalid image type %s, rejecting!\n", imgtype);
 		res.status = HTTP_BAD_REQUEST;
 		res.set_content("Error", "text/plain");
@@ -162,6 +203,21 @@ HANDLER_FUNC(emblem_upload) {
 	auto length = img.length();
 	if (length > MAX_EMBLEM_SIZE) {
 		ShowDebug("Emblem is too big, current size is %lu and the max length is %d.\n", length, MAX_EMBLEM_SIZE);
+		res.status = HTTP_BAD_REQUEST;
+		res.set_content("Error", "text/plain");
+		return;
+	}
+
+	uint32 width = 0, height = 0;
+	if (!emblem_dimensions(img, imgtype_str, width, height) || width == 0 || height == 0 || width > MAX_EMBLEM_DIMENSION || height > MAX_EMBLEM_DIMENSION) {
+		ShowDebug("Emblem is %ux%u, it must be between 1x1 and %dx%d pixels.\n", width, height, MAX_EMBLEM_DIMENSION, MAX_EMBLEM_DIMENSION);
+		res.status = HTTP_BAD_REQUEST;
+		res.set_content("Error", "text/plain");
+		return;
+	}
+
+	if (imgtype_str == "PNG" && img.compare(0, PNG_SIGNATURE.length(), PNG_SIGNATURE) != 0) {
+		ShowDebug("Server received ImgType PNG but received file does not start with the PNG signature.\n");
 		res.status = HTTP_BAD_REQUEST;
 		res.set_content("Error", "text/plain");
 		return;
@@ -221,6 +277,8 @@ HANDLER_FUNC(emblem_upload) {
 	}
 
 	SQLLock sl(WEB_SQL_LOCK);
+	// Held until the handler returns: the statement below must close before another request
+	// uses the shared connection, so there is no early unlock.
 	sl.lock();
 	auto handle = sl.getHandle();
 	SqlStmt stmt{ *handle };
@@ -232,7 +290,6 @@ HANDLER_FUNC(emblem_upload) {
 		|| SQL_SUCCESS != stmt.Execute()
 	) {
 		SqlStmt_ShowDebug(stmt);
-		sl.unlock();
 		res.status = HTTP_BAD_REQUEST;
 		res.set_content("Error", "text/plain");
 		return;
@@ -245,7 +302,6 @@ HANDLER_FUNC(emblem_upload) {
 			|| SQL_SUCCESS != stmt.NextRow()
 		) {
 			SqlStmt_ShowDebug(stmt);
-			sl.unlock();
 			res.status = HTTP_BAD_REQUEST;
 			res.set_content("Error", "text/plain");
 			return;
@@ -265,13 +321,11 @@ HANDLER_FUNC(emblem_upload) {
 		|| SQL_SUCCESS != stmt.Execute()
 	) {
 		SqlStmt_ShowDebug(stmt);
-		sl.unlock();
 		res.status = HTTP_BAD_REQUEST;
 		res.set_content("Error", "text/plain");
 		return;
 	}
 
-	sl.unlock();
 
 	std::ostringstream stream;
 	stream << "{\"Type\":1,\"version\":" << version << "}";
