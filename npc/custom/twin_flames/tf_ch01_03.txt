@@ -34,6 +34,7 @@ prontera,158,179,4	script	Ashigaru Courier#tf	8_M_JPNSOLDIER,{
 		close;
 	}
 	TF_STEP = 1;
+	questinfo_refresh;
 	setquest 900101;
 	mes "She waits by the town guides in Amatsu. Go swiftly, and may the kami walk with you.";
 	close;
@@ -64,6 +65,7 @@ amatsu,192,94,4	script	Old Servant Oharu#tf	4_F_JPNOBA,{
 		mes "[Oharu]";
 		mes "Go up the stone path at the northern edge of the fields. The shrine sits behind it.";
 		TF_STEP = 2;
+		questinfo_refresh;
 		close;
 	case 2:
 		mes "The forgotten shrine is in the fields north of town, at the top of the stone path.";
@@ -86,6 +88,7 @@ amatsu,192,94,4	script	Old Servant Oharu#tf	4_F_JPNOBA,{
 		mes "Perhaps the town could be your house.";
 		completequest 900102;
 		TF_STEP = 10;
+		questinfo_refresh;
 		callfunc "F_TF_Reward", 3000000, 2000000, 100000;
 		next;
 		mes "[Oharu]";
@@ -137,6 +140,7 @@ ama_in01,175,176,4	script	Hooded Kami#tf	4_M_SOULREAPER,{
 	completequest 900101;
 	setquest 900102;
 	TF_STEP = 3;
+	questinfo_refresh;
 	close;
 
 OnInit:
@@ -164,6 +168,7 @@ amatsu,185,160,4	script	Elder Genzo#tf	4_M_JPNOJI,{
 		mes "We cannot pay a lord's stipend. But Amatsu remembers those who protect it.";
 		setquest 900111;
 		TF_STEP = 11;
+		questinfo_refresh;
 		close;
 	case 11:
 		if (checkquest(900111, HUNTING) != 2) {
@@ -178,6 +183,7 @@ amatsu,185,160,4	script	Elder Genzo#tf	4_M_JPNOJI,{
 		completequest 900111;
 		setquest 900112;
 		TF_STEP = 12;
+		questinfo_refresh;
 		callfunc "F_TF_Reward", 3000000, 2000000, 100000;
 		close;
 	case 12:
@@ -224,6 +230,7 @@ amatsu,180,150,6	script	Captured Raider#tf	8_M_JPNSOLDIER,{
 	mes "^777777Someone has been watching from the rooftops all along...^000000";
 	completequest 900112;
 	TF_STEP = 20;
+	questinfo_refresh;
 	callfunc "F_TF_Reward", 2000000, 1500000, 50000;
 	close;
 

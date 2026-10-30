@@ -53,6 +53,7 @@ ama_fild01,200,291,4	script	Battle Standard#tf	4_BOARD3,{
 	setquest 900133;
 	setquest 900134;
 	TF_STEP = 40;
+	questinfo_refresh;
 	callfunc "F_TF_Reward", 8000000, 6000000, 200000;
 	next;
 	mes "^777777Chapter IV, Whispers in Steel, is complete. Find Tetsuya in Amatsu.^000000";
@@ -104,6 +105,7 @@ amatsu,210,150,4	script	Kiyoshi Takeda#tf	8_M_JPNMASTER,{
 	}
 	getitem 900012, 1;
 	TF_BOND |= 1;
+	questinfo_refresh;
 	completequest 900132;
 	callfunc "F_TF_Reward", 4000000, 3000000, 100000;
 	mes "[Kiyoshi Takeda]";
@@ -159,6 +161,7 @@ amatsu,200,140,4	script	Brother Renga#tf	4_M_MONK,{
 	}
 	getitem 900011, 1;
 	TF_BOND |= 2;
+	questinfo_refresh;
 	completequest 900133;
 	callfunc "F_TF_Reward", 4000000, 3000000, 100000;
 	mes "[Brother Renga]";
@@ -210,6 +213,7 @@ amatsu,215,140,4	script	Ayame#tf	4_F_EDEN_MASTER,{
 		delitem 900019, 1;
 		getitem 900010, 1;
 		TF_BOND |= 4;
+		questinfo_refresh;
 		completequest 900134;
 		callfunc "F_TF_Reward", 4000000, 3000000, 100000;
 		specialeffect2 EF_HOLYHIT;
@@ -309,6 +313,7 @@ ama_dun03,120,30,4	script	Sealed Gate#tf	4_BOARD3,{
 	completequest 900141;
 	setquest 900142;
 	TF_STEP = 52;
+	questinfo_refresh;
 	callfunc "F_TF_Reward", 10000000, 7000000, 250000;
 	next;
 	mes "^777777You received ^0000FFKusanagi^000000. A shrine maiden waits beside the gate.^000000";
@@ -357,6 +362,7 @@ ama_dun03,110,30,4	script	Chiyo#tf	4_F_JPNMU,{
 	getitem 900013, 1;
 	completequest 900142;
 	TF_STEP = 60;
+	questinfo_refresh;
 	callfunc "F_TF_Reward", 6000000, 4000000, 150000;
 	mes "^777777You received ^0000FFChiyo's Carved Talisman^000000.^000000";
 	next;
@@ -422,6 +428,7 @@ function	script	F_TF_Twins	{
 	}
 	getitem 900014, 1;
 	TF_BOND |= 8;
+	questinfo_refresh;
 	completequest 900151;
 	callfunc "F_TF_Reward", 6000000, 4000000, 150000;
 	mes "^777777You received the ^0000FFTwin Sigils of Fire and Water^000000.^000000";
@@ -488,6 +495,7 @@ ama_in02,196,172,4	script	Lady Hanae#tf	4_F_JPN,{
 	}
 	getitem 900015, 1;
 	TF_BOND |= 16;
+	questinfo_refresh;
 	completequest 900152;
 	callfunc "F_TF_Reward", 6000000, 4000000, 150000;
 	mes "^777777You received the ^0000FFJade of the Exile's Fan^000000.^000000";

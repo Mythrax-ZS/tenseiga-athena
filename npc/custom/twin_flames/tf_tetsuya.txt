@@ -25,6 +25,7 @@ amatsu,192,163,4	script	Tetsuya Takahashi#tf	4_EXJOB_NINJA2,{
 		mes "Here's a wager. Answer my riddle, and I'll tell you who paid the raiders who burned your lord's house.";
 		setquest 900121;
 		TF_STEP = 21;
+		questinfo_refresh;
 		next;
 		// Fall through to the riddle.
 	case 21:
@@ -62,6 +63,7 @@ amatsu,192,163,4	script	Tetsuya Takahashi#tf	4_EXJOB_NINJA2,{
 		mes "We fought well together, though. I think I'll stay around. Somebody has to keep you honest.";
 		completequest 900122;
 		TF_STEP = 30;
+		questinfo_refresh;
 		callfunc "F_TF_Reward", 5000000, 3500000, 150000;
 		next;
 		mes "^777777Chapter III, The Trickster's Tail, is complete.^000000";
@@ -74,6 +76,7 @@ amatsu,192,163,4	script	Tetsuya Takahashi#tf	4_EXJOB_NINJA2,{
 		mes "Villagers are caught between the armies. We could hold the line for them. Find the battle standard in the fields north of town, past the stone path.";
 		setquest 900131;
 		TF_STEP = 31;
+		questinfo_refresh;
 		close;
 	case 31:
 		mes "The Crimson Fields are north of town. Cut through the soldiers, ^0000FFforty^000000 of them, and find their standard.";
@@ -102,6 +105,7 @@ amatsu,192,163,4	script	Tetsuya Takahashi#tf	4_EXJOB_NINJA2,{
 		mes "Take the deepest floor of the Amatsu dungeon. Keep Muramasa in your hand; the gate won't wake for anything else.";
 		setquest 900141;
 		TF_STEP = 51;
+		questinfo_refresh;
 		close;
 	case 51:
 	case 52:
@@ -137,6 +141,7 @@ amatsu,192,163,4	script	Tetsuya Takahashi#tf	4_EXJOB_NINJA2,{
 		setquest 900151;
 		setquest 900152;
 		TF_STEP = 61;
+		questinfo_refresh;
 		close;
 	case 61:
 		.@b = TF_BOND;
@@ -156,6 +161,7 @@ amatsu,192,163,4	script	Tetsuya Takahashi#tf	4_EXJOB_NINJA2,{
 		setquest 900161;
 		setquest 900162;
 		TF_STEP = 71;
+		questinfo_refresh;
 		close;
 	case 71:
 		.@b = TF_BOND;
@@ -171,6 +177,7 @@ amatsu,192,163,4	script	Tetsuya Takahashi#tf	4_EXJOB_NINJA2,{
 		mes "It's waiting in the woods east of Payon. I think it wants to talk.";
 		setquest 900171;
 		TF_STEP = 81;
+		questinfo_refresh;
 		callfunc "F_TF_Reward", 15000000, 10000000, 300000;
 		next;
 		mes "^777777Chapter VII, Return of the Ashes, is complete.^000000";
@@ -216,6 +223,7 @@ amatsu,192,163,4	script	Tetsuya Takahashi#tf	4_EXJOB_NINJA2,{
 		completequest 900181;
 		setquest 900191;
 		TF_STEP = 100;
+		questinfo_refresh;
 		next;
 		mes "[Tetsuya]";
 		mes "Masaru waits at the First Forge, on the second level of the Magma Dungeon. Bring both blades in hand, ^0000FF10 Oridecon^000000 and ^0000FF10 Burning Hearts^000000.";
