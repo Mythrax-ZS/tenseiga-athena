@@ -179,7 +179,7 @@ amatsu,185,160,4	script	Elder Genzo#tf	4_M_JPNOJI,{
 		next;
 		mes "[Elder Genzo]";
 		mes "One thing more. The watch caught one of the raiders who burned your lord's house.";
-		mes "He is bound just south of here, under guard. The town leaves his fate to you.";
+		mes "There he kneels, bound, a few paces from me. The watch keeps him, but the town leaves his fate to you.";
 		completequest 900111;
 		setquest 900112;
 		TF_STEP = 12;
@@ -187,7 +187,7 @@ amatsu,185,160,4	script	Elder Genzo#tf	4_M_JPNOJI,{
 		callfunc "F_TF_Reward", 3000000, 2000000, 100000;
 		close;
 	case 12:
-		mes "The raider is bound just south of here. His fate is yours to decide.";
+		mes "The raider kneels there, beside me, under guard. His fate is yours to decide.";
 		close;
 	default:
 		mes "Amatsu is grateful, samurai. Walk with honour.";
