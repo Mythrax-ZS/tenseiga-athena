@@ -30,7 +30,7 @@ side trial: 1 Kiyoshi, 2 Renga, 4 Ayame, 8 Taro and Jiro, 16 Hanae, 32 the Heral
 | Chapter | Steps | Where | What happens |
 | --- | --- | --- | --- |
 | I Ashes of Honor | 0-10 | Ashigaru Courier, Prontera 158,179; Oharu, Amatsu 192,94; the Hooded Kami in the field shrine (ama_in01 175,176) | The house you served is burned. A "kami of justice" (Yami in disguise) answers your prayer with **Muramasa**. Hunt 20 Ashigaru Raiders. |
-| II The Wandering Ronin | 10-20 | Elder Genzo, Amatsu 185,160; the Captured Raider, 180,150 | Drive back 30 Kapha. Spare or cut down a captured raider. |
+| II The Wandering Ronin | 10-20 | Elder Genzo, Amatsu 185,160; the Captured Raider, 187,158 | Drive back 30 Kapha. Spare or cut down a captured raider. |
 | III The Trickster's Tail | 20-30 | Tetsuya, Amatsu 192,163; War Banner, ama_dun02 45,50 | Tetsuya's riddle (the answer: a soul). Defeat **Warlord Kurogane** (Muramasa in hand). |
 | IV Whispers in Steel | 30-51 | Battle Standard, ama_fild01 200,291; Kiyoshi 210,150, Renga 200,140, Ayame 215,140 in Amatsu | 40 Crimson Fields Soldiers and the **Shade of Yami**; Yami reveals himself. Three trials: **General Mibu** (ice_dun02 150,155), **Fallen Monk Genkai** (prt_monk 225,140), **Kage** (ama_dun02 40,50; then 5 Holy Water). Each companion gives a relic. |
 | V The Shrine of Seals | 51-60 | Sealed Gate, ama_dun03 120,30; Chiyo, 110,30 | The **Guardian of the Seal** (Muramasa in hand); curse and Sarugami blood free **Kusanagi**. Chiyo's master, **High Priestess Sayo**. |

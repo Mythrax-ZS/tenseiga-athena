@@ -199,7 +199,7 @@ OnInit:
 	end;
 }
 
-amatsu,180,150,6	script	Captured Raider#tf	8_M_JPNSOLDIER,{
+amatsu,187,158,4	script	Captured Raider#tf	8_M_JPNSOLDIER,{
 	if (Class != JOB_SAMURAI || TF_STEP != 12) {
 		mes "^777777A bound man stares at the ground.^000000";
 		close;
