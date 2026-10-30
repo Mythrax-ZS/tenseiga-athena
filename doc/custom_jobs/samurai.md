@@ -136,6 +136,15 @@ refineable, Neutral. Client view 9003. Its script maps the forging to bonuses:
 | Physical damage +1% per refine level | Masaru's forge technique |
 | Mortal Flame: 5% on a weapon hit, 8 s of ASPD +15%, critical damage +30%, ignore 30% DEF of all races (Izayoi effect) | Human will burns hotter than any god's fire |
 
+While Tenseiga is equipped its wielder wears the **Mortal Flame aura**, in the
+blade's colours: crimson to violet ribbons climbing around them, crimson and cyan
+starbursts turning on the ground like its guard, and magenta, cyan and violet
+sparks rising (the runes, the edge and the body) over a dark indigo pool. The
+equip and unequip scripts turn on custom hat effect `HAT_EF_SAMURAI_TENSEIGA`
+(id 2000, added after the official ids in `src/map/script.hpp`), so the server
+shows it to everyone nearby and restores it on login. roclient draws it in code;
+clients that don't know the id show nothing.
+
 **Masaru** (`npc/custom/samurai_tenseiga.txt`) stands in **Prontera, 161,179**,
 beside the Samurai Mentor. A Samurai dual wielding Kusanagi and Muramasa (either
 hand order) with **10 Oridecon** and **10 Burning Hearts** can have them forged.

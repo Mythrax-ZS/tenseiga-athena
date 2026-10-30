@@ -2200,6 +2200,9 @@ enum e_hat_effects : int16{
 	FOOTPRINT_EF_FLOWER_GARDEN,
 	HAT_EF_C_ANGEL_GIFT,
 
+	// Custom: drawn by roclient in code, so kept clear of the official ids.
+	HAT_EF_SAMURAI_TENSEIGA = 2000,
+
 	HAT_EF_MAX
 };
 
