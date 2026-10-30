@@ -12,10 +12,10 @@
 
 // ---------------------------------------------------------------- VII. Return of the Ashes
 
-thor_v02,90,199,4	script	Altar of Ashes#tf	4_BOARD3,{
+thor_v02,90,199,4	script	Altar of Ashes#tf	4_BONFIRE,{
 	mes "[Altar of Ashes]";
 	if (Class != JOB_SAMURAI || isbegin_quest(900161) != 1 || (TF_BOND & 32)) {
-		mes "^777777An altar heaped with ash. The heat here is unbearable.^000000";
+		mes "^777777An altar of charred timber, heaped with ash. The heat here is unbearable.^000000";
 		close;
 	}
 	if (checkquest(900161, HUNTING) != 2) {
@@ -103,10 +103,10 @@ OnInit:
 	end;
 }
 
-thor_v03,49,250,4	script	Abyssal Gate#tf	4_BOARD3,{
+thor_v03,49,250,4	script	Abyssal Gate#tf	4_ED_FENCE,{
 	mes "[Abyssal Gate]";
 	if (Class != JOB_SAMURAI || TF_STEP != 82) {
-		mes "^777777A crack in the volcano's floor. Chains hang into it, glowing like coals.^000000";
+		mes "^777777A black iron gate over a crack in the volcano's floor. Chains hang through its bars into the dark, glowing like coals.^000000";
 		close;
 	}
 	if (checkquest(900172, HUNTING) != 2) {
@@ -295,10 +295,10 @@ OnInit:
 }
 
 // The Celestial Veil, where light and shadow fuse into the goddess's true form.
-valkyrie,48,64,4	script	Weaver's Throne#tf	4_BOARD3,{
+valkyrie,48,64,4	script	Weaver's Throne#tf	4_ED_ORB,{
 	mes "[Weaver's Throne]";
 	if (Class != JOB_SAMURAI || TF_STEP != 110) {
-		mes "^777777An empty throne of white marble, carved with a sun on one arm and a moon on the other.^000000";
+		mes "^777777An empty throne of white marble beneath a golden orrery: a sun on one ring, a moon on the other.^000000";
 		close;
 	}
 	if (checkquest(900192, HUNTING) != 2) {
@@ -314,7 +314,7 @@ valkyrie,48,64,4	script	Weaver's Throne#tf	4_BOARD3,{
 		}
 		close;
 	}
-	mes "^777777The throne cracks down the middle, sun from moon.^000000";
+	mes "^777777The orrery cracks down the middle, sun from moon, and the throne beneath it with it.^000000";
 	next;
 	mes "[Tetsuya]";
 	mes "...Is it over? It's raining. In heaven. That has to mean something.";

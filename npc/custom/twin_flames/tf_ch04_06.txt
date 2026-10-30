@@ -194,10 +194,10 @@ OnInit:
 	end;
 }
 
-prt_monk,225,140,4	script	Desecrated Altar#tf	4_BOARD3,{
+prt_monk,225,140,4	script	Desecrated Altar#tf	2_MONEMUS,{
 	mes "[Desecrated Altar]";
 	if (Class != JOB_SAMURAI || isbegin_quest(900133) != 1 || checkquest(900133, HUNTING) == 2) {
-		mes "^777777An old wayside altar. Someone has scrawled black sigils across its stones.^000000";
+		mes "^777777An old wayside altar, a pillar of stone carved with watching faces. Someone has scrawled black sigils across it.^000000";
 		close;
 	}
 	mes "^777777Genkai's sigils. Speak his name, and he will answer.^000000";
@@ -270,10 +270,10 @@ OnInit:
 	end;
 }
 
-ama_dun02,40,50,4	script	Kunai in the Wall#tf	4_BOARD3,{
+ama_dun02,40,50,4	script	Kunai in the Wall#tf	4_CRACK,{
 	mes "[Kunai in the Wall]";
 	if (Class != JOB_SAMURAI || isbegin_quest(900134) != 1 || checkquest(900134, HUNTING) == 2) {
-		mes "^777777A black kunai, driven deep into the stone.^000000";
+		mes "^777777A black kunai, driven deep into a crack in the stone.^000000";
 		close;
 	}
 	mes "^777777Kage's mark. Pull it free, and its owner will come for it.^000000";
@@ -287,10 +287,10 @@ ama_dun02,40,50,4	script	Kunai in the Wall#tf	4_BOARD3,{
 
 // ---------------------------------------------------------------- V. The Shrine of Seals
 
-ama_dun03,120,30,4	script	Sealed Gate#tf	4_BOARD3,{
+ama_dun03,120,30,4	script	Sealed Gate#tf	4_4JOB_SEALSTONE,{
 	mes "[Sealed Gate]";
 	if (Class != JOB_SAMURAI || TF_STEP < 51) {
-		mes "^777777A gate of stone and old talismans. Monkeys are carved into every pillar.^000000";
+		mes "^777777A gate of piled stone blocks, set with green seal crystals and old talismans. Monkeys are carved into every block.^000000";
 		close;
 	}
 	if (TF_STEP > 51) {
@@ -478,10 +478,10 @@ function	script	F_TF_Twins	{
 	close;
 }
 
-ice_dun03,149,45,4	script	Frozen Seal#tf	4_BOARD3,{
+ice_dun03,149,45,4	script	Frozen Seal#tf	4_RUNESTONE,{
 	mes "[Frozen Seal]";
 	if (Class != JOB_SAMURAI || isbegin_quest(900151) != 1 || checkquest(900151, HUNTING) == 2) {
-		mes "^777777A pillar of blue ice. Something moves inside it.^000000";
+		mes "^777777A standing stone sheathed in ice, its runes glowing blue. Something moves inside the ice.^000000";
 		close;
 	}
 	mes "^777777A great shape coils inside the ice. Break the seal, and it will wake.^000000";
@@ -520,11 +520,11 @@ ama_in02,196,172,4	script	Lady Hanae#tf	4_F_JPN,{
 		callfunc "F_TF_Moved";
 		mes "[Lady Hanae]";
 		mes "This is his seal. Now he cannot deny it.";
-		mes "He will hear soon that we know. He hides behind the folding screen in the inner court; confront him there.";
+		mes "He will hear soon that we know. He hides in the inner court, behind a masked steward; confront him there.";
 		close;
 	}
 	if (checkquest(900152, HUNTING) != 2) {
-		mes "Kurozane hides behind the masked screen in the inner court, just there. Show him what his pact has bought him.";
+		mes "Kurozane hides in the inner court, just there, behind his masked steward. Show him what his pact has bought him.";
 		close;
 	}
 	mes "The daimyo is dead and his letters are in the lord's hands. My exile is over.";
@@ -551,13 +551,13 @@ OnInit:
 	end;
 }
 
-ama_in02,204,168,4	script	Masked Screen#tf	4_BOARD3,{
-	mes "[Masked Screen]";
+ama_in02,204,168,4	script	Masked Steward#tf	4_M_MASKMAN,{
+	mes "[Masked Steward]";
 	if (Class != JOB_SAMURAI || TF_HANAE == 0 || isbegin_quest(900152) != 1 || checkquest(900152, HUNTING) == 2) {
-		mes "^777777A folding screen painted with smiling masks. Someone breathes behind it.^000000";
+		mes "^777777A steward in a smiling white mask stands before the inner door. He does not move, and he does not answer. Someone breathes behind the door.^000000";
 		close;
 	}
-	mes "^777777Behind the screen, the daimyo waits. He knows.^000000";
+	mes "^777777The steward looks at the letters in your hand and steps aside. Behind the door, the daimyo waits. He knows.^000000";
 	next;
 	if (callfunc("F_TF_Arena", 9)) {
 		mes "[Daimyo Kurozane]";
