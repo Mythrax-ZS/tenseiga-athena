@@ -20,7 +20,7 @@
 
 OnInit:
 	// arena: quest, monster, blade needed (0 none, 1 Muramasa, 2 Twin Flames, 3 Tenseiga), where it appears
-	setarray .quest[1],  900122, 900131, 900132, 900133, 900134, 900141, 900142, 900151, 900152, 900161, 900171, 900172, 900192, 900192, 900192;
+	setarray .quest[1],  900122, 900131, 900132, 900133, 900134, 900141, 900142, 900151, 900154, 900161, 900171, 900172, 900192, 900192, 900192;
 	setarray .mob[1],    31903,  31904,  31905,  31906,  31907,  31908,  31909,  31910,  31911,  31912,  31913,  31914,  31915,  31916,  31917;
 	setarray .need[1],   1,      1,      0,      0,      0,      1,      0,      0,      0,      2,      0,      2,      3,      3,      3;
 	setarray .map$[1],   "ama_dun02", "ama_fild01", "ice_dun02", "prt_monk", "ama_dun02", "ama_dun03", "ama_dun03", "ice_dun03", "ama_in02", "thor_v02", "pay_fild08", "thor_v03", "valkyrie", "valkyrie", "valkyrie";
@@ -257,11 +257,13 @@ OnMark:
 			if (isbegin_quest(900151) == 1 && checkquest(900151, HUNTING) != 2)
 				callsub L_Mark, "ice_dun03", 149, 45;
 		}
-		if (!(TF_BOND & 16)) {
+		// Hanae, or the steward before Kurozane; not while the letters are still out there.
+		if (!(TF_BOND & 16) && !(isbegin_quest(900153) == 1 && countitem(900020) < 3)) {
 			callsub L_Mark, "amatsu", 85, 235;	// the palace gate
-			callsub L_Mark, "ama_in02", 196, 172;
-			if (TF_HANAE && isbegin_quest(900152) == 1 && checkquest(900152, HUNTING) != 2)
+			if (isbegin_quest(900154) == 1 && checkquest(900154, HUNTING) != 2)
 				callsub L_Mark, "ama_in02", 204, 168;
+			else
+				callsub L_Mark, "ama_in02", 196, 172;
 		}
 		break;
 	case 71:

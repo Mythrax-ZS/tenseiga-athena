@@ -66,6 +66,8 @@ Body:
         Count: 1
   - Id: 900152
     Title: "Twin Flames VI: The Palace of Masks"
+  - Id: 900153
+    Title: "Twin Flames VI: Sealed Letters"
     Drops:
       - Mob: SHINOBI
         Item: TF_Sealed_Letter
@@ -73,6 +75,8 @@ Body:
       - Mob: MIYABI_NINGYO
         Item: TF_Sealed_Letter
         Rate: 2500
+  - Id: 900154
+    Title: "Twin Flames VI: Behind the Masks"
     Targets:
       - Mob: TF_KUROZANE
         Count: 1
