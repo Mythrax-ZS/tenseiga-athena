@@ -1451,6 +1451,8 @@ enum sc_type : int16 {
 	SC_SAM_BLADE_HARMONY,
 	SC_SAM_BLOOD_COVENANT,
 	SC_SAM_MURAMASAS_CURSE,
+	SC_SAM_UNCHAINED_WILL,
+	SC_SAM_FORGE_OF_TEN_SOULS,
 
 	SC_MAX, //Automatically updated max, used in for's to check we are within bounds.
 };
@@ -2957,6 +2959,8 @@ enum efst_type : int16{
 	EFST_SAM_BLADE_HARMONY,
 	EFST_SAM_BLOOD_COVENANT,
 	EFST_SAM_MURAMASAS_CURSE,
+	EFST_SAM_UNCHAINED_WILL,
+	EFST_SAM_FORGE_OF_TEN_SOULS,
 	EFST_MAX,
 };
 

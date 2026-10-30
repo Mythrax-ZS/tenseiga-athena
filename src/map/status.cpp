@@ -4936,6 +4936,10 @@ int32 status_calc_pc_sub(map_session_data* sd, uint8 opt)
 			pc_bonus(sd, SP_ATK_RATE, sc->getSCE(SC_SHRIMP)->val2);
 			pc_bonus(sd, SP_MATK_RATE, sc->getSCE(SC_SHRIMP)->val2);
 		}
+		if (const status_change_entry* forge = sc->getSCE(SC_SAM_FORGE_OF_TEN_SOULS); forge != nullptr) {
+			pc_bonus(sd, SP_ATK_RATE, forge->val2);
+			pc_bonus(sd, SP_MATK_RATE, forge->val2);
+		}
 		if (sc->getSCE(SC_INCMATKRATE))
 			pc_bonus(sd, SP_MATK_RATE, sc->getSCE(SC_INCMATKRATE)->val1);
 		if (sc->getSCE(SC_MINDBREAKER))
@@ -9657,6 +9661,17 @@ t_tick status_get_sc_def(const block_list* src, const block_list* bl, sc_type ty
 	sc = status_get_sc(bl);
 	if( sc != nullptr && sc->empty() )
 		sc = nullptr;
+
+	// Samurai's Unchained Will wards off the chains it cured when cast.
+	if( sc != nullptr && sc->getSCE(SC_SAM_UNCHAINED_WILL) != nullptr ){
+		switch( type ){
+			case SC_STUN: case SC_FREEZE: case SC_STONE: case SC_STONEWAIT: case SC_SLEEP:
+			case SC_SILENCE: case SC_CURSE: case SC_BLIND: case SC_CONFUSION:
+				return 0;
+			default:
+				break;
+		}
+	}
 
 #ifdef RENEWAL
 	uint16 levelAdv = (static_cast<uint16>(pow(max(0, status_get_lv(src) - status_get_lv(bl)), 2)) / 5) * 100;

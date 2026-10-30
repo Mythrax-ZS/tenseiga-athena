@@ -150,6 +150,12 @@ Body:
       bonus2 bAddClass,Class_All,getrefine();
       // Mortal Flame: 5% on a weapon hit, human will burns hotter than any god's fire for 8 seconds.
       autobonus "{ bonus bAspdRate,15; bonus bCritAtkRate,30; bonus2 bIgnoreDefRaceRate,RC_All,30; }",50,8000,BF_WEAPON,"{ specialeffect2 EF_KO_IZAYOI; }";
+      // Mortal Flame (quest skill): its core burns with human will, cutting light and shadow alike.
+      if (getskilllv("SAM_MORTAL_FLAME")) {
+        bonus bAtkRate,5;
+        bonus2 bSubEle,Ele_Holy,10;
+        bonus2 bSubEle,Ele_Dark,10;
+      }
     EquipScript: |
       // The Mortal Flame's aura, in the blade's colours (drawn by roclient).
       hateffect HAT_EF_SAMURAI_TENSEIGA,true;

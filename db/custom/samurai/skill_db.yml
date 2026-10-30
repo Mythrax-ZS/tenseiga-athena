@@ -163,3 +163,107 @@ Body:
         1hSword: true
         2hSword: true
         Katar: true
+  # The Mortal Flame line: Tenseiga's techniques. Mortal Flame itself is a quest skill
+  # (granted by the Tenseiga questline); the others are learned from it and are used only
+  # while Tenseiga is wielded (skill.cpp, skill_check_samurai_tenseiga).
+  - Id: 7009
+    Name: SAM_MORTAL_FLAME
+    Description: "Mortal Flame"
+    MaxLevel: 1
+    Flags:
+      IsQuest: true
+  - Id: 7010
+    Name: SAM_SEVER_HEAVENS_LIES
+    Description: "Severing Heaven's Lies"
+    MaxLevel: 5
+    Type: Weapon
+    TargetType: Attack
+    Hit: Single
+    HitCount: 1
+    Element: Weapon
+    Range: 2
+    AfterCastActDelay: 300
+    Cooldown: 3000
+    Requires:
+      SpCost: 40
+      Weapon:
+        2hSword: true
+  - Id: 7011
+    Name: SAM_LIGHT_AND_SHADOW
+    Description: "Light and Shadow"
+    MaxLevel: 5
+    Type: Weapon
+    TargetType: Attack
+    Hit: Multi_Hit
+    HitCount: 2
+    Element: Weapon
+    Range: 2
+    AfterCastActDelay: 500
+    Cooldown: 5000
+    Requires:
+      SpCost: 50
+      Weapon:
+        2hSword: true
+  - Id: 7012
+    Name: SAM_UNCHAINED_WILL
+    Description: "Unchained Will"
+    MaxLevel: 5
+    Type: Weapon
+    TargetType: Self
+    DamageFlags:
+      NoDamage: true
+    Duration1:
+      - Level: 1
+        Time: 15000
+      - Level: 2
+        Time: 20000
+      - Level: 3
+        Time: 25000
+      - Level: 4
+        Time: 30000
+      - Level: 5
+        Time: 35000
+    Status: Sam_UNCHAINED_WILL
+    AfterCastActDelay: 300
+    Cooldown: 60000
+    Requires:
+      SpCost: 40
+      Weapon:
+        2hSword: true
+  - Id: 7013
+    Name: SAM_FORGE_OF_TEN_SOULS
+    Description: "Forge of Ten Souls"
+    MaxLevel: 5
+    Type: Weapon
+    TargetType: Self
+    DamageFlags:
+      NoDamage: true
+      Splash: true
+    SplashArea: 7
+    Duration1: 60000
+    Status: Sam_FORGE_OF_TEN_SOULS
+    AfterCastActDelay: 1000
+    Cooldown: 120000
+    Requires:
+      SpCost: 80
+      Weapon:
+        2hSword: true
+  - Id: 7014
+    Name: SAM_DESTINYS_SEVERANCE
+    Description: "Destiny's Severance"
+    MaxLevel: 5
+    Type: Weapon
+    TargetType: Attack
+    DamageFlags:
+      IgnoreDefense: true
+    Hit: Single
+    HitCount: 1
+    Element: Weapon
+    Range: 2
+    CastTime: 1000
+    AfterCastActDelay: 1000
+    Cooldown: 30000
+    Requires:
+      SpCost: 100
+      Weapon:
+        2hSword: true

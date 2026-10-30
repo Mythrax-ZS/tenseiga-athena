@@ -2,15 +2,16 @@
 
 Samurai is custom job **4500**, based on the Assassin Cross lineage, for the
 sibling Rust **roclient** project. Server registration, statistics, equipment,
-eight skills, status effects and the job trainer are included. The earlier
+fourteen skills (eight, plus Tenseiga's six-skill Mortal Flame line), status
+effects and the job trainer are included. The earlier
 Ember Ronin body and matching katana assets are bundled with that client.
 
 Source and staged Release/x64 binaries are provided in `build/samurai`.
 The running executables in the repository root have **not** been replaced or
 restarted. Deploy the client and server changes together during a coordinated
 restart. Both **char-server and map-server must be updated together**:
-`MAX_SKILL` increased from 1641 to 1649, changing their shared character data
-layout. A full solution build produces a matching set of binaries.
+`MAX_SKILL` increased from 1641 to 1655 (1649 for the first eight skills),
+changing their shared character data layout. A full solution build produces a matching set of binaries.
 
 This setup depends on the existing `MAX_LEVEL 999` setting and local packet
 version **20250402**. The job's tracked data supplies base levels through 999
@@ -177,6 +178,35 @@ the normal combat pipeline applies defenses and modifiers.
 Client buff IDs **2000–2004** correspond to Guard, Reflection, Harmony,
 Covenant and Curse. These temporary effects are not saved through logout
 and end when the required weapon is unequipped.
+
+### The Mortal Flame line (Tenseiga)
+
+Chapter 13 of the saga ends with Tenseiga "unleashing abilities that cut
+through both light and shadow". Its techniques form a third line, unlocked by
+the same questline as Tenseiga:
+
+- **Mortal Flame** (7009) is a quest skill (`IsQuest`): skill points cannot
+  raise it, since `quest_skill_learn` stays off. The questline grants it with
+  `skill "SAM_MORTAL_FLAME",1,SKILL_PERM;`. Until those quests are written,
+  Masaru grants it when he forges Tenseiga, and to anyone who already did
+  (`SamuraiTenseigaForged`) or who wields it.
+- The other five need Mortal Flame in the skill tree, and can be used only
+  while **Tenseiga** (900003) is wielded (`skill_check_samurai_tenseiga` in
+  `src/map/skill.cpp`). Otherwise they fail with "wrong weapon".
+- Prerequisites: 7009 → 7010 (Lv 3) → 7011, and 7009 → 7012 (Lv 3) → 7013.
+  7014 needs 7011 at Lv 5 and 7013 at Lv 3.
+
+| ID | Skill | Story | Effect (levels 1–5) | SP / cooldown |
+| --- | --- | --- | --- | --- |
+| 7009 | Mortal Flame | "powered by mortal will rather than divine essence" | Passive, 1 level. While wielding Tenseiga: ATK +5%, 10% less damage from Holy and Shadow (in Tenseiga's item script). | — |
+| 7010 | Severing Heaven's Lies | "its edge cut through illusions and divine lies" | One target, 500/600/700/800/900%; 30/40/50/60/70% chance to strip its buffs. | 40 / 3 s |
+| 7011 | Light and Shadow | "cut through both light and shadow" | Two hits of 300/350/400/450/500% each, as Holy or Shadow, whichever element the target takes more damage from. | 50 / 5 s |
+| 7012 | Unchained Will | "Balance is not obedience. Balance is freedom." | Cures Stun, Freeze, Stone, Sleep, Silence, Curse, Blind and Confusion, then blocks them for 15/20/25/30/35 s. | 40 / 60 s |
+| 7013 | Forge of Ten Souls | every companion's will lit the First Forge | Party members within 7 cells: ATK and MATK +1/2/3/4/5% per party member there (at most 10) for 60 s. | 80 / 120 s |
+| 7014 | Destiny's Severance | "severed the bond between divinity and mortal destiny" | One target, 1000/1250/1500/1750/2000%, ignoring DEF; +50% against boss monsters. 1 s cast. | 100 / 30 s |
+
+Client buff IDs **2005** and **2006** are Unchained Will and Forge of Ten
+Souls. Like the other Samurai buffs, they are not saved through logout.
 
 ## Verification
 

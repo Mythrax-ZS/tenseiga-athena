@@ -8225,7 +8225,27 @@ int32 skill_check_bl_sc(block_list *target, va_list ap) {
 
 }
 
-/** 
+/// Tenseiga-no-Hayate (db/custom/samurai/item_db.yml).
+static constexpr t_itemid ITEMID_SAMURAI_TENSEIGA = 900003;
+
+/**
+ * The Mortal Flame line is Tenseiga's own: its skills (all but the passive) are used only
+ * while Tenseiga is wielded. Fails the skill with a message when it is not.
+ */
+static bool skill_check_samurai_tenseiga( map_session_data& sd, uint16 skill_id ){
+	if( skill_id < SAM_SEVER_HEAVENS_LIES || skill_id > SAM_DESTINYS_SEVERANCE )
+		return true;
+
+	int16 index = sd.equip_index[EQI_HAND_R];
+
+	if( index >= 0 && sd.inventory.u.items_inventory[index].nameid == ITEMID_SAMURAI_TENSEIGA )
+		return true;
+
+	clif_skill_fail( sd, skill_id, USESKILL_FAIL_THIS_WEAPON );
+	return false;
+}
+
+/**
  * Check skill condition when cast begin
  * For ammo, only check if the skill need ammo
  * For checking ammo requirement (type and amount) will be skill_check_condition_castend
@@ -8247,6 +8267,8 @@ bool skill_check_condition_castbegin( map_session_data& sd, uint16 skill_id, uin
 		clif_skill_fail(sd, skill_id, USESKILL_FAIL_HP_INSUFFICIENT);
 		return false;
 	}
+	if (!skill_check_samurai_tenseiga(sd, skill_id))
+		return false;
 
 	if( pc_has_permission(&sd, PC_PERM_SKILL_UNCONDITIONAL) && sd.skillitem != skill_id )
 	{	//GMs don't override the skillItem check, otherwise they can use items without them being consumed! [Skotlex]
@@ -9342,6 +9364,8 @@ bool skill_check_condition_castend( map_session_data& sd, uint16 skill_id, uint1
 		clif_skill_fail(sd, skill_id, USESKILL_FAIL_HP_INSUFFICIENT);
 		return false;
 	}
+	if (!skill_check_samurai_tenseiga(sd, skill_id))
+		return false;
 
 	if( pc_has_permission(&sd, PC_PERM_SKILL_UNCONDITIONAL) && sd.skillitem != skill_id ) {
 		//GMs don't override the skillItem check, otherwise they can use items without them being consumed! [Skotlex]

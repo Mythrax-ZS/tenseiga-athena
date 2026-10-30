@@ -46,3 +46,19 @@ Body:
       RequireWeapon: true
       RemoveOnUnequipWeapon: true
       RemoveOnHermode: true
+  - Status: Sam_UNCHAINED_WILL
+    Icon: EFST_SAM_UNCHAINED_WILL
+    DurationLookup: SAM_UNCHAINED_WILL
+    Flags:
+      NoSave: true
+      RequireWeapon: true
+      RemoveOnUnequipWeapon: true
+      RemoveOnHermode: true
+  - Status: Sam_FORGE_OF_TEN_SOULS
+    Icon: EFST_SAM_FORGE_OF_TEN_SOULS
+    DurationLookup: SAM_FORGE_OF_TEN_SOULS
+    CalcFlags:
+      All: true
+    Flags:
+      NoSave: true
+      RemoveOnHermode: true

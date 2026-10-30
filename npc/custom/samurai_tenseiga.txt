@@ -9,6 +9,18 @@ prontera,161,179,4	script	Masaru#tenseiga	4_M_JOB_BLACKSMITH,{
 		mes "Come back when you walk the way of the Samurai.";
 		close;
 	}
+	// Until the Tenseiga questline is written, its reward is given here: the Mortal Flame
+	// line opens to whoever forged (or wields) Tenseiga.
+	if ((SamuraiTenseigaForged || getequipid(EQI_HAND_R) == 900003) && !getskilllv("SAM_MORTAL_FLAME")) {
+		mes "Wait. The blade is only half of what the First Forge made. The other half is in you.";
+		mes "Tenseiga burns with mortal will, not a god's flame. Let that flame burn in your own hands as well.";
+		skill "SAM_MORTAL_FLAME",1,SKILL_PERM;
+		specialeffect2 EF_KO_IZAYOI;
+		next;
+		mes "[Masaru]";
+		mes "You have learned ^FF0000Mortal Flame^000000. Tenseiga's own techniques are yours to master now.";
+		close;
+	}
 	if (getequipid(EQI_HAND_R) == 900003) {
 		mes "Tenseiga. No god's gift, no curse's chain.";
 		mes "Whatever my family broke, you and that blade have mended.";
@@ -87,10 +99,12 @@ prontera,161,179,4	script	Masaru#tenseiga	4_M_JOB_BLACKSMITH,{
 	mes "No god's gift, no curse's chain. This is the blade of men, and with it, I sever heaven's lies.";
 	getitem2 "Samurai_Tenseiga",1,1,.@refine,0,0,0,0,0;
 	SamuraiTenseigaForged = 1;
+	skill "SAM_MORTAL_FLAME",1,SKILL_PERM;
 	announce strcharinfo(0) + " has forged Tenseiga-no-Hayate, the Mortal Flame.",bc_all;
 	next;
 	mes "[Masaru]";
 	mes "Tenseiga-no-Hayate. Not a relic of gods, but the first true sword of men.";
 	mes "It takes both hands. It is two blades made one.";
+	mes "And its flame burns in you now: you have learned ^FF0000Mortal Flame^000000.";
 	close;
 }

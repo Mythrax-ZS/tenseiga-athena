@@ -45,3 +45,34 @@ Body:
         Requires:
           - Name: SAM_ASHEN_WIND_SLASH
             Level: 3
+      # The Mortal Flame line. SAM_MORTAL_FLAME is a quest skill: skill points cannot
+      # raise it; the Tenseiga questline grants it.
+      - Name: SAM_MORTAL_FLAME
+        MaxLevel: 1
+      - Name: SAM_SEVER_HEAVENS_LIES
+        MaxLevel: 5
+        Requires:
+          - Name: SAM_MORTAL_FLAME
+            Level: 1
+      - Name: SAM_LIGHT_AND_SHADOW
+        MaxLevel: 5
+        Requires:
+          - Name: SAM_SEVER_HEAVENS_LIES
+            Level: 3
+      - Name: SAM_UNCHAINED_WILL
+        MaxLevel: 5
+        Requires:
+          - Name: SAM_MORTAL_FLAME
+            Level: 1
+      - Name: SAM_FORGE_OF_TEN_SOULS
+        MaxLevel: 5
+        Requires:
+          - Name: SAM_UNCHAINED_WILL
+            Level: 3
+      - Name: SAM_DESTINYS_SEVERANCE
+        MaxLevel: 5
+        Requires:
+          - Name: SAM_LIGHT_AND_SHADOW
+            Level: 5
+          - Name: SAM_FORGE_OF_TEN_SOULS
+            Level: 3

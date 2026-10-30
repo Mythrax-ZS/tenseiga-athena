@@ -11091,11 +11091,15 @@
 	export_constant(SC_SAM_BLADE_HARMONY);
 	export_constant(SC_SAM_BLOOD_COVENANT);
 	export_constant(SC_SAM_MURAMASAS_CURSE);
+	export_constant(SC_SAM_UNCHAINED_WILL);
+	export_constant(SC_SAM_FORGE_OF_TEN_SOULS);
 	export_constant(EFST_SAM_KUSANAGI_GUARD);
 	export_constant(EFST_SAM_MOONLIT_REFLECTION);
 	export_constant(EFST_SAM_BLADE_HARMONY);
 	export_constant(EFST_SAM_BLOOD_COVENANT);
 	export_constant(EFST_SAM_MURAMASAS_CURSE);
+	export_constant(EFST_SAM_UNCHAINED_WILL);
+	export_constant(EFST_SAM_FORGE_OF_TEN_SOULS);
 
 	#undef export_constant
 	#undef export_constant2
