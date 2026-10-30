@@ -42,6 +42,15 @@ side trial: 1 Kiyoshi, 2 Renga, 4 Ayame, 8 Taro and Jiro, 16 Hanae, 32 the Heral
 
 The forge keeps the lower refine of the two blades and refuses blades with cards in them.
 
+## Finding the way
+
+Every step says where to go next, in the dialog that ends it, though not always plainly.
+The NPC that is waiting shows a quest marker (`questinfo`). `TF_Marks` in `tf_common.txt`
+marks the next target on the minimap (`viewpoint`), on the map the player is on: as each saga
+map loads (`loadevent` mapflag) and after every step (`F_TF_Moved`). During the side trials it
+marks both the companion and their trial. The client's quest log shows each quest's location,
+with a Navigate button (NpcNavi / NpcPosX / NpcPosY in `samurai_questinfo.lua`).
+
 ## Bosses
 
 Each boss is called by the quest's own player at an arena NPC, on that quest step and with

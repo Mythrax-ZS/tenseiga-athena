@@ -153,6 +153,141 @@ function	script	F_TF_Reward	{
 	return;
 }
 
+// The saga moved on: its quest markers and minimap marks follow.
+function	script	F_TF_Moved	{
+	questinfo_refresh;
+	doevent "TF_Marks::OnMark";
+	return;
+}
+
+// After a companion's trial: once every trial of the chapter (arg 0, TF_BOND bits) is done,
+// where to report (arg 1); until then, Tetsuya knows who still waits.
+function	script	F_TF_Bonded	{
+	if ((TF_BOND & getarg(0)) == getarg(0))
+		mes "^777777" + getarg(1) + "^000000";
+	else
+		mes "^777777Others still wait on you. Tetsuya will know who.^000000";
+	return;
+}
+
+// Minimap marks (viewpoint) on the saga's next step, for the map the player is on: set as a
+// map loads (the loadevent mapflag on every map the saga visits) and after every step
+// (F_TF_Moved, queued until the dialog ends).
+-	script	TF_Marks	-1,{
+	end;
+
+OnInit:
+	setarray .@maps$, "prontera", "amatsu", "ama_in01", "ama_in02", "ama_fild01", "ama_dun02", "ama_dun03", "ice_dun02", "ice_dun03", "prt_monk", "thor_v02", "thor_v03", "pay_fild08", "mag_dun02", "valkyrie";
+	for (.@i = 0; .@i < getarraysize(.@maps$); .@i++)
+		setmapflag .@maps$[.@i], mf_loadevent;
+	end;
+
+OnPCLoadMapEvent:
+OnMark:
+	if (Class != JOB_SAMURAI)
+		end;
+	for (.@i = 1; .@i <= 8; .@i++)
+		viewpoint 2, 1, 1, .@i, 0xFFFFFF;
+	@tf_mark = 0;
+	switch (TF_STEP) {
+	case 0:  callsub L_Mark, "prontera", 158, 179; break;
+	case 1:  callsub L_Mark, "amatsu", 192, 94; break;
+	case 2:
+		callsub L_Mark, "ama_fild01", 174, 331;	// the shrine's door, up the stone path
+		callsub L_Mark, "ama_in01", 175, 176;
+		break;
+	case 3:
+		if (checkquest(900102, HUNTING) == 2)
+			callsub L_Mark, "amatsu", 192, 94;
+		break;
+	case 10: callsub L_Mark, "amatsu", 185, 160; break;
+	case 11:
+		if (checkquest(900111, HUNTING) == 2)
+			callsub L_Mark, "amatsu", 185, 160;
+		break;
+	case 12: callsub L_Mark, "amatsu", 187, 158; break;
+	case 21:
+		if (isbegin_quest(900122) == 1 && checkquest(900122, HUNTING) != 2) {
+			callsub L_Mark, "ama_dun02", 45, 50;
+			break;
+		}
+		// the riddle, or Kurogane is dead: Tetsuya
+	case 20:
+	case 30:
+	case 60:
+	case 90:
+		callsub L_Mark, "amatsu", 192, 163;
+		break;
+	case 31: callsub L_Mark, "ama_fild01", 200, 291; break;
+	case 40:
+		if ((TF_BOND & 7) == 7) {
+			callsub L_Mark, "amatsu", 192, 163;
+			break;
+		}
+		if (!(TF_BOND & 1)) {
+			callsub L_Mark, "amatsu", 210, 150;
+			if (isbegin_quest(900132) == 1 && checkquest(900132, HUNTING) != 2)
+				callsub L_Mark, "ice_dun02", 150, 155;
+		}
+		if (!(TF_BOND & 2)) {
+			callsub L_Mark, "amatsu", 200, 140;
+			if (isbegin_quest(900133) == 1 && checkquest(900133, HUNTING) != 2)
+				callsub L_Mark, "prt_monk", 225, 140;
+		}
+		if (!(TF_BOND & 4)) {
+			callsub L_Mark, "amatsu", 215, 140;
+			if (isbegin_quest(900134) == 1 && checkquest(900134, HUNTING) != 2)
+				callsub L_Mark, "ama_dun02", 40, 50;
+		}
+		break;
+	case 51: callsub L_Mark, "ama_dun03", 120, 30; break;
+	case 52: callsub L_Mark, "ama_dun03", 110, 30; break;
+	case 61:
+		if ((TF_BOND & 24) == 24) {
+			callsub L_Mark, "amatsu", 192, 163;
+			break;
+		}
+		if (!(TF_BOND & 8)) {
+			callsub L_Mark, "amatsu", 225, 150;
+			if (isbegin_quest(900151) == 1 && checkquest(900151, HUNTING) != 2)
+				callsub L_Mark, "ice_dun03", 149, 45;
+		}
+		if (!(TF_BOND & 16)) {
+			callsub L_Mark, "amatsu", 85, 235;	// the palace gate
+			callsub L_Mark, "ama_in02", 196, 172;
+			if (TF_HANAE && isbegin_quest(900152) == 1 && checkquest(900152, HUNTING) != 2)
+				callsub L_Mark, "ama_in02", 204, 168;
+		}
+		break;
+	case 71:
+		if ((TF_BOND & 96) == 96) {
+			callsub L_Mark, "amatsu", 192, 163;
+			break;
+		}
+		if (!(TF_BOND & 32))
+			callsub L_Mark, "thor_v02", 90, 199;
+		if (!(TF_BOND & 64))
+			callsub L_Mark, "prontera", 161, 179;
+		break;
+	case 81:  callsub L_Mark, "pay_fild08", 40, 80; break;
+	case 82:  callsub L_Mark, "thor_v03", 49, 250; break;
+	case 100: callsub L_Mark, "mag_dun02", 49, 40; break;
+	case 110:
+		callsub L_Mark, "mag_dun02", 53, 44;
+		callsub L_Mark, "valkyrie", 48, 64;
+		break;
+	}
+	end;
+
+// A mark at (map, x, y), if the player is on that map.
+L_Mark:
+	if (getarg(0) != strcharinfo(3))
+		return;
+	@tf_mark++;
+	viewpoint 1, getarg(1), getarg(2), @tf_mark, 0xFFAA00;
+	return;
+}
+
 // The saga's field monsters.
 ama_fild01,0,0	monster	Ashigaru Raider	31900,25,5000
 ama_fild01,200,260,35,30	monster	Crimson Fields Soldier	31901,30,5000

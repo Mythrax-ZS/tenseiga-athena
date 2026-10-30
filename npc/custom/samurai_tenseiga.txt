@@ -61,10 +61,11 @@ prontera,161,179,4	script	Masaru#tenseiga	4_M_KAGE_OLD,{
 	}
 	getitem 900016, 1;
 	TF_BOND |= 64;
-	questinfo_refresh;
+	callfunc "F_TF_Moved";
 	completequest 900162;
 	callfunc "F_TF_Reward", 6000000, 4000000, 150000;
 	mes "^777777You received the ^0000FFEmber of the First Smith^000000.^000000";
+	callfunc "F_TF_Bonded", 96, "Tetsuya will want to hear of it, back in Amatsu.";
 	close;
 
 OnInit:

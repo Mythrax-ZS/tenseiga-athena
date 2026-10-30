@@ -34,7 +34,7 @@ prontera,158,179,4	script	Ashigaru Courier#tf	8_M_JPNSOLDIER,{
 		close;
 	}
 	TF_STEP = 1;
-	questinfo_refresh;
+	callfunc "F_TF_Moved";
 	setquest 900101;
 	mes "She waits by the town guides in Amatsu. Go swiftly, and may the kami walk with you.";
 	close;
@@ -65,7 +65,7 @@ amatsu,192,94,4	script	Old Servant Oharu#tf	4_F_JPNOBA,{
 		mes "[Oharu]";
 		mes "Go up the stone path at the northern edge of the fields. The shrine sits behind it.";
 		TF_STEP = 2;
-		questinfo_refresh;
+		callfunc "F_TF_Moved";
 		close;
 	case 2:
 		mes "The forgotten shrine is in the fields north of town, at the top of the stone path.";
@@ -88,7 +88,7 @@ amatsu,192,94,4	script	Old Servant Oharu#tf	4_F_JPNOBA,{
 		mes "Perhaps the town could be your house.";
 		completequest 900102;
 		TF_STEP = 10;
-		questinfo_refresh;
+		callfunc "F_TF_Moved";
 		callfunc "F_TF_Reward", 3000000, 2000000, 100000;
 		next;
 		mes "[Oharu]";
@@ -140,7 +140,7 @@ ama_in01,175,176,4	script	Hooded Kami#tf	4_M_SOULREAPER,{
 	completequest 900101;
 	setquest 900102;
 	TF_STEP = 3;
-	questinfo_refresh;
+	callfunc "F_TF_Moved";
 	close;
 
 OnInit:
@@ -168,7 +168,7 @@ amatsu,185,160,4	script	Elder Genzo#tf	4_M_JPNOJI,{
 		mes "We cannot pay a lord's stipend. But Amatsu remembers those who protect it.";
 		setquest 900111;
 		TF_STEP = 11;
-		questinfo_refresh;
+		callfunc "F_TF_Moved";
 		close;
 	case 11:
 		if (checkquest(900111, HUNTING) != 2) {
@@ -183,11 +183,14 @@ amatsu,185,160,4	script	Elder Genzo#tf	4_M_JPNOJI,{
 		completequest 900111;
 		setquest 900112;
 		TF_STEP = 12;
-		questinfo_refresh;
+		callfunc "F_TF_Moved";
 		callfunc "F_TF_Reward", 3000000, 2000000, 100000;
 		close;
 	case 12:
 		mes "The raider kneels there, beside me, under guard. His fate is yours to decide.";
+		close;
+	case 20:
+		mes "That fellow with the monkey's tail has been loitering by my roof for days, just over there. He keeps asking about you.";
 		close;
 	default:
 		mes "Amatsu is grateful, samurai. Walk with honour.";
@@ -217,20 +220,22 @@ amatsu,187,158,4	script	Captured Raider#tf	8_M_JPNSOLDIER,{
 		next;
 		mes "[Captured Raider]";
 		mes "...Thank you. I will not forget this. I swear it on my daughter.";
+		mes "And samurai... the one with the tail, up past the elder. He has watched you since you came to town.";
 		TF_MERCY++;
 		break;
 	case 2:
 		specialeffect EF_BLOODDRAIN;
 		mes "^777777Muramasa moves almost before you do. The man falls without a sound.^000000";
 		mes "^777777The blade feels warm, satisfied. You feel nothing at all, and that frightens you.^000000";
+		mes "^777777Somewhere just past Elder Genzo, someone whistles, low and long.^000000";
 		break;
 	}
 	next;
 	mes "^777777Chapter II, The Wandering Ronin, is complete.^000000";
-	mes "^777777Someone has been watching from the rooftops all along...^000000";
+	mes "^777777Someone has been watching from the rooftops all along, a few paces past Elder Genzo...^000000";
 	completequest 900112;
 	TF_STEP = 20;
-	questinfo_refresh;
+	callfunc "F_TF_Moved";
 	callfunc "F_TF_Reward", 2000000, 1500000, 50000;
 	close;
 

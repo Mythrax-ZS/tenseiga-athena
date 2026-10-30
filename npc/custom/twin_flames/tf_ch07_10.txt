@@ -36,9 +36,10 @@ thor_v02,90,199,4	script	Altar of Ashes#tf	4_BOARD3,{
 	next;
 	mes "^777777Then it is gone. You are on your knees on hot stone, still holding both.^000000";
 	TF_BOND |= 32;
-	questinfo_refresh;
+	callfunc "F_TF_Moved";
 	completequest 900161;
 	callfunc "F_TF_Reward", 12000000, 9000000, 300000;
+	callfunc "F_TF_Bonded", 96, "Tetsuya will want to hear of it, back in Amatsu.";
 	close;
 
 OnInit:
@@ -92,7 +93,7 @@ pay_fild08,40,80,4	script	Kohaku#tf	1180,{
 	completequest 900171;
 	setquest 900172;
 	TF_STEP = 82;
-	questinfo_refresh;
+	callfunc "F_TF_Moved";
 	callfunc "F_TF_Reward", 10000000, 7000000, 250000;
 	mes "^777777You received ^0000FFKohaku's Foxfire^000000.^000000";
 	close;
@@ -129,7 +130,7 @@ thor_v03,49,250,4	script	Abyssal Gate#tf	4_BOARD3,{
 	mes "^777777Almost.^000000";
 	completequest 900172;
 	TF_STEP = 90;
-	questinfo_refresh;
+	callfunc "F_TF_Moved";
 	callfunc "F_TF_Reward", 25000000, 18000000, 500000;
 	announce strcharinfo(0) + " has defeated Kagutsuchi-no-Yami, the God of Ashes and Chains.", bc_all, "0xFFD27F";
 	next;
@@ -232,13 +233,14 @@ mag_dun02,49,40,4	script	Masaru#forge	4_M_KAGE_OLD,{
 	completequest 900191;
 	setquest 900192;
 	TF_STEP = 110;
-	questinfo_refresh;
+	callfunc "F_TF_Moved";
 	announce strcharinfo(0) + " has forged Tenseiga-no-Hayate, the Mortal Flame.", bc_all;
 	next;
 	mes "[Masaru]";
 	mes "Tenseiga-no-Hayate. Not a relic of gods, but the first true sword of men.";
 	mes "It takes both hands. It is two blades made one.";
 	mes "And its flame burns in you now: you have learned ^FF0000Mortal Flame^000000. Tenseiga's own techniques are yours to master.";
+	mes "^777777Beside the anvil, Tetsuya is already looking up, as if he can see through the mountain to the sky.^000000";
 	close;
 
 OnInit:
@@ -312,7 +314,7 @@ valkyrie,48,64,4	script	Weaver's Throne#tf	4_BOARD3,{
 	mes "Go on, then. Disappear into legend, like the stories say. I'll keep wandering. Somebody has to keep the balance honest.";
 	completequest 900192;
 	TF_STEP = 120;
-	questinfo_refresh;
+	callfunc "F_TF_Moved";
 	callfunc "F_TF_Reward", 50000000, 35000000, 1000000;
 	announce strcharinfo(0) + " has cut the Weaver's chains with Tenseiga-no-Hayate. The Twin Flames Saga is complete.", bc_all, "0xFFFFFF";
 	next;
