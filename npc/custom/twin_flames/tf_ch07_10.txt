@@ -266,7 +266,7 @@ mag_dun02,53,44,4	script	Tetsuya Takahashi#forge	4_EXJOB_NINJA2,{
 		mes "Take your time. Gods are patient. That's the worst thing about them.";
 		close;
 	}
-	warp "valkyrie", 48, 58;
+	warp "tf_goddess", 149, 178;
 	end;
 
 OnInit:
@@ -276,7 +276,7 @@ OnInit:
 
 // Tetsuya in the Celestial Veil: he comes up with the player (shown as they arrive, by
 // TF_Marks).
-valkyrie,45,60,7	script	Tetsuya Takahashi#veil	4_EXJOB_NINJA2,{
+tf_goddess,146,179,7	script	Tetsuya Takahashi#veil	4_EXJOB_NINJA2,{
 	mes "[Tetsuya]";
 	if (TF_STEP == 110) {
 		mes "There's the throne. Light, then shadow, then both at once, if the Sarugami are right.";
@@ -295,7 +295,7 @@ OnInit:
 }
 
 // The Celestial Veil, where light and shadow fuse into the goddess's true form.
-valkyrie,48,64,4	script	Weaver's Throne#tf	4_ED_ORB,{
+tf_goddess,149,187,4	script	Weaver's Throne#tf	4_ED_ORB,{
 	mes "[Weaver's Throne]";
 	if (Class != JOB_SAMURAI || TF_STEP != 110) {
 		mes "^777777An empty throne of white marble beneath a golden orrery: a sun on one ring, a moon on the other.^000000";

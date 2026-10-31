@@ -38,7 +38,7 @@ side trial: 1 Kiyoshi, 2 Renga, 4 Ayame, 8 Taro and Jiro, 16 Hanae, 32 the Heral
 | VII Return of the Ashes | 71-81 | Altar of Ashes, thor_v02 90,199; Masaru, Prontera 161,179 | 30 Cultists of Ashes and the **Herald of Ashes** (Twin Flames: both blades dual wielded). Five ledger pages (from Kasa and Salamanders) for Masaru. |
 | VIII The Fall of Yami | 81-90 | Kohaku, pay_fild08 40,80; Abyssal Gate, thor_v03 49,250 | The **Contract Binder** frees Kohaku the fox. **Kagutsuchi-no-Yami** falls (Twin Flames); the goddess's false blessing. |
 | IX The Weaver Unmasked | 90-100 | Tetsuya | Bring all eight relics; Tetsuya adds the Sarugami Essence. |
-| X The Mortal Flame | 100-120 | Masaru and Tetsuya at the First Forge, mag_dun02 49,40 / 53,44; the Weaver's Throne, valkyrie 48,64 | Forge **Tenseiga-no-Hayate** (Twin Flames, 9 relics, 10 Oridecon, 10 Burning Hearts) and learn **Mortal Flame**. In the Celestial Veil, the Weaver in three forms: Radiant, Eclipsed, then **Amaterasu-no-Mikazuki** (Tenseiga in hand). |
+| X The Mortal Flame | 100-120 | Masaru and Tetsuya at the First Forge, mag_dun02 49,40 / 53,44; the Weaver's Throne, tf_goddess 149,187 | Forge **Tenseiga-no-Hayate** (Twin Flames, 9 relics, 10 Oridecon, 10 Burning Hearts) and learn **Mortal Flame**. In the Celestial Veil, the Weaver in three forms: Radiant, Eclipsed, then **Amaterasu-no-Mikazuki** (Tenseiga in hand). |
 
 The forge keeps the lower refine of the two blades and refuses blades with cards in them.
 

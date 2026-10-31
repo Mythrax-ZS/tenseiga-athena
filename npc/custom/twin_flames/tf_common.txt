@@ -23,9 +23,9 @@ OnInit:
 	setarray .quest[1],  900122, 900131, 900132, 900133, 900134, 900141, 900142, 900151, 900154, 900161, 900171, 900172, 900192, 900192, 900192;
 	setarray .mob[1],    31903,  31904,  31905,  31906,  31907,  31908,  31909,  31910,  31911,  31912,  31913,  31914,  31915,  31916,  31917;
 	setarray .need[1],   1,      1,      0,      0,      0,      1,      0,      0,      0,      2,      0,      2,      3,      3,      3;
-	setarray .map$[1],   "ama_dun02", "ama_fild01", "ice_dun02", "prt_monk", "ama_dun02", "ama_dun03", "ama_dun03", "ice_dun03", "ama_in02", "thor_v02", "pay_fild08", "thor_v03", "valkyrie", "valkyrie", "valkyrie";
-	setarray .x[1],      47,     200,    150,    225,    40,     120,    110,    149,    204,    90,     42,     49,     48,     48,     48;
-	setarray .y[1],      48,     294,    158,    143,    47,     33,     33,     51,     165,    202,    82,     253,    67,     67,     67;
+	setarray .map$[1],   "ama_dun02", "ama_fild01", "ice_dun02", "prt_monk", "ama_dun02", "ama_dun03", "ama_dun03", "ice_dun03", "ama_in02", "thor_v02", "pay_fild08", "thor_v03", "tf_goddess", "tf_goddess", "tf_goddess";
+	setarray .x[1],      47,     200,    150,    225,    40,     120,    110,    149,    204,    90,     42,     49,     149,    149,    149;
+	setarray .y[1],      48,     294,    158,    143,    47,     33,     33,     51,     165,    202,    82,     253,    184,    184,    184;
 	initnpctimer;
 	end;
 
@@ -60,21 +60,21 @@ OnDead12:
 // The Weaver: radiance, then eclipse, then both. Each falls into the next.
 OnDead13:
 	.gid[13] = 0;
-	mapannounce "valkyrie", "Amaterasu-no-Mikazuki: Light alone cannot hold you? Then be swallowed by my shadow.", bc_map, "0xC8A0FF";
+	mapannounce "tf_goddess", "Amaterasu-no-Mikazuki: Light alone cannot hold you? Then be swallowed by my shadow.", bc_map, "0xC8A0FF";
 	monster .map$[14], .x[14], .y[14], "Eclipsed Amaterasu", .mob[14], 1, "TF_Arenas::OnDead14";
 	.gid[14] = $@mobid[0];
 	.since[14] = gettimetick(2);
 	end;
 OnDead14:
 	.gid[14] = 0;
-	mapannounce "valkyrie", "Amaterasu-no-Mikazuki: Moon and sun, mother and jailer. I am both, and you are nothing!", bc_map, "0xFFD27F";
+	mapannounce "tf_goddess", "Amaterasu-no-Mikazuki: Moon and sun, mother and jailer. I am both, and you are nothing!", bc_map, "0xFFD27F";
 	monster .map$[15], .x[15], .y[15], "Amaterasu-no-Mikazuki", .mob[15], 1, "TF_Arenas::OnDead15";
 	.gid[15] = $@mobid[0];
 	.since[15] = gettimetick(2);
 	end;
 OnDead15:
 	.gid[15] = 0;
-	mapannounce "valkyrie", "Amaterasu-no-Mikazuki: Perhaps mortals need no gods... perhaps that is freedom.", bc_map, "0xFFFFFF";
+	mapannounce "tf_goddess", "Amaterasu-no-Mikazuki: Perhaps mortals need no gods... perhaps that is freedom.", bc_map, "0xFFFFFF";
 	end;
 }
 
@@ -177,7 +177,7 @@ function	script	F_TF_Bonded	{
 	end;
 
 OnInit:
-	setarray .@maps$, "prontera", "amatsu", "ama_in01", "ama_in02", "ama_fild01", "ama_dun02", "ama_dun03", "ice_dun02", "ice_dun03", "prt_monk", "thor_v02", "thor_v03", "pay_fild08", "mag_dun02", "valkyrie";
+	setarray .@maps$, "prontera", "amatsu", "ama_in01", "ama_in02", "ama_fild01", "ama_dun02", "ama_dun03", "ice_dun02", "ice_dun03", "prt_monk", "thor_v02", "thor_v03", "pay_fild08", "mag_dun02", "tf_goddess";
 	for (.@i = 0; .@i < getarraysize(.@maps$); .@i++)
 		setmapflag .@maps$[.@i], mf_loadevent;
 	end;
@@ -186,7 +186,7 @@ OnPCLoadMapEvent:
 	// Tetsuya comes along into the Shrine of Seals and the Celestial Veil.
 	if (Class == JOB_SAMURAI && strcharinfo(3) == "ama_dun03" && (TF_STEP == 51 || TF_STEP == 52))
 		cloakoffnpcself "Tetsuya Takahashi#seal";
-	if (Class == JOB_SAMURAI && strcharinfo(3) == "valkyrie" && TF_STEP >= 110)
+	if (Class == JOB_SAMURAI && strcharinfo(3) == "tf_goddess" && TF_STEP >= 110)
 		cloakoffnpcself "Tetsuya Takahashi#veil";
 OnMark:
 	if (Class != JOB_SAMURAI)
@@ -281,7 +281,7 @@ OnMark:
 	case 100: callsub L_Mark, "mag_dun02", 49, 40; break;
 	case 110:
 		callsub L_Mark, "mag_dun02", 53, 44;
-		callsub L_Mark, "valkyrie", 48, 64;
+		callsub L_Mark, "tf_goddess", 149, 187;
 		break;
 	}
 	end;
@@ -294,6 +294,10 @@ L_Mark:
 	viewpoint 1, getarg(1), getarg(2), @tf_mark, 0xFFAA00;
 	return;
 }
+
+// The Celestial Veil (tf_goddess, a copy of herosria): no memo, and no teleporting off the platform.
+tf_goddess	mapflag	nomemo
+tf_goddess	mapflag	noteleport
 
 // The saga's field monsters.
 ama_fild01,0,0	monster	Ashigaru Raider	31900,25,5000
