@@ -1,0 +1,28 @@
+//===== rAthena Script =======================================
+//= Kafra Dungeon Teleport Service, always on
+//===== Description: =========================================
+//= The official Dungeon Teleport Service (npc/kafras/dts_warper.txt) runs as an election
+//= between Kafra and Cool Event Corp: a day of voting with the service off, then six days
+//= for the winner. An election needs at least 20 votes to be decided, which a small server
+//= never reaches, so the service would stay off for good.
+//=
+//= This keeps the outcome settled: Kafra has won (at its full service: Toy Factory 2,
+//= Clock Tower 3 and the Magma Dungeon 2) and its service period never runs out.
+//= Remove this file to go back to the official elections.
+//============================================================
+
+-	script	DTS_KafraService	-1,{
+OnInit:
+	set $DTS_Result, 2;		// Kafra provides the service
+	set $DTS_KafraWins, 2;		// its full list of dungeons
+	set $DTS_JondaWins, 0;
+	set $DTS_Time, 0;
+	set $DTS_PeriodCheck, 0;
+	end;
+
+// The service period counts minutes up to 8640 and then reopens the vote; hold it at the start.
+OnMinute00:
+	set $DTS_Result, 2;
+	set $DTS_PeriodCheck, 0;
+	end;
+}
