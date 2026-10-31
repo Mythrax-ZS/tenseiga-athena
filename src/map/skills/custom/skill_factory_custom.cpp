@@ -124,6 +124,23 @@ public:
             ratio = ratio * 3 / 2;
     }
 };
+
+// Crescent Gale: Hayate's will loosed from Tenseiga's edge as a crescent of mortal flame,
+// through every enemy on its path (ActiveInstance cells long, SplashArea either side).
+class SamuraiCrescentGale final : public SkillImpl {
+public:
+    SamuraiCrescentGale() : SkillImpl(SAM_CRESCENT_GALE) {}
+    void calculateSkillRatio(const Damage*, const block_list* src, const block_list*, uint16 lv, int32& ratio, int32) const override {
+        samurai_ratio(src, ratio, 3000 + 2500 * lv); // 5500-15500% x base level / 100.
+    }
+    void castendDamageId(block_list* src, block_list* target, uint16 lv, t_tick tick, int32& flag) const override {
+        skill_area_temp[1] = target->id;
+        if (!map_foreachindir(skill_attack_area, src->m, src->x, src->y, target->x, target->y,
+                skill_get_splash(getSkillId(), lv), skill_get_maxcount(getSkillId(), lv), 0, splash_target(src),
+                skill_get_type(getSkillId()), src, src, getSkillId(), lv, tick, flag, BCT_ENEMY))
+            skill_attack(skill_get_type(getSkillId()), src, src, target, getSkillId(), lv, tick, flag); // The target is hit even off the path.
+    }
+};
 } // namespace
 
 std::unique_ptr<const SkillImpl> SkillFactoryCustom::create(const e_skill skill_id) const {
@@ -149,6 +166,8 @@ std::unique_ptr<const SkillImpl> SkillFactoryCustom::create(const e_skill skill_
             return std::make_unique<SamuraiForgeOfTenSouls>();
         case SAM_DESTINYS_SEVERANCE:
             return std::make_unique<SamuraiDestinysSeverance>();
+        case SAM_CRESCENT_GALE:
+            return std::make_unique<SamuraiCrescentGale>();
         default:
             return nullptr;
     }

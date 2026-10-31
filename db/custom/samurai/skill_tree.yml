@@ -76,3 +76,8 @@ Body:
             Level: 5
           - Name: SAM_FORGE_OF_TEN_SOULS
             Level: 3
+      - Name: SAM_CRESCENT_GALE
+        MaxLevel: 5
+        Requires:
+          - Name: SAM_SEVER_HEAVENS_LIES
+            Level: 5

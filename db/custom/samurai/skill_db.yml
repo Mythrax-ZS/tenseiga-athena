@@ -267,3 +267,26 @@ Body:
       SpCost: 150
       Weapon:
         2hSword: true
+  # Crescent Gale: a crescent of mortal flame loosed from the blade, through every enemy on
+  # its path (11 cells long, 3 wide; skill_factory_custom.cpp).
+  - Id: 7015
+    Name: SAM_CRESCENT_GALE
+    Description: "Crescent Gale"
+    MaxLevel: 5
+    Type: Weapon
+    TargetType: Attack
+    DamageFlags:
+      Splash: true
+    Range: 9
+    Hit: Single
+    HitCount: 1
+    Element: Weapon
+    SplashArea: 1
+    ActiveInstance: 11
+    CastTime: 500
+    AfterCastActDelay: 500
+    Cooldown: 6000
+    Requires:
+      SpCost: 120
+      Weapon:
+        2hSword: true

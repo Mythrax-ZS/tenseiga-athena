@@ -10,7 +10,7 @@ Source and staged Release/x64 binaries are provided in `build/samurai`.
 The running executables in the repository root have **not** been replaced or
 restarted. Deploy the client and server changes together during a coordinated
 restart. Both **char-server and map-server must be updated together**:
-`MAX_SKILL` increased from 1641 to 1655 (1649 for the first eight skills),
+`MAX_SKILL` increased from 1641 to 1656 (one per Samurai skill),
 changing their shared character data layout. A full solution build produces a matching set of binaries.
 
 This setup depends on the existing `MAX_LEVEL 999` setting and local packet
@@ -204,11 +204,11 @@ the same questline as Tenseiga:
   `skill "SAM_MORTAL_FLAME",1,SKILL_PERM;` when Tenseiga is forged in Chapter X. Masaru in
   Prontera also grants it to anyone who forged Tenseiga before the saga existed
   (`SamuraiTenseigaForged`).
-- The other five need Mortal Flame in the skill tree, and can be used only
+- The other six need Mortal Flame in the skill tree, and can be used only
   while **Tenseiga** (900003) is wielded (`skill_check_samurai_tenseiga` in
   `src/map/skill.cpp`). Otherwise they fail with "wrong weapon".
 - Prerequisites: 7009 → 7010 (Lv 3) → 7011, and 7009 → 7012 (Lv 3) → 7013.
-  7014 needs 7011 at Lv 5 and 7013 at Lv 3.
+  7014 needs 7011 at Lv 5 and 7013 at Lv 3. 7015 needs 7010 at Lv 5.
 
 | ID | Skill | Story | Effect (levels 1–5) | SP / cooldown |
 | --- | --- | --- | --- | --- |
@@ -218,6 +218,7 @@ the same questline as Tenseiga:
 | 7012 | Unchained Will | "Balance is not obedience. Balance is freedom." | Cures Stun, Freeze, Stone, Sleep, Silence, Curse, Blind and Confusion, then blocks them for 40/50/60/70/80 s. | 60 / 60 s |
 | 7013 | Forge of Ten Souls | every companion's will lit the First Forge | Party members within 7 cells: ATK and MATK +5/10/15/20/25%, and 1/2/3/4/5% more per party member there (at most 10), for 90 s. | 100 / 120 s |
 | 7014 | Destiny's Severance | "severed the bond between divinity and mortal destiny" | One target, 8000/12000/16000/20000/24000% × base level / 100, ignoring DEF; +50% against boss monsters. 1 s cast. | 150 / 20 s |
+| 7015 | Crescent Gale | Hayate's will loosed from the blade as a crescent of mortal flame | Every enemy on an 11-cell path toward the target (range 9), 3 cells wide, 5500/8000/10500/13000/15500% × base level / 100. Ranged. 0.5 s cast. | 120 / 6 s |
 
 Client buff IDs **2005** and **2006** are Unchained Will and Forge of Ten
 Souls. Like the other Samurai buffs, they are not saved through logout.

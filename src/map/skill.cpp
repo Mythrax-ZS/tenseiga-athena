@@ -8233,7 +8233,7 @@ static constexpr t_itemid ITEMID_SAMURAI_TENSEIGA = 900003;
  * while Tenseiga is wielded. Fails the skill with a message when it is not.
  */
 static bool skill_check_samurai_tenseiga( map_session_data& sd, uint16 skill_id ){
-	if( skill_id < SAM_SEVER_HEAVENS_LIES || skill_id > SAM_DESTINYS_SEVERANCE )
+	if( skill_id < SAM_SEVER_HEAVENS_LIES || skill_id > SAM_CRESCENT_GALE )
 		return true;
 
 	int16 index = sd.equip_index[EQI_HAND_R];
