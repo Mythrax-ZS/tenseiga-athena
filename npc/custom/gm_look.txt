@@ -1,0 +1,32 @@
+//===== rAthena Script =======================================
+//= GM look: @gmlook
+//===== Description: =========================================
+//= The original client draws Game Masters with the GM sprite and a yellow name for the
+//= accounts its clientinfo.xml lists (<aid> and <yellow>), a list each player keeps. This lets
+//= a GM switch the look on or off for everyone instead: Tenseiga reads it from the character's
+//= name font, which the server saves and sends to every client that sees the character.
+//=
+//=   Font 200: GM look on (GM sprite, yellow name).
+//=   Font 201: GM look off, even for clients that list the account.
+//=   Anything else: as the viewer's own lists say.
+//=
+//= @gmlook toggles it; "@gmlook on" / "@gmlook off" set it. GM groups only (level 1 and up).
+//============================================================
+
+-	script	GM_Look	-1,{
+OnInit:
+	bindatcmd "gmlook", strnpcinfo(3) + "::OnCommand", 1, 99;
+	end;
+
+OnCommand:
+	.@arg$ = (.@atcmd_numparameters > 0) ? .@atcmd_parameters$[0] : "";
+	if (.@arg$ == "on")
+		.@on = 1;
+	else if (.@arg$ == "off")
+		.@on = 0;
+	else
+		.@on = (Font != 200);
+	Font = .@on ? 200 : 201;
+	dispbottom "GM look " + (.@on ? "on." : "off.");
+	end;
+}
