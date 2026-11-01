@@ -10,6 +10,9 @@ The server for [Tenseiga](https://github.com/Mythrax-ZS/tenseiga), forked from r
 - **Tenseiga features.** Support for what the client needs, such as `PACKETVER` 20250402
   (`src/custom/defines_pre.hpp`).
 
+To set up this server and the client on a new machine, Linux or Windows, see the
+[setup guide](https://github.com/Mythrax-ZS/tenseiga/blob/main/DEPLOY.md).
+
 Like rAthena, Tenseiga Athena is licensed under the GNU GPL v3 (see LICENSE). Everything
 below is rAthena's own README.
 
