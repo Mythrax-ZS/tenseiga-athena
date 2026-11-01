@@ -2090,7 +2090,7 @@ void intif_parse_questlog(int32 fd)
 		if(sd->avail_quests < k) {
 			// sd->avail_quests and k didn't meet in the middle: some entries were skipped
 			if(k < num_received) // Move the entries at the end to fill the gap
-				memmove(&sd->quest_log[k], &sd->quest_log[sd->avail_quests], sizeof(struct quest) * (num_received - k));
+				memmove(&sd->quest_log[sd->avail_quests], &sd->quest_log[k], sizeof(struct quest) * (num_received - k));
 			sd->quest_log = (struct quest *)aRealloc(sd->quest_log, sizeof(struct quest) * sd->num_quests);
 		}
 	}
