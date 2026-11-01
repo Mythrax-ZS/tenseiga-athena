@@ -1,3 +1,20 @@
+# Tenseiga Athena
+
+The server for [Tenseiga](https://github.com/Mythrax-ZS/tenseiga), forked from rAthena. It adds:
+
+- **The Samurai.** A custom job with three skill lines (Kusanagi, Muramasa and Tenseiga's
+  Mortal Flame) and its own weapons ([doc](doc/custom_jobs/samurai.md)).
+- **The Twin Flames Saga.** The Samurai's ten-chapter questline ([doc](doc/custom_jobs/twin_flames.md)).
+- **Custom jobs.** Ids 4500-4599 are reserved for them, each one a row in
+  `src/custom/jobs.hpp` ([doc](doc/custom_jobs/adding_a_job.md)).
+- **Tenseiga features.** Support for what the client needs, such as `PACKETVER` 20250402
+  (`src/custom/defines_pre.hpp`).
+
+Like rAthena, Tenseiga Athena is licensed under the GNU GPL v3 (see LICENSE). Everything
+below is rAthena's own README.
+
+---
+
 <img src="doc/logo.png" align="right" height="90" />
 
 # rAthena
