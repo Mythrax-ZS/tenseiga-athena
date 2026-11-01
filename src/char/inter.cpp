@@ -19,6 +19,7 @@
 #include <common/socket.hpp>
 #include <common/strlib.hpp>
 #include <common/timer.hpp>
+#include <custom/jobs.hpp>
 
 #include "char.hpp"
 #include "char_logif.hpp"
@@ -84,6 +85,9 @@ static std::unordered_map<int32, std::shared_ptr<struct WisData>> wis_db;
 
 /* from pc.cpp due to @accinfo. any ideas to replace this crap are more than welcome. */
 const char* job_name(int32 class_) {
+	if( const s_custom_job* job = custom_job( class_ ); job != nullptr )
+		return job->name;
+
 	switch (class_) {
 		case JOB_NOVICE:
 		case JOB_SWORDMAN:
@@ -367,8 +371,6 @@ const char* job_name(int32 class_) {
 
 		case JOB_SKY_EMPEROR2:
 			return msg_txt( 135 );
-		case JOB_SAMURAI:
-			return "Samurai";
 
 		default:
 			return msg_txt(199);

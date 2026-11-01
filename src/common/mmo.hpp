@@ -1109,7 +1109,10 @@ enum e_job {
 
 	JOB_SECOND_JOB_END = 4350,
 
-	JOB_SAMURAI = 4500,
+	// Reserved for custom jobs (custom/jobs.hpp).
+	JOB_CUSTOM_START = 4500,
+	JOB_SAMURAI = JOB_CUSTOM_START,
+	JOB_CUSTOM_END = 4599,
 
 	JOB_MAX,
 };

@@ -262,7 +262,11 @@
 	export_constant(JOB_SURA_2ND);
 	export_constant(JOB_MINSTREL_2ND);
 	export_constant(JOB_WANDERER_2ND);
-	export_constant(JOB_SAMURAI);
+	// Custom jobs (custom/jobs.hpp): JOB_<constant> and EAJ_<constant>.
+	for( const s_custom_job& job : custom_jobs ){
+		script_set_constant( ( std::string( "JOB_" ) + job.constant ).c_str(), job.id, false, false );
+		script_set_constant( ( std::string( "EAJ_" ) + job.constant ).c_str(), pc_jobid2mapid( job.id ), false, false );
+	}
 
 	/* EA jobs */
 	export_constant2("EAJL_2_1",JOBL_2_1);
@@ -438,7 +442,6 @@
 	export_constant2("EAJ_BIOLO",MAPID_BIOLO);
 	export_constant2("EAJ_ABYSS_CHASER",MAPID_ABYSS_CHASER);
 	export_constant2("EAJ_SOUL_ASCETIC",MAPID_SOUL_ASCETIC);
-	export_constant2("EAJ_SAMURAI",MAPID_SAMURAI);
 
 	/* sex */
 	export_constant(SEX_FEMALE);

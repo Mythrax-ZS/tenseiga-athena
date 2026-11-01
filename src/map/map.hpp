@@ -95,6 +95,12 @@ void map_msg_reload(void);
 #define JOBL_UPPER 0x100000
 #define JOBL_BABY 0x200000
 
+// A custom job (custom/jobs.hpp): this flag, its row in the table, and the map id of the job it
+// descends from, whose checks it then passes. Items made for it carry its own bit.
+#define JOBL_CUSTOM 0x400000
+#define MAPID_CUSTOM_ROW(mapid) ( ( (mapid) >> 23 ) & 0x1f )
+#define ITEMJOB_CUSTOM(mapid) ( 1ULL << ( 63 - MAPID_CUSTOM_ROW(mapid) ) )
+
 //For filtering and quick checking.
 #define MAPID_FIRSTMASK 0xff
 #define MAPID_SECONDMASK 0xfff
@@ -265,8 +271,6 @@ enum e_mapid : uint64{
 	MAPID_BIOLO,
 	MAPID_ABYSS_CHASER,
 	MAPID_SOUL_ASCETIC,
-// Custom branch: retain Assassin Cross ancestry without aliasing its job ID.
-	MAPID_SAMURAI = 0x400000 | MAPID_ASSASSIN_CROSS,
 // Additional constants
 	MAPID_ALL = UINT64_MAX
 };

@@ -1785,10 +1785,6 @@ static bool pc_job_can_use_item( const map_session_data* sd, const item_data* it
 			}
 		}
 
-		// Samurai-only items use a separate bit from inherited Assassin gear.
-		if( ( item->class_base[1] & ITEMJOB_SAMURAI ) != 0 )
-			return true;
-
 		// Swords may also come from the Swordman family. Class tier, level,
 		// gender and other equipment restrictions are still checked normally.
 		if( item->type == IT_WEAPON && ( item->subtype == W_1HSWORD || item->subtype == W_2HSWORD ) ){
@@ -1800,6 +1796,11 @@ static bool pc_job_can_use_item( const map_session_data* sd, const item_data* it
 
 	// Calculate the required bit to check
 	uint64 job = 1ULL << ( sd->class_ & MAPID_FIRSTMASK );
+
+	// A custom job wears its ancestor's items and its own.
+	if( ( sd->class_ & JOBL_CUSTOM ) != 0 ){
+		job |= ITEMJOB_CUSTOM( sd->class_ );
+	}
 
 	size_t index;
 
@@ -7544,6 +7545,10 @@ bool pc_checkequip2( const map_session_data* sd, t_itemid nameid, int32 min, int
  *------------------------------------------*/
 uint64 pc_jobid2mapid(uint16 b_class)
 {
+	if( const s_custom_job* job = custom_job( b_class ); job != nullptr ){
+		return JOBL_CUSTOM | ( static_cast<uint64>( job - custom_jobs ) << 23 ) | pc_jobid2mapid( job->ancestor );
+	}
+
 	switch(b_class)
 	{
 	//Novice And 1-1 Jobs
@@ -7604,7 +7609,6 @@ uint64 pc_jobid2mapid(uint16 b_class)
 		case JOB_HIGH_PRIEST:           return MAPID_HIGH_PRIEST;
 		case JOB_WHITESMITH:            return MAPID_WHITESMITH;
 		case JOB_ASSASSIN_CROSS:        return MAPID_ASSASSIN_CROSS;
-		case JOB_SAMURAI:               return MAPID_SAMURAI;
 	//Trans 2-2 Jobs
 		case JOB_PALADIN:               return MAPID_PALADIN;
 		case JOB_PROFESSOR:             return MAPID_PROFESSOR;
@@ -7727,6 +7731,12 @@ uint64 pc_jobid2mapid(uint16 b_class)
 //Reverts the map-style class id to the client-style one.
 int32 pc_mapid2jobid(uint64 class_, int32 sex)
 {
+	if( class_ & JOBL_CUSTOM ){
+		size_t row = MAPID_CUSTOM_ROW( class_ );
+
+		return row < std::size( custom_jobs ) ? custom_jobs[row].id : -1;
+	}
+
 	switch(class_) {
 	//Novice And 1-1 Jobs
 		case MAPID_NOVICE:                return JOB_NOVICE;
@@ -7784,7 +7794,6 @@ int32 pc_mapid2jobid(uint64 class_, int32 sex)
 		case MAPID_HIGH_PRIEST:           return JOB_HIGH_PRIEST;
 		case MAPID_WHITESMITH:            return JOB_WHITESMITH;
 		case MAPID_ASSASSIN_CROSS:        return JOB_ASSASSIN_CROSS;
-		case MAPID_SAMURAI:               return JOB_SAMURAI;
 	//Trans 2-2 Jobs
 		case MAPID_PALADIN:               return JOB_PALADIN;
 		case MAPID_PROFESSOR:             return JOB_PROFESSOR;
@@ -7901,9 +7910,10 @@ int32 pc_mapid2jobid(uint64 class_, int32 sex)
  *----------------------------------------------------*/
 const char* job_name(int32 class_)
 {
+	if( const s_custom_job* job = custom_job( class_ ); job != nullptr )
+		return job->name;
+
 	switch (class_) {
-	case JOB_SAMURAI:
-		return "Samurai";
 	case JOB_NOVICE:
 	case JOB_SWORDMAN:
 	case JOB_MAGE:

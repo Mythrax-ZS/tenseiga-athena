@@ -13,6 +13,7 @@
 #include <common/mmo.hpp> // JOB_*, MAX_FAME_LIST, struct fame_list, struct mmo_charstatus
 #include <common/strlib.hpp>// StringBuf
 #include <common/timer.hpp>
+#include <custom/jobs.hpp>
 
 #include "battleground.hpp"
 #include "buyingstore.hpp" // struct s_buyingstore
@@ -1230,7 +1231,7 @@ enum e_mado_type : uint16 {
 	( (class_) >= JOB_DRAGON_KNIGHT			&& (class_) <= JOB_TROUVERE       ) || \
 	( (class_) >= JOB_WINDHAWK2				&& (class_) <= JOB_IMPERIAL_GUARD2 ) || \
 	( (class_) >= JOB_SKY_EMPEROR			&& (class_) <= JOB_SPIRIT_HANDLER ) || \
-	  (class_) == JOB_SKY_EMPEROR2 || (class_) == JOB_SAMURAI \
+	  (class_) == JOB_SKY_EMPEROR2 || custom_job( class_ ) != nullptr \
 )
 #define pcdb_checkid(class_) pcdb_checkid_sub((uint32)class_)
 
