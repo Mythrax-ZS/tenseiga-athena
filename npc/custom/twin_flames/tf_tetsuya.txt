@@ -150,9 +150,16 @@ amatsu,192,163,4	script	Tetsuya Takahashi#tf	4_EXJOB_NINJA2,{
 		case 1:
 			TF_TRUST = 1;
 			mes "[Tetsuya]";
-			mes "...Then I'll trust you. Even if I don't trust her.";
-			mes "Draw on me if you must. I won't draw back.";
+			mes "...Then prove it. Not to her. To me.";
+			mes "Steel against tail, right here. Nobody dies; somebody learns something.";
 			emotion ET_SCRATCH;
+			next;
+			if (select("Draw on him:Not today") == 1)
+				callfunc "F_TF_Duel";
+			else {
+				mes "[Tetsuya]";
+				mes "...Then I'll trust you. Even if I don't trust her.";
+			}
 			break;
 		case 2:
 			TF_TRUST = 0;
@@ -216,47 +223,42 @@ amatsu,192,163,4	script	Tetsuya Takahashi#tf	4_EXJOB_NINJA2,{
 		mes "The Abyssal Pit is at the bottom of Thor's volcano. Kagutsuchi-no-Yami waits there. Both blades, and all your courage.";
 		close;
 	case 90:
-		mes "...You felt it too, didn't you? That blessing. Something in it cracked.";
-		next;
-		mes "[Tetsuya]";
-		mes "I dreamed of the Sarugami last night. They showed me the goddess, and behind her, wearing her like a mask, Yami's fire.";
-		mes "They were never enemies. Two halves of one divine being, testing us from both ends. Mother and jailer.";
-		next;
-		mes "[Tetsuya]";
-		mes "There's only one way to cut both. Kusanagi and Muramasa, forged into a blade that answers to no god.";
-		mes "Masaru can do it at the First Forge, but the forge needs more than steel. It needs what each of us carries.";
-		if (isbegin_quest(900181) == 0)
+		if (isbegin_quest(900181) == 0) {
+			mes "...You felt it too, didn't you? That blessing. Something in it cracked.";
+			next;
+			mes "[Tetsuya]";
+			mes "I dreamed of the Sarugami last night. They showed me the goddess, and behind her, wearing her like a mask, Yami's fire.";
+			mes "They were never enemies. Two halves of one divine being, testing us from both ends. Mother and jailer.";
+			next;
+			mes "[Tetsuya]";
+			mes "And the fall in the pit? Staged. She let him burn so she could bless us for it, and so both blades would end up in one pair of hands. Hers, next.";
+			emotion ET_ANGER;
+			next;
+			mes "[Tetsuya]";
+			mes "There's only one way to cut both. Kusanagi and Muramasa, forged into a blade that answers to no god.";
+			mes "Masaru can do it at the First Forge, but the forge needs more than steel. It needs what each of us carries.";
 			setquest 900181;
-		next;
-		mes "[Tetsuya]";
+			callfunc "F_TF_Moved";
+			next;
+			mes "[Tetsuya]";
+		}
 		if (callfunc("F_TF_Relics") < 8) {
 			mes "Bring every companion's relic: Ayame's kunai, Renga's beads, Kiyoshi's crest, Chiyo's talisman, the twins' sigils, Hanae's jade, Masaru's ember and Kohaku's foxfire.";
 			mes "^777777You carry " + callfunc("F_TF_Relics") + " of the eight relics.^000000";
 			close;
 		}
-		mes "All eight. Then take the last piece, mine.";
-		specialeffect2 EF_HOLYHIT;
+		mes "All eight. Then the last piece is mine to bring, and the Sarugami won't hand it over without judging me first.";
+		mes "My mother's people have a trial ground. Come with me? I'd rather not be judged alone.";
 		next;
-		mes "[Tetsuya]";
-		mes "Sarugami blood broke Kusanagi's seal. Let it seal nothing ever again.";
-		mes "Balance is not obedience. Balance is freedom.";
-		if (!checkweight(900018, 1)) {
-			next;
+		if (select("Go to the trial ground:Not yet") != 1) {
 			mes "[Tetsuya]";
-			mes "Your pack's too full for even a little essence. Make some room.";
+			mes "Fair. I've been avoiding it for twenty years. What's another day?";
 			close;
 		}
-		getitem 900018, 1;
-		completequest 900181;
-		setquest 900191;
-		TF_STEP = 100;
-		callfunc "F_TF_Moved";
-		next;
-		mes "[Tetsuya]";
-		mes "Masaru waits at the First Forge, on the second level of the Magma Dungeon. Bring both blades in hand, ^0000FF10 Oridecon^000000 and ^0000FF10 Burning Hearts^000000.";
-		next;
-		mes "^777777Chapter IX, The Weaver Unmasked, is complete.^000000";
-		close;
+		close2;
+		if (!callfunc("F_TF_Memorial", "Twin Flames: The Trial of Balance"))
+			close;
+		end;
 	case 100:
 	case 110:
 		mes "The First Forge is on the second level of the Magma Dungeon. I'll meet you there.";
@@ -280,4 +282,48 @@ amatsu,192,163,4	script	Tetsuya Takahashi#tf	4_EXJOB_NINJA2,{
 OnInit:
 	questinfo QTYPE_QUEST, QMARK_YELLOW, "Class == JOB_SAMURAI && (TF_STEP == 20 || TF_STEP == 30 || TF_STEP == 60 || TF_STEP == 90 || (TF_STEP == 21 && isbegin_quest(900122) == 2) || (TF_STEP == 40 && (TF_BOND & 7) == 7) || (TF_STEP == 61 && (TF_BOND & 24) == 24) || (TF_STEP == 71 && (TF_BOND & 96) == 96))";
 	end;
+}
+
+// The Clash of Brothers (Chapter VI, if the Samurai sides with the goddess): a duel of
+// stances, best of five. Tetsuya gives away each strike; the right guard answers it.
+// TF_DUEL: 1 the Samurai won, 2 Tetsuya did.
+function	script	F_TF_Duel	{
+	setarray .@tell$[0],
+		"His tail coils low, curling behind his heel.",
+		"He drops his shoulder and grins, the way he does before a joke.",
+		"His weight rocks back. His sword point dips toward your belt.";
+	setarray .@strike$[0],
+		"The tail sweeps for your ankles!",
+		"A feint low, and then the real cut comes down from above!",
+		"He lunges, a straight thrust!";
+	.@won = 0;
+	for (.@round = 1; .@round <= 5 && .@won < 3 && .@round - 1 - .@won < 3; .@round++) {
+		.@t = rand(3);
+		mes "[Clash of Brothers: " + .@round + " of 5]";
+		mes "^777777" + .@tell$[.@t] + "^000000";
+		next;
+		.@pick = select("Leap:Guard high:Sidestep") - 1;
+		mes "^777777" + .@strike$[.@t] + "^000000";
+		if (.@pick == .@t) {
+			.@won++;
+			mes "^0000FFYou answer it cleanly. Tetsuya stumbles back, laughing.^000000";
+			specialeffect2 EF_HOLYHIT;
+		} else {
+			mes "^FF0000It lands. Not hard. Just hard enough to make a point.^000000";
+			emotion ET_KIK;
+		}
+		next;
+	}
+	TF_DUEL = (.@won >= 3) ? 1 : 2;
+	mes "[Tetsuya]";
+	if (TF_DUEL == 1) {
+		mes "Ha! All right, all right. You read me like a scroll.";
+		mes "If you can read me, you can read her. Promise me you'll try.";
+		emotion ET_BEST;
+	} else {
+		mes "And that's the trouble with trusting something shiny. You stop watching the tail.";
+		mes "I'll still watch your back. Even if you're watching hers.";
+		emotion ET_SMILE;
+	}
+	return;
 }

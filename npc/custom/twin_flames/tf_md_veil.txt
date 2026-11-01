@@ -1,0 +1,327 @@
+//===== rAthena Script =======================================
+//= The Twin Flames Saga: The Celestial Veil (memorial dungeon, Chapter X)
+//===== Description: =========================================
+//= Tetsuya takes the Samurai up from the First Forge (tf_ch07_10.txt) into the Celestial Veil,
+//= above both realms. The goddess speaks first through echoes of the companions whose relics
+//= burned in the forge; each echo broken frees a memory of the real one. At the throne the
+//= Weaver is light, then shadow, then both: the sun's judgement falls on any who stand outside
+//= the shade stones, moon shards mend her, and at the last Tetsuya tears her seal open.
+//= Her words, the rain in heaven, and what became of everyone.     TF_STEP 110 -> 120
+//= Instance "Twin Flames: The Celestial Veil" on tf_goddess (a copy of herosria).
+//=
+//= Instance variables:
+//=   'map$     the instance's copy of tf_goddess   'aid, 'name$   the Samurai
+//=   'echoes   echoes broken (bits)                'stage  0 the echoes, 1 the throne, 2 the Weaver, 3 over
+//=   'boss     the Weaver's GID (any form)         'form   1 radiant, 2 eclipsed, 3 unmasked
+//=   'phase    bits: 1 the seal, 2 Tetsuya         'sun    seconds until the sun's judgement
+//============================================================
+
+tf_goddess	mapflag	loadevent
+tf_goddess	mapflag	nobranch
+tf_goddess	mapflag	monster_noteleport
+tf_goddess	mapflag	nosave	mag_dun02,51,42
+
+tf_goddess,1,1,0	script	#cv_ctrl	-1,{
+	end;
+
+OnPCLoadMapEvent:
+	.@id = instance_id(IM_CHAR);
+	if (.@id > 0) {
+		if (strcharinfo(3) == instance_mapname("tf_goddess", .@id))
+			doevent instance_npcname("#cv_ctrl", .@id) + "::OnEnter";
+	}
+	end;
+
+OnInstanceInit:
+	'map$ = instance_mapname("tf_goddess");
+	disablenpc instance_npcname("Tetsuya#cv2");
+	disablenpc instance_npcname("Stone of Shade#cv1");
+	disablenpc instance_npcname("Stone of Shade#cv2");
+	// The bridge to the throne is closed until the echoes are broken.
+	setwall 'map$, 100, 106, 8, 0, 0, "cv_bridge" + instance_id();
+	setarray .@who$[0], "Echo of Kiyoshi", "Echo of Chiyo", "Echo of Ayame";
+	setarray .@ex[0], 55, 240, 240;
+	setarray .@ey[0], 240, 235, 80;
+	for (.@i = 0; .@i < 3; .@i++)
+		monster 'map$, .@ex[.@i], .@ey[.@i], .@who$[.@i], 31930, 1, instance_npcname("#cv_ctrl") + "::OnEcho" + (.@i + 1);
+	end;
+
+OnEnter:
+	'aid = getcharid(3);
+	'name$ = strcharinfo(0);
+	playBGM ('stage >= 2 ? "158" : "157");
+	addtimer 1000, instance_npcname("#cv_ctrl") + "::OnScene";
+	end;
+
+OnScene:
+	if (!'intro) {
+		'intro = 1;
+		setpcblock PCBLOCK_MOVE|PCBLOCK_ATTACK|PCBLOCK_SKILL, true;
+		mes "^777777Above both realms, the Celestial Veil: white stone floating in a sky with no sun and no moon, and rain falling upward.^000000";
+		next;
+		cutin "se_sun02", 2;
+		mes "[Amaterasu-no-Mikazuki]";
+		mes "You burned them, my child. Every one of them, into your new little blade.";
+		mes "But I kept their shapes. Come and see who still loves me.";
+		close2;
+		cutin "", 255;
+		setpcblock PCBLOCK_MOVE|PCBLOCK_ATTACK|PCBLOCK_SKILL, false;
+		npctalk "Tetsuya: Three echoes, three platforms. They're not them. Remember that when they talk.", instance_npcname("Tetsuya#cv1");
+		instance_announce 0, "Break the three echoes on the outer platforms. The bridge to the throne will open.", bc_map, "0xFFE8A0";
+	}
+	callsub L_Marks;
+	end;
+
+OnEcho1: callsub L_Echo, 1, "Kiyoshi (a memory): A general who spares his enemy has nothing left to prove. I never needed her for that.";
+OnEcho2: callsub L_Echo, 2, "Chiyo (a memory): My talisman has only my name on it. Hers was a lie, and so is this.";
+OnEcho3: callsub L_Echo, 4, "Ayame (a memory): The Hidden Leaf does not bow. Not to Yami, not to her.";
+L_Echo:
+	'echoes |= getarg(0);
+	instance_announce 0, getarg(1), bc_map, "0xA0E0FF";
+	if ('echoes == 7) {
+		'stage = 1;
+		delwall "cv_bridge" + instance_id();
+		instance_announce 0, "The last echo shatters. The bridge to the throne is open.", bc_map, "0xFFE8A0";
+	}
+	if (playerattached())
+		callsub L_Marks;
+	end;
+
+// The Weaver takes her throne.
+OnThrone:
+	'stage = 2;
+	'form = 1;
+	'sun = 15;
+	enablenpc instance_npcname("Stone of Shade#cv1");
+	enablenpc instance_npcname("Stone of Shade#cv2");
+	monster 'map$, 149, 184, "Radiant Amaterasu", 31915, 1, instance_npcname("#cv_ctrl") + "::OnForm";
+	'boss = $@mobid[0];
+	unittalk 'boss, "Amaterasu-no-Mikazuki: My child. My vessel. Kneel, and give me the blade.";
+	instance_announce 0, "When the sun gathers, stand by a Stone of Shade.", bc_map, "0xFFE8A0";
+	playBGMall "158", 'map$;
+	donpcevent instance_npcname("#cv_watch") + "::OnStart";
+	end;
+
+OnShardDead:
+	end;
+
+// Each form falls into the next: radiance, eclipse, then both at once.
+OnForm:
+	if ('form == 1) {
+		'form = 2;
+		monster 'map$, 149, 184, "Eclipsed Amaterasu", 31916, 1, instance_npcname("#cv_ctrl") + "::OnForm";
+		'boss = $@mobid[0];
+		unittalk 'boss, "Amaterasu-no-Mikazuki: Light alone cannot hold you? Then be swallowed by my shadow.";
+		.@ev$ = instance_npcname("#cv_ctrl") + "::OnShardDead";
+		monster 'map$, 138, 192, "Moon Shard", 31931, 1, .@ev$;
+		monster 'map$, 160, 192, "Moon Shard", 31931, 1, .@ev$;
+		monster 'map$, 149, 172, "Moon Shard", 31931, 1, .@ev$;
+		instance_announce 0, "Moon Shards drift around the throne. While they shine, she mends.", bc_map, "0xC8A0FF";
+		end;
+	}
+	if ('form == 2) {
+		'form = 3;
+		'sun = 10;
+		killmonster 'map$, instance_npcname("#cv_ctrl") + "::OnShardDead";
+		monster 'map$, 149, 184, "Amaterasu-no-Mikazuki", 31917, 1, instance_npcname("#cv_ctrl") + "::OnForm";
+		'boss = $@mobid[0];
+		unittalk 'boss, "Amaterasu-no-Mikazuki: Moon and sun, mother and jailer. I am both, and you are nothing!";
+		end;
+	}
+	// Unmasked, and fallen (the Samurai attached): the true ending.
+	'boss = 0;
+	'stage = 3;
+	killmonster 'map$, "All";
+	disablenpc instance_npcname("Stone of Shade#cv1");
+	disablenpc instance_npcname("Stone of Shade#cv2");
+	if (!playerattached()) {
+		if (!attachrid('aid))
+			end;
+	}
+	setpcblock PCBLOCK_MOVE|PCBLOCK_ATTACK|PCBLOCK_SKILL, true;
+	cutin "se_sun02", 2;
+	mes "[Amaterasu-no-Mikazuki]";
+	mes "Foolish mortal. No man may bear both flame and shadow...";
+	next;
+	mes "[" + strcharinfo(0) + "]";
+	mes "I am no god's pawn. I choose my own fate.";
+	next;
+	mes "[Amaterasu-no-Mikazuki]";
+	mes "...Perhaps mortals need no gods. Perhaps that is freedom.";
+	next;
+	cutin "", 255;
+	mes "^777777The orrery above the throne cracks down the middle, sun from moon. The goddess dissolves into mist, and the mist into rain.^000000";
+	close2;
+	setpcblock PCBLOCK_MOVE|PCBLOCK_ATTACK|PCBLOCK_SKILL, false;
+	enablenpc instance_npcname("Tetsuya#cv2");
+	npctalk "Tetsuya: ...Is it over? It's raining. In heaven. That has to mean something.", instance_npcname("Tetsuya#cv2");
+	callsub L_Marks;
+	end;
+
+OnMarks:
+	callsub L_Marks;
+	end;
+L_Marks:
+	for (.@i = 1; .@i <= 3; .@i++)
+		viewpoint 2, 1, 1, .@i, 0xFFFFFF;
+	if ('stage == 0) {
+		setarray .@x[0], 55, 240, 240;
+		setarray .@y[0], 240, 235, 80;
+		for (.@i = 0; .@i < 3; .@i++)
+			if (!('echoes & (1 << .@i)))
+				viewpoint 1, .@x[.@i], .@y[.@i], .@i + 1, 0xA0E0FF;
+	} else if ('stage < 3)
+		viewpoint 1, 149, 184, 1, 0xFF0000;
+	else
+		viewpoint 1, 146, 179, 1, 0x66CCFF;
+	return;
+}
+
+// The Weaver's mechanics, every second while she stands.
+tf_goddess,1,2,0	script	#cv_watch	-1,{
+	end;
+OnStart:
+	initnpctimer;
+	end;
+OnTimer1000:
+	if ('stage != 2) {
+		stopnpctimer;
+		end;
+	}
+	if (!'boss || !unitexists('boss)) {
+		initnpctimer;
+		end;
+	}
+	getunitdata 'boss, .@d;
+	// The sun's judgement (radiant and unmasked): a warning, then fire on all outside the shade.
+	if ('form != 2) {
+		'sun--;
+		if ('sun == 3) {
+			unittalk 'boss, "Amaterasu-no-Mikazuki: Behold the sun!";
+			instance_announce 0, "The sun gathers above the throne! Stand by a Stone of Shade!", bc_map, "0xFFD040";
+			specialeffect EF_MAGNUS, AREA, instance_npcname("Weaver's Throne#cv");
+		}
+		if ('sun <= 0) {
+			'sun = ('form == 1 ? 15 : 10);
+			specialeffect EF_GRANDCROSS, AREA, instance_npcname("Weaver's Throne#cv");
+			if (getmapxy(.@m$, .@x, .@y, BL_PC, 'name$) == 0 && .@m$ == 'map$) {
+				.@safe = 0;
+				for (.@s = 1; .@s <= 2; .@s++) {
+					getmapxy(.@sm$, .@sx, .@sy, BL_NPC, instance_npcname("Stone of Shade#cv" + .@s));
+					if (distance(.@x, .@y, .@sx, .@sy) <= 3)
+						.@safe = 1;
+				}
+				if (!.@safe) {
+					percentheal -60, 0, getcharid(0, 'name$);
+					instance_announce 0, "The sun's judgement scorches you.", bc_map, "0xFF6644";
+				}
+			}
+		}
+	}
+	// Moon shards mend the eclipse, two in a hundred each second for each one that shines.
+	if ('form == 2) {
+		.@shine = mobcount('map$, instance_npcname("#cv_ctrl") + "::OnShardDead");
+		if (.@shine)
+			setunitdata 'boss, UMOB_HP, min(.@d[UMOB_MAXHP], .@d[UMOB_HP] + .@d[UMOB_MAXHP] * .@shine / 100);
+	}
+	// Unmasked: at a third, her seal closes over her; Tetsuya tears it open.
+	if ('form == 3) {
+		.@pct = .@d[UMOB_HP] * 100 / .@d[UMOB_MAXHP];
+		if (.@pct <= 30 && !('phase & 1)) {
+			'phase |= 1;
+			'seal_at = gettimetick(2);
+			setunitdata 'boss, UMOB_DMGIMMUNE, 1;
+			unittalk 'boss, "Amaterasu-no-Mikazuki: I sealed Kusanagi. I can seal myself. Strike at nothing, little vessel.";
+			instance_announce 0, "A seal of light and shadow closes over the goddess. Nothing can touch her.", bc_map, "0xFFE8A0";
+		}
+		if (('phase & 1) && !('phase & 2) && gettimetick(2) - 'seal_at >= 6) {
+			'phase |= 2;
+			setunitdata 'boss, UMOB_DMGIMMUNE, 0;
+			enablenpc instance_npcname("Tetsuya#cv2");
+			npctalk "Tetsuya: Your seals, goddess? Sarugami made the first seals. My grandmother's grandmothers! And they come apart like THIS!", instance_npcname("Tetsuya#cv2");
+			specialeffect EF_STORM_MIN, AREA, instance_npcname("Tetsuya#cv2");
+			instance_announce 0, "Tetsuya's tail tears the seal apart. Now! Tenseiga!", bc_map, "0xFFE8A0";
+		}
+	}
+	initnpctimer;
+	end;
+}
+
+// The orrery above the throne, where the sun's judgement gathers.
+tf_goddess,149,187,4	script	Weaver's Throne#cv	4_ED_ORB,{
+	mes "[Weaver's Throne]";
+	mes "^777777A throne of white marble beneath a golden orrery: a sun on one ring, a moon on the other.^000000";
+	close;
+}
+
+// The two Stones of Shade by the throne: the only shelter from the sun.
+tf_goddess,140,180,4	script	Stone of Shade#cv1	4_4JOB_SEALSTONE,{
+	mes "[Stone of Shade]";
+	mes "^777777A standing stone that casts a shadow in a sky with no sun. Stand close to it when the light gathers.^000000";
+	close;
+}
+tf_goddess,158,180,4	duplicate(Stone of Shade#cv1)	Stone of Shade#cv2	4_4JOB_SEALSTONE
+
+// The bridge to the throne: the Weaver takes her seat as the Samurai crosses.
+tf_goddess,112,110,0	script	#cv_bridge	-1,6,4,{
+	end;
+OnTouch:
+	if ('stage != 1)
+		end;
+	donpcevent instance_npcname("#cv_ctrl") + "::OnThrone";
+	doevent instance_npcname("#cv_ctrl") + "::OnMarks";
+	end;
+}
+
+// Tetsuya: beside the Samurai as they arrive, and at the throne at the end.
+tf_goddess,63,88,4	script	Tetsuya#cv1	4_EXJOB_NINJA2,{
+	mes "[Tetsuya]";
+	if ('stage == 0)
+		mes "Three echoes, three platforms. Kiyoshi to the north, Chiyo north-east, Ayame south-east. They're not them. Break them.";
+	else
+		mes "The throne's across the bridge. Light, then shadow, then both. Keep Tenseiga in your hands.";
+	close;
+}
+
+tf_goddess,146,179,7	script	Tetsuya#cv2	4_EXJOB_NINJA2,{
+	mes "[Tetsuya]";
+	if ('stage < 3) {
+		mes "Hit her! I'll handle the seals. Seals are a family business.";
+		close;
+	}
+	if (TF_MERCY >= 2) {
+		mes "You know what I'll remember? Not the gods. The raider you let go. Mibu, kneeling in the snow. The villagers in the Crimson Fields. You chose mercy when the blade wanted blood.";
+		mes "That's what a mortal flame is, I think.";
+	} else if (TF_TRUST) {
+		mes "You trusted her, once. I don't blame you. She was very convincing.";
+		mes (TF_DUEL == 1) ? "But you read me in that duel, and in the end you read her too. You cut the chain yourself." : "But in the end you cut the chain yourself. That's what matters.";
+	} else {
+		mes "Balance lies not in heaven, but in the hearts of mortals. Somebody wise said that. Probably me.";
+	}
+	next;
+	mes "[Tetsuya]";
+	mes "Go on, then. Disappear into legend, like the stories say. I'll keep wandering. Somebody has to keep the balance honest.";
+	next;
+	mes "^777777Kiyoshi Takeda went home to his family's lands and gave them to the farmers who had held them through the war.^000000";
+	mes "^777777Brother Renga opened his monastery's doors to anyone, of any god or none.^000000";
+	mes "^777777Ayame taught the children of the Hidden Leaf, and never once spoke of revenge.^000000";
+	next;
+	mes "^777777Chiyo kept a shrine with no goddess in it. Taro and Jiro still argue about everything.^000000";
+	mes "^777777Lady Hanae went back to court. Masaru opened a forge in Amatsu that makes ploughs and kitchen knives.^000000";
+	mes "^777777Kohaku was seen sometimes at the edge of the woods, with fire in her tails, belonging to no one.^000000";
+	next;
+	if (TF_STEP == 110) {
+		completequest 900192;
+		TF_STEP = 120;
+		callfunc "F_TF_Moved";
+		callfunc "F_TF_Reward", 50000000, 35000000, 1000000;
+		announce strcharinfo(0) + " has cut the Weaver's chains with Tenseiga-no-Hayate. The Twin Flames Saga is complete.", bc_all, "0xFFFFFF";
+	}
+	mes "^777777The Twin Flames Saga is complete.^000000";
+	next;
+	if (select("Return to Amatsu:Stay a while") == 1) {
+		warp "amatsu", 192, 160;
+		instance_destroy;
+	}
+	close;
+}

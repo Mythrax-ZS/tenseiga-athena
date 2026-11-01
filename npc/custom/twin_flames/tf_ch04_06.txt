@@ -95,7 +95,7 @@ ice_dun02,150,155,4	script	Mibu's War Banner#tf	1_FLAG_EAGLE,{
 	}
 	mes "^777777Kiyoshi's crest, painted over with Mibu's. Tear it down, and the usurper will come.^000000";
 	next;
-	if (callfunc("F_TF_Arena", 3)) {
+	if (callfunc("F_TF_Arena", 1)) {
 		mes "[Usurper General Mibu]";
 		mes "Takeda sends a ronin to do his work? He always was a coward.";
 	}
@@ -152,7 +152,7 @@ prt_monk,225,140,4	script	Desecrated Altar#tf	2_MONEMUS,{
 	}
 	mes "^777777Genkai's sigils. Speak his name, and he will answer.^000000";
 	next;
-	if (callfunc("F_TF_Arena", 4)) {
+	if (callfunc("F_TF_Arena", 2)) {
 		mes "[Fallen Monk Genkai]";
 		mes "Renga sends a sword instead of coming himself? He always prayed more than he fought.";
 	}
@@ -228,7 +228,7 @@ ama_dun02,40,50,4	script	Kunai in the Wall#tf	4_CRACK,{
 	}
 	mes "^777777Kage's mark. Pull it free, and its owner will come for it.^000000";
 	next;
-	if (callfunc("F_TF_Arena", 5)) {
+	if (callfunc("F_TF_Arena", 3)) {
 		mes "[Kage]";
 		mes "The Hidden Leaf sends a samurai? How the clans have fallen.";
 	}
@@ -313,7 +313,7 @@ function	script	F_TF_Twins	{
 		mes "Because he wants to melt it and I want to drown it.";
 		next;
 		mes "[" + .@me$ + "]";
-		mes "You! Be the tiebreaker. Go to the third floor of the Ice Dungeon and break the frozen seal. Whatever comes out, we'll seal it properly.";
+		mes "You! Be the tiebreaker. Go to the third floor of the Ice Dungeon and break the frozen seal. Whatever comes out, we'll seal it properly. We'll be right there with you. Try to stop us arguing.";
 		close;
 	}
 	mes "It's done? You fought it, and we sealed it... together?";
@@ -347,13 +347,14 @@ ice_dun03,149,45,4	script	Frozen Seal#tf	4_RUNESTONE,{
 	}
 	mes "^777777A great shape coils inside the ice. Break the seal, and it will wake.^000000";
 	next;
-	if (callfunc("F_TF_Arena", 8)) {
+	if (callfunc("F_TF_Arena", 4)) {
 		mes "^777777The ice shatters. The cavern grows colder still.^000000";
 	}
 	close;
 }
 
-// Lady Hanae, an exile, gathers proof of Daimyo Kurozane's pact with Yami's cult.
+// Lady Hanae, an exile, needs proof of Daimyo Kurozane's pact with Yami's cult: she takes the
+// Samurai into his masquerade (the memorial in tf_md_palace.txt).
 ama_in02,196,172,4	script	Lady Hanae#tf	4_F_JPN,{
 	mes "[Lady Hanae]";
 	if (Class != JOB_SAMURAI || TF_STEP < 61) {
@@ -364,76 +365,33 @@ ama_in02,196,172,4	script	Lady Hanae#tf	4_F_JPN,{
 		mes "My name is cleared, and the daimyo's masks are off. Thank you, samurai.";
 		close;
 	}
-	// The Palace of Masks: find her (900152), bring the letters (900153), then the daimyo (900154).
 	if (isbegin_quest(900152) == 1) {
 		mes "So you are the one Tetsuya told me about. Then listen carefully; walls have ears here.";
 		next;
 		mes "[Lady Hanae]";
-		mes "Daimyo Kurozane made a pact with Yami's cult, and had me exiled when I learned of it. I need proof.";
-		if (TF_HANAE) {
-			// Brought the letters before the quest had steps.
-			changequest 900152, 900154;
-			callfunc "F_TF_Moved";
-			mes "And you have already brought it to me. He hides in the inner court, behind a masked steward; confront him there.";
-			close;
-		}
-		mes "The cult sends its orders as ^0000FFsealed letters^000000, carried by the shinobi and Miyabi dolls of the Tatami Maze, the first floor of the Amatsu dungeon. Bring me ^0000FFthree^000000.";
-		changequest 900152, 900153;
-		callfunc "F_TF_Moved";
-		close;
-	}
-	if (isbegin_quest(900153) == 1) {
-		if (countitem(900020) < 3) {
-			mes "Three sealed letters" + (countitem(900020) ? "; you have " + countitem(900020) + " so far" : "") + ". The shinobi and Miyabi dolls of the Tatami Maze, the first floor of the Amatsu dungeon, carry them.";
-			close;
-		}
-		delitem 900020, 3;
-		TF_HANAE = 1;
-		changequest 900153, 900154;
-		callfunc "F_TF_Moved";
-		mes "This is his seal. Now he cannot deny it.";
-		mes "He will hear soon that we know. He hides in the inner court, behind a masked steward; confront him there.";
-		close;
-	}
-	if (checkquest(900154, HUNTING) != 2) {
-		mes "Kurozane hides in the inner court, just there, behind his masked steward. Show him what his pact has bought him.";
-		close;
-	}
-	mes "The daimyo is dead and his letters are in the lord's hands. My exile is over.";
-	next;
-	mes "[Lady Hanae]";
-	mes "Take this jade from my fan. It has seen through many lies at court.";
-	if (!checkweight(900015, 1)) {
+		mes "Daimyo Kurozane made a pact with Yami's cult, and had my father exiled when he learned of it. I need proof.";
+		mes "The cult sends its orders as sealed letters, and tonight the daimyo holds a masquerade. Every guest masked. Every steward masked. Even him.";
 		next;
 		mes "[Lady Hanae]";
-		mes "Your pack is full. Make room.";
+		mes "We go in as guests. We find the letters, we find out which mask is the daimyo, and we make him take it off.";
+		changequest 900152, 900153;
+		callfunc "F_TF_Moved";
+		next;
+	} else {
+		mes "The masquerade is still going. Shall we go back in?";
+		next;
+	}
+	if (select("Put on a mask:Not yet") != 1) {
+		mes "[Lady Hanae]";
+		mes "When you are ready. The masks will wait; they always do.";
 		close;
 	}
-	getitem 900015, 1;
-	TF_BOND |= 16;
-	callfunc "F_TF_Moved";
-	completequest 900154;
-	callfunc "F_TF_Reward", 6000000, 4000000, 150000;
-	mes "^777777You received the ^0000FFJade of the Exile's Fan^000000.^000000";
-	callfunc "F_TF_Bonded", 24, "Tetsuya will want to hear of it, back in Amatsu.";
-	close;
+	close2;
+	if (!callfunc("F_TF_Memorial", "Twin Flames: The Palace of Masks"))
+		close;
+	end;
 
 OnInit:
 	questinfo QTYPE_QUEST, QMARK_YELLOW, "Class == JOB_SAMURAI && TF_STEP >= 61 && !(TF_BOND & 16)";
 	end;
-}
-
-ama_in02,204,168,4	script	Masked Steward#tf	4_M_MASKMAN,{
-	mes "[Masked Steward]";
-	if (Class != JOB_SAMURAI || isbegin_quest(900154) != 1 || checkquest(900154, HUNTING) == 2) {
-		mes "^777777A steward in a smiling white mask stands before the inner door. He does not move, and he does not answer. Someone breathes behind the door.^000000";
-		close;
-	}
-	mes "^777777The steward looks at the letters in your hand and steps aside. Behind the door, the daimyo waits. He knows.^000000";
-	next;
-	if (callfunc("F_TF_Arena", 9)) {
-		mes "[Daimyo Kurozane]";
-		mes "Letters? Proof? Fool. In this palace, the truth is whatever wears the finest mask.";
-	}
-	close;
 }

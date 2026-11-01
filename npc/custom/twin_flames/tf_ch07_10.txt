@@ -22,7 +22,7 @@ thor_v02,90,199,4	script	Altar of Ashes#tf	4_BONFIRE,{
 		mes "^777777Yami's cult has made this altar its heart. Its Herald answers when the Twin Flames draw near.^000000";
 		mes "^777777(The quest also asks for thirty Cultists of Ashes, on the volcano's first level.)^000000";
 		next;
-		if (callfunc("F_TF_Arena", 10)) {
+		if (callfunc("F_TF_Arena", 5)) {
 			mes "[Herald of Ashes]";
 			mes "Both blades in one pair of hands. The master said you would come. He is so very hungry.";
 		}
@@ -70,7 +70,7 @@ pay_fild08,40,80,4	script	Kohaku#tf	1180,{
 		mes "[Kohaku]";
 		mes "Burn it for me. The Contract Binder answers when I call its name.";
 		next;
-		if (callfunc("F_TF_Arena", 11)) {
+		if (callfunc("F_TF_Arena", 6)) {
 			mes "[Contract Binder]";
 			mes "The fox is the goddess's property. As are you, little vessel. As are you.";
 		}
@@ -103,40 +103,25 @@ OnInit:
 	end;
 }
 
+// The way down into the Abyssal Pit (the memorial in tf_md_abyss.txt).
 thor_v03,49,250,4	script	Abyssal Gate#tf	4_ED_FENCE,{
 	mes "[Abyssal Gate]";
 	if (Class != JOB_SAMURAI || TF_STEP != 82) {
 		mes "^777777A black iron gate over a crack in the volcano's floor. Chains hang through its bars into the dark, glowing like coals.^000000";
 		close;
 	}
-	if (checkquest(900172, HUNTING) != 2) {
-		mes "^777777The chains rattle. Something enormous breathes far below.^000000";
-		next;
-		mes "[Kagutsuchi-no-Yami]";
-		mes "My blade, and her blade, in one mortal's hands. You have carried them to me like a good servant.";
-		mes "Come. Feed me one last time.";
-		next;
-		callfunc "F_TF_Arena", 12;
+	mes "^777777The chains rattle. Something enormous breathes far below.^000000";
+	mes "^777777A white fox sits by the gate, her tails burning like candles. Kohaku.^000000";
+	next;
+	mes "[Kagutsuchi-no-Yami]";
+	mes "Come down, little ronin. Bring me both blades. Feed me one last time.";
+	next;
+	if (select("Go down into the pit:Not yet") != 1)
 		close;
-	}
-	mes "^777777Kagutsuchi-no-Yami falls. Muramasa screams in your hand, and a crack runs down its length.^000000";
-	next;
-	specialeffect2 EF_LIGHTSPHERE;
-	mes "[A Voice of Light]";
-	mes "It is done, my child. The dark flame is quenched. Balance is restored.";
-	mes "Rest now. You are free.";
-	next;
-	mes "^777777Golden light fills the Abyssal Pit. It is warm, and kind, and you could almost believe it.^000000";
-	mes "^777777Almost.^000000";
-	completequest 900172;
-	TF_STEP = 90;
-	callfunc "F_TF_Moved";
-	callfunc "F_TF_Reward", 25000000, 18000000, 500000;
-	announce strcharinfo(0) + " has defeated Kagutsuchi-no-Yami, the God of Ashes and Chains.", bc_all, "0xFFD27F";
-	next;
-	mes "^777777Chapter VIII, The Fall of Yami, is complete.^000000";
-	mes "^777777...or is it? Tetsuya is waiting in Amatsu.^000000";
-	close;
+	close2;
+	if (!callfunc("F_TF_Memorial", "Twin Flames: The Abyssal Pit"))
+		close;
+	end;
 
 OnInit:
 	questinfo QTYPE_QUEST, QMARK_YELLOW, "Class == JOB_SAMURAI && TF_STEP == 82";
@@ -190,24 +175,41 @@ mag_dun02,49,40,4	script	Masaru#forge	4_M_KAGE_OLD,{
 		mes "Make room in your inventory and lighten your load first.";
 		close;
 	}
-	mes "Then we begin.";
+	mes "Then we begin. And not alone.";
 	next;
+	// Everyone whose relic goes into the fire comes to see it go (seen by this Samurai).
+	setarray .@who$[0], "Kohaku#forge", "Ayame#forge", "Brother Renga#forge", "Kiyoshi Takeda#forge", "Chiyo#forge", "Taro#forge", "Jiro#forge", "Lady Hanae#forge";
+	for (.@i = 0; .@i < getarraysize(.@who$); .@i++)
+		cloakoffnpcself .@who$[.@i];
 	mes "[Masaru]";
 	mes "Kohaku's foxfire lights the First Forge, freed from the goddess's contract. My family's ember feeds it.";
+	npctalk "Kohaku: Burn bright. Burn for no one but yourself.", "Kohaku#forge", bc_self;
 	specialeffect EF_FIREPILLARBOMB;
 	next;
+	setarray .@line$[0],
+		"Ayame: My clan's kunai. Clean, at last. Go.",
+		"Brother Renga: Beads that turned aside one god's whisper. Let them turn aside two.",
+		"Kiyoshi Takeda: My family's crest. Honour that answers to no lord. Take it into the fire.",
+		"Chiyo: A talisman with only my name on it. That is the only kind I trust now.",
+		"Taro: Fire to break it...",
+		"Jiro: ...and water to bind it. Don't tell him I said it was his idea.",
+		"Lady Hanae: The jade from my father's fan. It has seen through every lie but this one. Let it see through hers.";
+	setarray .@speaker$[0], "Ayame#forge", "Brother Renga#forge", "Kiyoshi Takeda#forge", "Chiyo#forge", "Taro#forge", "Jiro#forge", "Lady Hanae#forge";
 	mes "[Masaru]";
-	mes "Ayame's kunai, purified in sacred water. Brother Renga's prayer beads. Kiyoshi's family crest.";
-	mes "Chiyo's carved talisman. Taro and Jiro's twin sigils of fire and water. Lady Hanae's jade.";
-	mes "One by one, they go into the fire.";
+	mes "One by one, then. Each of you, give the fire what you carried.";
+	close2;
+	for (.@i = 0; .@i < getarraysize(.@line$); .@i++) {
+		npctalk .@line$[.@i], .@speaker$[.@i], bc_self;
+		specialeffect EF_FIREPILLARBOMB;
+		sleep2 2200;
+	}
 	specialeffect EF_MAGNUMBREAK;
-	next;
 	mes "[Tetsuya]";
 	mes "Sarugami blood broke Kusanagi's seal. Let it seal nothing ever again. Balance is not obedience. Balance is freedom.";
 	specialeffect2 EF_HOLYHIT;
 	next;
 	mes "[Masaru]";
-	mes "Now, Samurai. Clash them together.";
+	mes "And the curse's fragments, and the light's essence, from your own hands. Now, Samurai. Clash them together.";
 	next;
 	// Re-check: everything must still be at hand when the forge takes it.
 	if (!callfunc("F_TF_Twin") || callfunc("F_TF_Relics") < 8 || !countitem(900018) || countitem("Oridecon") < 10 || countitem("Burning_Heart") < 10) {
@@ -266,7 +268,9 @@ mag_dun02,53,44,4	script	Tetsuya Takahashi#forge	4_EXJOB_NINJA2,{
 		mes "Take your time. Gods are patient. That's the worst thing about them.";
 		close;
 	}
-	warp "tf_goddess", 149, 178;
+	close2;
+	if (!callfunc("F_TF_Memorial", "Twin Flames: The Celestial Veil"))
+		close;
 	end;
 
 OnInit:
@@ -274,76 +278,20 @@ OnInit:
 	end;
 }
 
-// Tetsuya in the Celestial Veil: he comes up with the player (shown as they arrive, by
-// TF_Marks).
-tf_goddess,146,179,7	script	Tetsuya Takahashi#veil	4_EXJOB_NINJA2,{
-	mes "[Tetsuya]";
-	if (TF_STEP == 110) {
-		mes "There's the throne. Light, then shadow, then both at once, if the Sarugami are right.";
-		mes "Keep Tenseiga in your hands. I'll keep my tail out of the way.";
-		close;
-	}
-	mes "It's still raining. In heaven. I think I like it.";
-	next;
-	if (select("Back to Amatsu:Stay a while") == 1)
-		warp "amatsu", 192, 160;
+// The companions at the First Forge: each comes to see their relic go into the fire (shown
+// only to the Samurai forging, by Masaru#forge).
+mag_dun02,45,43,4	script	Kohaku#forge	1180,{
+	mes "[" + strnpcinfo(1) + "]";
+	mes "^777777They watch the fire, and do not look away.^000000";
 	close;
-
 OnInit:
 	cloakonnpc strnpcinfo(0);
 	end;
 }
-
-// The Celestial Veil, where light and shadow fuse into the goddess's true form.
-tf_goddess,149,187,4	script	Weaver's Throne#tf	4_ED_ORB,{
-	mes "[Weaver's Throne]";
-	if (Class != JOB_SAMURAI || TF_STEP != 110) {
-		mes "^777777An empty throne of white marble beneath a golden orrery: a sun on one ring, a moon on the other.^000000";
-		close;
-	}
-	if (checkquest(900192, HUNTING) != 2) {
-		mes "^777777The throne is empty. Then light gathers on it, and a woman sits where no one sat.^000000";
-		next;
-		mes "[Amaterasu-no-Mikazuki]";
-		mes "My child. My vessel. You brought both flames back to me, as I always meant you to.";
-		mes "Kneel, and give me the blade. Mother and jailer, I will hold you forever.";
-		next;
-		if (callfunc("F_TF_Arena", 13)) {
-			mes "[" + strcharinfo(0) + "]";
-			mes "If gods are chains, then let man forge the key.";
-		}
-		close;
-	}
-	mes "^777777The orrery cracks down the middle, sun from moon, and the throne beneath it with it.^000000";
-	next;
-	mes "[Tetsuya]";
-	mes "...Is it over? It's raining. In heaven. That has to mean something.";
-	next;
-	mes "[Tetsuya]";
-	if (TF_MERCY >= 2) {
-		mes "You know what I'll remember? Not the gods. The raider you let go. Mibu, kneeling in the snow. You chose mercy when the blade wanted blood.";
-		mes "That's what a mortal flame is, I think.";
-	} else if (TF_TRUST) {
-		mes "You trusted her, once. I don't blame you. She was very convincing.";
-		mes "But in the end you cut the chain yourself. That's what matters.";
-	} else {
-		mes "Balance lies not in heaven, but in the hearts of mortals. Somebody wise said that. Probably me.";
-	}
-	next;
-	mes "[Tetsuya]";
-	mes "Go on, then. Disappear into legend, like the stories say. I'll keep wandering. Somebody has to keep the balance honest.";
-	completequest 900192;
-	TF_STEP = 120;
-	callfunc "F_TF_Moved";
-	callfunc "F_TF_Reward", 50000000, 35000000, 1000000;
-	announce strcharinfo(0) + " has cut the Weaver's chains with Tenseiga-no-Hayate. The Twin Flames Saga is complete.", bc_all, "0xFFFFFF";
-	next;
-	mes "^777777The Twin Flames Saga is complete.^000000";
-	if (select("Return to Amatsu:Stay a while") == 1)
-		warp "amatsu", 192, 160;
-	close;
-
-OnInit:
-	questinfo QTYPE_QUEST, QMARK_YELLOW, "Class == JOB_SAMURAI && TF_STEP == 110";
-	end;
-}
+mag_dun02,46,45,5	duplicate(Kohaku#forge)	Ayame#forge	4_F_EDEN_MASTER
+mag_dun02,49,46,4	duplicate(Kohaku#forge)	Brother Renga#forge	4_M_MONK
+mag_dun02,52,46,3	duplicate(Kohaku#forge)	Kiyoshi Takeda#forge	8_M_JPNMASTER
+mag_dun02,54,42,2	duplicate(Kohaku#forge)	Chiyo#forge	4_F_JPNMU
+mag_dun02,44,38,6	duplicate(Kohaku#forge)	Taro#forge	4_M_JPN
+mag_dun02,46,36,7	duplicate(Kohaku#forge)	Jiro#forge	4_M_JPN2
+mag_dun02,53,37,1	duplicate(Kohaku#forge)	Lady Hanae#forge	4_F_JPN

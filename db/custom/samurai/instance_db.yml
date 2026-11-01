@@ -55,8 +55,8 @@ Body:
     TimeLimit: 3600
     Enter:
       Map: tf_trial
-      X: 20
-      Y: 16
+      X: 150
+      Y: 22
   - Id: 907
     Name: "Twin Flames: The Celestial Veil"
     TimeLimit: 3600
