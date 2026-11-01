@@ -8,6 +8,8 @@ Header:
 Body:
   - Id: 900101
     Title: "Twin Flames I: Ashes of Honor"
+  - Id: 900103
+    Title: "Twin Flames I: Kagemori Burning"
   - Id: 900102
     Title: "Twin Flames I: Ash on the Wind"
     Targets:
@@ -23,10 +25,7 @@ Body:
   - Id: 900121
     Title: "Twin Flames III: The Trickster's Tail"
   - Id: 900122
-    Title: "Twin Flames III: Warlord Kurogane"
-    Targets:
-      - Mob: TF_KUROGANE
-        Count: 1
+    Title: "Twin Flames III: Kurogane's Fortress"
   - Id: 900131
     Title: "Twin Flames IV: Whispers in Steel"
     Targets:

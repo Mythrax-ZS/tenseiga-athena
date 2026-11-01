@@ -170,6 +170,40 @@ function	script	F_TF_Bonded	{
 	return;
 }
 
+// Opens saga memorial getarg(0) (db/custom/samurai/instance_db.yml) and moves the attached
+// player in at once, so close their dialog first. It is a solo instance (IM_CHAR) that lasts an
+// hour, so a player who falls inside can come back to it. Another memorial still open is let go
+// first, if the player agrees. Returns 1 when the player is in.
+function	script	F_TF_Memorial	{
+	.@md$ = getarg(0);
+	.@id = instance_id(IM_CHAR);
+	if (.@id > 0 && instance_live_info(ILI_NAME, .@id) != .@md$) {
+		mes "^777777Another memory still holds you: " + instance_live_info(ILI_NAME, .@id) + ". Let it go?^000000";
+		if (select("Let it go:Not yet") != 1)
+			return 0;
+		instance_destroy .@id;
+		.@id = 0;
+	}
+	if (.@id <= 0)
+		.@id = instance_create(.@md$, IM_CHAR);
+	if (.@id <= 0) {
+		mes "^777777The memory will not open. Try again in a moment.^000000";
+		return 0;
+	}
+	// instance_enter looks for a party's instance unless it is told which one.
+	if (instance_enter(.@md$, -1, -1, getcharid(0), .@id) != IE_OK) {
+		mes "^777777The memory will not let you in.^000000";
+		return 0;
+	}
+	return 1;
+}
+
+// The attached player says getarg(0) aloud, over their head.
+function	script	F_TF_Say	{
+	unittalk getcharid(3), strcharinfo(0) + ": " + getarg(0);
+	return;
+}
+
 // Minimap marks (viewpoint) on the saga's next step, for the map the player is on: set as a
 // map loads (the loadevent mapflag on every map the saga visits) and after every step
 // (F_TF_Moved, queued until the dialog ends).
@@ -189,7 +223,8 @@ OnPCLoadMapEvent:
 	if (Class == JOB_SAMURAI && strcharinfo(3) == "tf_goddess" && TF_STEP >= 110)
 		cloakoffnpcself "Tetsuya Takahashi#veil";
 OnMark:
-	if (Class != JOB_SAMURAI)
+	// Memorials (instance maps, named "<slot>#<instance>") keep their own marks.
+	if (Class != JOB_SAMURAI || compare(strcharinfo(3), "#"))
 		end;
 	for (.@i = 1; .@i <= 8; .@i++)
 		viewpoint 2, 1, 1, .@i, 0xFFFFFF;
@@ -198,10 +233,11 @@ OnMark:
 	case 0:  callsub L_Mark, "prontera", 158, 179; break;
 	case 1:  callsub L_Mark, "amatsu", 192, 94; break;
 	case 2:
+	case 3:
 		callsub L_Mark, "ama_fild01", 174, 331;	// the shrine's door, up the stone path
 		callsub L_Mark, "ama_in01", 175, 176;
 		break;
-	case 3:
+	case 4:
 		if (checkquest(900102, HUNTING) == 2)
 			callsub L_Mark, "amatsu", 192, 94;
 		break;
@@ -212,7 +248,7 @@ OnMark:
 		break;
 	case 12: callsub L_Mark, "amatsu", 187, 158; break;
 	case 21:
-		if (isbegin_quest(900122) == 1 && checkquest(900122, HUNTING) != 2) {
+		if (isbegin_quest(900122) == 1) {
 			callsub L_Mark, "ama_dun02", 45, 50;
 			break;
 		}

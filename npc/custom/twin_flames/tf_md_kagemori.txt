@@ -1,0 +1,453 @@
+//===== rAthena Script =======================================
+//= The Twin Flames Saga: Kagemori Burning (memorial dungeon, Chapter I)
+//===== Description: =========================================
+//= The Hooded Kami (tf_ch01_03.txt) shows the Samurai the night the village of Kagemori
+//= burned. Four villagers are trapped in the flames: free them, and the fire at the manor
+//= gate dies down. Raiders have cornered Oharu by the rice store. The lord lies dying in the
+//= inner court, and the Torch Captain comes for whoever is left. When the captain is nearly
+//= beaten the vision stops, and the kami holds out Muramasa.     TF_STEP 3 -> 4
+//= Instance "Twin Flames: Kagemori Burning" (db/custom/samurai/instance_db.yml) on
+//= tf_kagemori: Amatsu's cells under another name, which the Tenseiga client draws at night.
+//=
+//= Instance variables:
+//=   'map$       the instance's copy of tf_kagemori
+//=   'aid        the Samurai's account id (they walk in alone)
+//=   'stage      0 the village, 1 the courtyard, 2 the lord, 3 the captain, 4 over
+//=   'freed      villagers freed, as bits (1 << villager - 1)
+//=   'court      1 Oharu is cornered, 2 she is safe
+//=   'boss       the Torch Captain's GID while he stands
+//=   'phase      bits for the captain's phases: 1 torches, 2 his men, 4 the vision stops
+//=   'boss_hp, 'boss_x, 'boss_y    where the vision stopped him
+//============================================================
+
+tf_kagemori	mapflag	loadevent
+tf_kagemori	mapflag	noteleport
+tf_kagemori	mapflag	nomemo
+tf_kagemori	mapflag	nobranch
+tf_kagemori	mapflag	monster_noteleport
+tf_kagemori	mapflag	nosave	ama_in01,175,173
+
+tf_kagemori,1,1,0	script	#kg_ctrl	-1,{
+	end;
+
+// A Samurai loading their own Kagemori: the scene picks up where they left it.
+OnPCLoadMapEvent:
+	.@id = instance_id(IM_CHAR);
+	if (.@id > 0) {
+		if (strcharinfo(3) == instance_mapname("tf_kagemori", .@id))
+			doevent instance_npcname("#kg_ctrl", .@id) + "::OnEnter";
+	}
+	end;
+
+OnInstanceInit:
+	'map$ = instance_mapname("tf_kagemori");
+	// The manor gate burns until the village is free.
+	setwall 'map$, 113, 186, 6, 6, 0, "kg_gate" + instance_id();
+	disablenpc instance_npcname("Oharu#kg");
+	disablenpc instance_npcname("Lord of Kagemori#kg");
+	disablenpc instance_npcname("Hooded Kami#kg");
+	for (.@i = 1; .@i <= 4; .@i++)
+		disablenpc instance_npcname("#kg_hallfire" + .@i);
+	// Raiders by each trapped villager, and more roaming the streets.
+	.@ev$ = instance_npcname("#kg_ctrl") + "::OnRaiderDead";
+	areamonster 'map$, 146, 115, 157, 126, "--ja--", 31900, 3, .@ev$;
+	areamonster 'map$, 226, 133, 238, 145, "--ja--", 31900, 3, .@ev$;
+	areamonster 'map$, 246, 166, 258, 178, "--ja--", 31900, 3, .@ev$;
+	areamonster 'map$, 179, 170, 191, 182, "--ja--", 31900, 3, .@ev$;
+	areamonster 'map$, 160, 100, 240, 190, "--ja--", 31900, 6, .@ev$;
+	end;
+
+// The map-load scripts of every saga map run on the Samurai together; the scene waits for
+// them to finish before it opens a dialog.
+OnEnter:
+	'aid = getcharid(3);
+	playBGM ('stage == 3 ? "44" : "37");
+	addtimer 1000, instance_npcname("#kg_ctrl") + "::OnScene";
+	end;
+
+OnScene:
+	if (!'intro) {
+		'intro = 1;
+		setpcblock PCBLOCK_MOVE|PCBLOCK_ATTACK|PCBLOCK_SKILL, true;
+		cutin "soul_van01", 2;
+		mes "[Hooded Kami]";
+		mes "You asked for strength. First, look at what strength is for.";
+		next;
+		mes "[Hooded Kami]";
+		mes "Kagemori, in the hills above Amatsu. The house you served, on the night you were away.";
+		mes "I cannot change what happened here. But I can let you walk through it.";
+		next;
+		mes "^777777Smoke. The crack of burning timber. Somewhere close, a woman is screaming a child's name.^000000";
+		close2;
+		cutin "", 255;
+		setpcblock PCBLOCK_MOVE|PCBLOCK_ATTACK|PCBLOCK_SKILL, false;
+		callfunc "F_TF_Say", "Kagemori... no. No!";
+		instance_announce 0, "Four villagers are trapped in the burning streets. Free them.", bc_map, "0xFFAA66";
+	}
+	donpcevent instance_npcname("#kg_ctrl") + "::OnScreams";
+	callsub L_Marks;
+	end;
+
+// Doors and voices in the smoke while the village still burns.
+OnScreams:
+	if ('stage > 0)
+		end;
+	initnpctimer;
+	end;
+OnTimer9000:
+	if ('stage > 0) {
+		stopnpctimer;
+		end;
+	}
+	soundeffectall (rand(2) ? "se_scream01.wav" : "se_scream_w01.wav"), 0, 'map$;
+	initnpctimer;
+	end;
+
+OnRaiderDead:
+	end;
+
+OnFreed:
+	if ('freed != 15)
+		end;
+	'stage = 1;
+	delwall "kg_gate" + instance_id();
+	disablenpc instance_npcname("#kg_gatefire1");
+	disablenpc instance_npcname("#kg_gatefire2");
+	soundeffectall "se_door01.wav", 0, 'map$;
+	instance_announce 0, "The fire at the manor gate gutters and dies. Beyond the gate, someone is shouting.", bc_map, "0xFFAA66";
+	end;
+
+OnCourtDead:
+	if ('court != 1 || mobcount('map$, instance_npcname("#kg_ctrl") + "::OnCourtDead") > 0)
+		end;
+	'court = 2;
+	npctalk "Oharu: You... is it really you?", instance_npcname("Oharu#kg");
+	end;
+
+// The lord has fallen: the captain comes for whoever is left.
+OnCaptain:
+	monster 'map$, 82, 256, "Torch Captain Gonza", 31918, 1, instance_npcname("#kg_ctrl") + "::OnCaptainDead";
+	'boss = $@mobid[0];
+	unittalk 'boss, "Torch Captain Gonza: Another stray dog of Kagemori? Then burn with your master!";
+	playBGMall "44", 'map$;
+	donpcevent instance_npcname("#kg_watch") + "::OnStart";
+	end;
+
+// The vision has given its gift: the captain stands again, as he stood.
+OnResume:
+	monster 'map$, 'boss_x, 'boss_y, "Torch Captain Gonza", 31918, 1, instance_npcname("#kg_ctrl") + "::OnCaptainDead";
+	'boss = $@mobid[0];
+	setunitdata 'boss, UMOB_HP, 'boss_hp;
+	unittalk 'boss, "Torch Captain Gonza: What is that blade? It wasn't in your hand a moment ago!";
+	instance_announce 0, "The fire moves again. Muramasa hums in your hand, hungry.", bc_map, "0xFF4444";
+	donpcevent instance_npcname("#kg_watch") + "::OnStart";
+	end;
+
+OnCaptainDead:
+	'boss = 0;
+	killmonster 'map$, instance_npcname("#kg_ctrl") + "::OnRaiderDead";
+	if (!('phase & 4)) {
+		// Struck down before the vision could stop him: it stops now, and the kami's gift
+		// comes over his body.
+		'phase |= 4;
+		'fallen = 1;
+		enablenpc instance_npcname("Hooded Kami#kg");
+		specialeffect EF_DEVIL, AREA, instance_npcname("Hooded Kami#kg");
+		instance_announce 0, "The captain falls, and the flames stop in mid-air. A hooded figure walks out of them.", bc_map, "0xC8A0FF";
+		end;
+	}
+OnEnding:
+	'stage = 4;
+	if (!playerattached()) {
+		if (!attachrid('aid))
+			end;
+	}
+	setpcblock PCBLOCK_MOVE|PCBLOCK_ATTACK|PCBLOCK_SKILL, true;
+	instance_announce 0, "Torch Captain Gonza falls. Every flame in Kagemori goes out at once, like a breath on a candle.", bc_map, "0xC8A0FF";
+	sleep2 3000;
+	mes "^777777Darkness. Ash on your tongue. Somewhere very far away, the hooded figure is speaking.^000000";
+	next;
+	mes "[Hooded Kami]";
+	mes "You could not save them then. You can avenge them now.";
+	mes "Remember who answered you.";
+	next;
+	mes "^777777You wake on the shrine floor. The figure is gone. The sword is still in your hand.^000000";
+	mes "^777777The raiders who burned Kagemori still roam the fields north of Amatsu. Hunt ^0000FFtwenty^000000 of them, then return to Oharu.^000000";
+	close2;
+	setpcblock PCBLOCK_MOVE|PCBLOCK_ATTACK|PCBLOCK_SKILL, false;
+	if (TF_STEP == 3) {
+		completequest 900103;
+		setquest 900102;
+		TF_STEP = 4;
+		callfunc "F_TF_Moved";
+	}
+	warp "ama_in01", 175, 173;
+	instance_destroy;
+	end;
+
+// Minimap marks for what the Samurai must do next (player attached).
+OnMarks:
+	callsub L_Marks;
+	end;
+L_Marks:
+	for (.@i = 1; .@i <= 4; .@i++)
+		viewpoint 2, 1, 1, .@i, 0xFFFFFF;
+	switch ('stage) {
+	case 0:
+		setarray .@x[0], 151, 232, 252, 185;
+		setarray .@y[0], 120, 139, 172, 176;
+		for (.@i = 0; .@i < 4; .@i++)
+			if (!('freed & (1 << .@i)))
+				viewpoint 1, .@x[.@i], .@y[.@i], .@i + 1, 0xFF6600;
+		break;
+	case 1: viewpoint 1, 124, 199, 1, 0xFF6600; break;
+	case 2: viewpoint 1, 80, 260, 1, 0xFF6600; break;
+	case 3: viewpoint 1, 82, 258, 1, 0xFF0000; break;
+	}
+	return;
+}
+
+// The Torch Captain's phases, checked every second while he stands.
+tf_kagemori,1,2,0	script	#kg_watch	-1,{
+	end;
+OnStart:
+	initnpctimer;
+	end;
+OnTimer1000:
+	if (!'boss || !unitexists('boss)) {
+		stopnpctimer;
+		end;
+	}
+	getunitdata 'boss, .@d;
+	.@pct = .@d[UMOB_HP] * 100 / .@d[UMOB_MAXHP];
+	if (.@pct <= 70 && !('phase & 1)) {
+		'phase |= 1;
+		unittalk 'boss, "Torch Captain Gonza: Torches! Burn the hall down around them!";
+		for (.@i = 1; .@i <= 4; .@i++)
+			enablenpc instance_npcname("#kg_hallfire" + .@i);
+		soundeffectall "nw_wild_fire.wav", 0, 'map$;
+	}
+	if (.@pct <= 40 && !('phase & 2)) {
+		'phase |= 2;
+		unittalk 'boss, "Torch Captain Gonza: To me, you dogs! Cut the samurai down!";
+		areamonster 'map$, .@d[UMOB_X] - 5, .@d[UMOB_Y] - 5, .@d[UMOB_X] + 5, .@d[UMOB_Y] + 5, "--ja--", 31900, 4, instance_npcname("#kg_ctrl") + "::OnRaiderDead";
+	}
+	if (.@pct <= 15 && !('phase & 4)) {
+		// The vision stops: the captain is lifted out of it until the kami has spoken.
+		'phase |= 4;
+		'boss_hp = .@d[UMOB_HP];
+		'boss_x = .@d[UMOB_X];
+		'boss_y = .@d[UMOB_Y];
+		'boss = 0;
+		killmonster 'map$, instance_npcname("#kg_ctrl") + "::OnCaptainDead";
+		killmonster 'map$, instance_npcname("#kg_ctrl") + "::OnRaiderDead";
+		enablenpc instance_npcname("Hooded Kami#kg");
+		specialeffect EF_DEVIL, AREA, instance_npcname("Hooded Kami#kg");
+		soundeffectall "sr_cursedcircle.wav", 0, 'map$;
+		instance_announce 0, "Everything stops. The flames hang in the air like red silk, and a hooded figure walks out of them.", bc_map, "0xC8A0FF";
+		stopnpctimer;
+		end;
+	}
+	initnpctimer;
+	end;
+}
+
+// The villagers trapped in the burning streets. Each is freed with a few seconds' work, if
+// the Samurai stands still for it.
+tf_kagemori,151,120,4	script	Trapped Old Man#kg1	4_M_JPNOJI2,{
+	.@n = atoi(charat(strnpcinfo(2), 2));
+	setarray .@plea$[1],
+		"My granddaughter ran for the shrine! Is she... no, help me up, help me up!",
+		"The beam... my leg is pinned under the beam. Please!",
+		"Mother told me to hide in the well. It's so hot. I can't climb out.",
+		"I know your face. You served the lord. Where were you, when they came?";
+	setarray .@thanks$[1],
+		"Villager: Thank you... the river! I'll make for the river!",
+		"Villager: I can walk. I can walk! Thank the kami!",
+		"Child: Mother said a samurai would come. She said!",
+		"Villager: ...Go on. The lord is still up at the manor.";
+	mes "[" + strnpcinfo(1) + "]";
+	mes .@plea$[.@n];
+	next;
+	if (select("Pull the burning beam away:Not yet") != 1)
+		close;
+	close2;
+	progressbar "ffff00", 3;
+	specialeffect EF_DUST;
+	npctalk .@thanks$[.@n];
+	disablenpc;
+	'freed |= 1 << (.@n - 1);
+	.@left = 4;
+	for (.@i = 0; .@i < 4; .@i++)
+		.@left -= ('freed >> .@i) & 1;
+	if (.@left)
+		instance_announce 0, "A villager runs for the river. " + .@left + " still trapped in the flames.", bc_map, "0xFFAA66";
+	donpcevent instance_npcname("#kg_ctrl") + "::OnFreed";
+	doevent instance_npcname("#kg_ctrl") + "::OnMarks";
+	end;
+}
+tf_kagemori,232,139,4	duplicate(Trapped Old Man#kg1)	Trapped Woman#kg2	4_F_JPN2
+tf_kagemori,252,172,4	duplicate(Trapped Old Man#kg1)	Trapped Boy#kg3	4_M_JPNCHIBI
+tf_kagemori,185,176,4	duplicate(Trapped Old Man#kg1)	Trapped Old Woman#kg4	4_F_JPNOBA2
+
+// Burning wreckage through the village.
+tf_kagemori,160,130,0	script	#kg_fire1	4_BONFIRE,{
+	end;
+OnInstanceInit:
+	initnpctimer;
+	end;
+OnTimer2600:
+	specialeffect (rand(2) ? EF_FIREPILLAR : EF_FIREWALL);
+	initnpctimer;
+	end;
+}
+tf_kagemori,175,106,0	duplicate(#kg_fire1)	#kg_fire2	4_BONFIRE
+tf_kagemori,215,120,0	duplicate(#kg_fire1)	#kg_fire3	4_BONFIRE
+tf_kagemori,240,155,0	duplicate(#kg_fire1)	#kg_fire4	4_BONFIRE
+tf_kagemori,200,180,0	duplicate(#kg_fire1)	#kg_fire5	4_BONFIRE
+tf_kagemori,141,150,0	duplicate(#kg_fire1)	#kg_fire6	4_BONFIRE
+tf_kagemori,225,190,0	duplicate(#kg_fire1)	#kg_fire7	4_BONFIRE
+tf_kagemori,255,135,0	duplicate(#kg_fire1)	#kg_fire8	4_BONFIRE
+// The fire across the manor gate (a wall, set by #kg_ctrl, until the villagers are free).
+tf_kagemori,114,186,0	duplicate(#kg_fire1)	#kg_gatefire1	4_BONFIRE
+tf_kagemori,117,186,0	duplicate(#kg_fire1)	#kg_gatefire2	4_BONFIRE
+
+// The courtyard: raiders have cornered Oharu by the rice store.
+tf_kagemori,116,194,0	script	#kg_court	-1,5,3,{
+	end;
+OnTouch:
+	if ('stage != 1 || 'court)
+		end;
+	'court = 1;
+	enablenpc instance_npcname("Oharu#kg");
+	.@ev$ = instance_npcname("#kg_ctrl") + "::OnCourtDead";
+	monster 'map$, 120, 197, "Ashigaru Raider", 31900, 1, .@ev$;
+	monster 'map$, 128, 201, "Ashigaru Raider", 31900, 1, .@ev$;
+	monster 'map$, 122, 203, "Ashigaru Raider", 31900, 1, .@ev$;
+	monster 'map$, 126, 196, "Ashigaru Raider", 31900, 1, .@ev$;
+	npctalk "Oharu: Get back! Get back, you dogs!", instance_npcname("Oharu#kg");
+	instance_announce 0, "Raiders have cornered someone by the rice store!", bc_map, "0xFFAA66";
+	end;
+}
+
+tf_kagemori,124,199,4	script	Oharu#kg	4_F_JPNOBA,{
+	mes "[Oharu]";
+	if ('court < 2) {
+		mes "^777777Oharu presses her back against the storehouse door, a kitchen knife held out in both hands.^000000";
+		close;
+	}
+	if ('stage >= 2) {
+		mes "The great hall! Through the inner court, beyond the keep. Go!";
+		close;
+	}
+	mes "Young master...? You're here? But you were away, you were...";
+	mes "No. No time. They broke into the great hall. The lord is still inside!";
+	next;
+	mes "[Oharu]";
+	mes "I'll hide in the rice store. I'll keep very still. I'm good at keeping still.";
+	mes "Go! North, past the keep, to the inner court!";
+	close2;
+	'stage = 2;
+	npctalk "Oharu: May the kami walk with you...";
+	disablenpc;
+	instance_announce 0, "Oharu slips into the rice store. The great hall lies beyond the keep, in the inner court.", bc_map, "0xFFAA66";
+	doevent instance_npcname("#kg_ctrl") + "::OnMarks";
+	end;
+}
+
+// The inner court: the lord lies where his guards fell.
+tf_kagemori,100,254,0	script	#kg_hall	-1,4,5,{
+	end;
+OnTouch:
+	if ('stage != 2 || 'hall)
+		end;
+	'hall = 1;
+	enablenpc instance_npcname("Lord of Kagemori#kg");
+	npctalk "Lord of Kagemori: ...who's there? Is it you?", instance_npcname("Lord of Kagemori#kg");
+	end;
+}
+
+tf_kagemori,78,262,4	script	Lord of Kagemori#kg	4_M_JPNOJI2,{
+	if ('stage != 2)
+		end;
+	setpcblock PCBLOCK_MOVE|PCBLOCK_ATTACK|PCBLOCK_SKILL, true;
+	mes "[Lord of Kagemori]";
+	mes "So you came back after all. I sent you away to keep you safe. Foolish old man.";
+	next;
+	mes "[Lord of Kagemori]";
+	mes "Listen to me. These were no common raiders. Their captain spoke of a priest who paid them in gold...";
+	mes "...and of a fire that ^FF0000whispers^000000.";
+	next;
+	mes "[Lord of Kagemori]";
+	mes "Whatever offers you power tonight, do not take it.";
+	mes "A gift given in grief... is a hook...";
+	next;
+	mes "^777777His hand goes slack in yours. Behind you, someone laughs, and a torch is thrown.^000000";
+	close2;
+	setpcblock PCBLOCK_MOVE|PCBLOCK_ATTACK|PCBLOCK_SKILL, false;
+	'stage = 3;
+	specialeffect EF_DUST;
+	disablenpc;
+	donpcevent instance_npcname("#kg_ctrl") + "::OnCaptain";
+	doevent instance_npcname("#kg_ctrl") + "::OnMarks";
+	end;
+}
+
+// The hall burning around the fight (from the captain's first phase): fire underfoot.
+tf_kagemori,74,256,0	script	#kg_hallfire1	4_BONFIRE,2,2,{
+	end;
+OnInstanceInit:
+	initnpctimer;
+	end;
+OnTimer2400:
+	specialeffect EF_FIREWALL;
+	initnpctimer;
+	end;
+OnTouch:
+	specialeffect2 EF_FIREHIT;
+	percentheal -8, 0;
+	end;
+}
+tf_kagemori,90,256,0	duplicate(#kg_hallfire1)	#kg_hallfire2	4_BONFIRE,2,2
+tf_kagemori,76,266,0	duplicate(#kg_hallfire1)	#kg_hallfire3	4_BONFIRE,2,2
+tf_kagemori,90,265,0	duplicate(#kg_hallfire1)	#kg_hallfire4	4_BONFIRE,2,2
+
+// The kami, when the vision stops: Muramasa.
+tf_kagemori,86,262,4	script	Hooded Kami#kg	4_M_SOULREAPER,{
+	if (!('phase & 4) || 'boss)
+		end;
+	cutin "soul_van01", 2;
+	mes "[Hooded Kami]";
+	mes "Your suffering is known.";
+	next;
+	mes "[Hooded Kami]";
+	mes "Take this blade, Muramasa, forged of heaven's flame. With it, you will cut down the wicked and guard the innocent.";
+	next;
+	mes "[Hooded Kami]";
+	mes "This is not vengeance, " + strcharinfo(0) + ", but destiny.";
+	next;
+	if (select("Take the blade:Remember the lord's words") == 2) {
+		mes "^777777'A gift given in grief is a hook.' The words are already slipping away, like smoke through your fingers.^000000";
+		mes "^777777Your hand is reaching for the hilt. You did not tell it to.^000000";
+		next;
+	}
+	if (!countitem(900002) && !checkweight(900002, 1)) {
+		mes "[Hooded Kami]";
+		mes "Your burdens are too heavy to receive it. Set some down, and come back to me.";
+		close3;
+	}
+	if (!countitem(900002))
+		getitem 900002, 1;
+	mes "^777777The steel is red as a coal, and warm, like something living.^000000";
+	next;
+	mes "^FF0000...feed me...^000000";
+	close2;
+	cutin "", 255;
+	specialeffect2 EF_BLOODDRAIN;
+	disablenpc;
+	if ('fallen)
+		doevent instance_npcname("#kg_ctrl") + "::OnEnding";
+	else
+		donpcevent instance_npcname("#kg_ctrl") + "::OnResume";
+	end;
+}
