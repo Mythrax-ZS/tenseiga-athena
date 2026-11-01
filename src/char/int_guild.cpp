@@ -1226,6 +1226,8 @@ int32 mapif_parse_CreateGuild(int32 fd,uint32 account_id,char *name,struct guild
 	}
 
 	// Initialize guild property
+	g->guild.guild_lv = 1;
+	g->guild.next_exp = guild_exp_db.get_nextexp(1);
 	g->guild.max_member=16;
 	g->guild.average_lv=master->lv;
 	g->guild.connect_member=1;
