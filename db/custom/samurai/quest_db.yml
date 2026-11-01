@@ -27,10 +27,10 @@ Body:
   - Id: 900122
     Title: "Twin Flames III: Kurogane's Fortress"
   - Id: 900131
-    Title: "Twin Flames IV: Whispers in Steel"
+    Title: "Twin Flames IV: The Crimson Fields"
     Targets:
       - Mob: TF_CRIMSON_SOLDIER
-        Count: 40
+        Count: 30
       - Mob: TF_SHADE_OF_YAMI
         Count: 1
   - Id: 900132
