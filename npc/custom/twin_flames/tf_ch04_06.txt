@@ -9,76 +9,26 @@
 
 // ---------------------------------------------------------------- IV. Whispers in Steel
 
+// The way into the Crimson Fields as they were when the armies met (the memorial in
+// tf_md_crimson.txt).
 ama_fild01,200,291,4	script	Scorched War Banner#tf	1_FLAG_LION,{
 	mes "[Scorched War Banner]";
 	if (Class != JOB_SAMURAI || TF_STEP != 31) {
 		mes "^777777A clan war banner, scorched and torn, planted in churned earth.^000000";
 		close;
 	}
-	if (checkquest(900131, HUNTING) != 2) {
-		mes "^777777Bodies everywhere. Soldiers of both armies, and villagers who ran the wrong way.^000000";
-		mes "^777777Muramasa hums in your hand. It has been humming since you stepped onto the field.^000000";
-		next;
-		mes "^FF0000...more. More. Something stronger waits beneath the banner. Call it. Feed me.^000000";
-		next;
-		if (callfunc("F_TF_Arena", 2)) {
-			mes "[Shade of Yami]";
-			mes "Hungry, little ronin? So am I.";
-		}
+	mes "^777777The earth here still smells of smoke. Close your eyes, and you can hear the armies.^000000";
+	mes "^777777Muramasa hums. It remembers this field, or wants to.^000000";
+	next;
+	if (select("Walk onto the field:Not yet") != 1)
 		close;
-	}
-	mes "^777777The fields are quiet. You stand among the dead, and not all of them were soldiers.^000000";
-	mes "^777777A farmer. A girl clutching a doll. Your blade is red to the hilt.^000000";
-	next;
-	specialeffect2 EF_DARKCASTING;
-	mes "[Kagutsuchi-no-Yami]";
-	mes "Why do you weep? You did well. All are meat. All are fuel.";
-	mes "Feed me, and I will make you whole again.";
-	next;
-	mes "[Kagutsuchi-no-Yami]";
-	mes "Do you not know my voice? You prayed at my altar. ^FF0000It was I who answered your prayers.^000000";
-	mes "You prayed to me, not heaven.";
-	next;
-	mes "^777777You try to throw the blade away. Your fingers will not open.^000000";
-	next;
-	cloakoffnpcself "Tetsuya Takahashi#crimson";
-	specialeffect EF_TELEPORTATION, SELF, "Tetsuya Takahashi#crimson";
-	mes "[Tetsuya]";
-	mes "Hey! HEY! Look at me, not at the sword!";
-	mes "^777777A tail snaps around your wrist and wrenches your arm down. The whisper breaks.^000000";
-	next;
-	mes "[Tetsuya]";
-	mes "Breathe. It's a sword. A hungry, lying sword. And you are not its meal.";
-	mes "If gods made you their pawn, then let us break their game together. Come back to Amatsu.";
-	completequest 900131;
-	setquest 900132;
-	setquest 900133;
-	setquest 900134;
-	TF_STEP = 40;
-	callfunc "F_TF_Moved";
-	callfunc "F_TF_Reward", 8000000, 6000000, 200000;
-	next;
-	mes "^777777Chapter IV, Whispers in Steel, is complete. Find Tetsuya in Amatsu.^000000";
-	close;
+	close2;
+	if (!callfunc("F_TF_Memorial", "Twin Flames: The Crimson Fields"))
+		close;
+	end;
 
 OnInit:
 	questinfo QTYPE_QUEST, QMARK_YELLOW, "Class == JOB_SAMURAI && TF_STEP == 31";
-	end;
-}
-
-// Tetsuya in the Crimson Fields: he drops in as Yami's whisper takes hold (Scorched War Banner),
-// seen only by that player, until they leave the fields.
-ama_fild01,197,293,6	script	Tetsuya Takahashi#crimson	4_EXJOB_NINJA2,{
-	mes "[Tetsuya]";
-	if (TF_STEP == 31) {
-		mes "Still with me? Good. Don't listen to it. Whatever it says, it's hungry, and it's lying.";
-		close;
-	}
-	mes "Back to Amatsu. I'll catch up; I want one more look at this place. And at you, without that sword talking.";
-	close;
-
-OnInit:
-	cloakonnpc strnpcinfo(0);
 	end;
 }
 
@@ -145,7 +95,7 @@ ice_dun02,150,155,4	script	Mibu's War Banner#tf	1_FLAG_EAGLE,{
 	}
 	mes "^777777Kiyoshi's crest, painted over with Mibu's. Tear it down, and the usurper will come.^000000";
 	next;
-	if (callfunc("F_TF_Arena", 3)) {
+	if (callfunc("F_TF_Arena", 1)) {
 		mes "[Usurper General Mibu]";
 		mes "Takeda sends a ronin to do his work? He always was a coward.";
 	}
@@ -202,7 +152,7 @@ prt_monk,225,140,4	script	Desecrated Altar#tf	2_MONEMUS,{
 	}
 	mes "^777777Genkai's sigils. Speak his name, and he will answer.^000000";
 	next;
-	if (callfunc("F_TF_Arena", 4)) {
+	if (callfunc("F_TF_Arena", 2)) {
 		mes "[Fallen Monk Genkai]";
 		mes "Renga sends a sword instead of coming himself? He always prayed more than he fought.";
 	}
@@ -278,7 +228,7 @@ ama_dun02,40,50,4	script	Kunai in the Wall#tf	4_CRACK,{
 	}
 	mes "^777777Kage's mark. Pull it free, and its owner will come for it.^000000";
 	next;
-	if (callfunc("F_TF_Arena", 5)) {
+	if (callfunc("F_TF_Arena", 3)) {
 		mes "[Kage]";
 		mes "The Hidden Leaf sends a samurai? How the clans have fallen.";
 	}
@@ -293,127 +243,38 @@ ama_dun03,120,30,4	script	Sealed Gate#tf	4_4JOB_SEALSTONE,{
 		mes "^777777A gate of piled stone blocks, set with green seal crystals and old talismans. Monkeys are carved into every block.^000000";
 		close;
 	}
-	if (TF_STEP > 51) {
+	if (TF_STEP > 52) {
 		mes "^777777The gate stands open. The shrine beyond is empty now.^000000";
 		close;
 	}
-	if (checkquest(900141, HUNTING) != 2) {
-		mes "^777777Muramasa trembles as you approach. The carved monkeys seem to turn their heads.^000000";
-		next;
-		mes "[Tetsuya]";
-		mes "The Sarugami are awake. Something guards this place, and it wants a fight first.";
-		next;
-		if (callfunc("F_TF_Arena", 6)) {
-			mes "[Guardian of the Seal]";
-			mes "CURSE-BEARER. BLOOD OF THE MONKEY. YOU MAY NOT PASS UNTESTED.";
-		}
-		close;
-	}
-	mes "[Tetsuya]";
-	mes "The guardian's down. Now... my blood, and your curse. I hate this part.";
-	next;
-	specialeffect2 EF_LIGHTSPHERE;
-	mes "^777777Tetsuya cuts his palm and presses it to the gate. You lay Muramasa beside it.^000000";
-	mes "^777777The talismans burn white. The gate opens on a hall of moonlight.^000000";
-	next;
-	mes "^777777At its heart, a sword rests on a stone, shining like dawn: ^0000FFKusanagi-no-Tsurugi^000000.^000000";
-	next;
-	mes "[A Voice of Light]";
-	mes "Child of grief. You have suffered so much.";
-	mes "^0000FFTake this blade, and your curse will end.^000000";
+	mes "^777777Muramasa trembles as you approach. The carved monkeys seem to turn their heads.^000000";
+	mes "^777777Tetsuya is already here, sitting on the gate with his tail hanging down.^000000";
 	next;
 	mes "[Tetsuya]";
-	mes "...Huh. She sounds lovely. Why does that make my tail itch?";
-	if (!countitem(900001) && !checkweight(900001, 1)) {
-		next;
-		mes "^777777Your pack is too full to carry another blade. Make room and touch the gate again.^000000";
-		close;
-	}
-	if (!countitem(900001))
-		getitem 900001, 1;
-	completequest 900141;
-	setquest 900142;
-	TF_STEP = 52;
-	callfunc "F_TF_Moved";
-	callfunc "F_TF_Reward", 10000000, 7000000, 250000;
+	mes "The Sarugami are awake. Whatever's in there, it's been waiting for your curse and my blood.";
+	mes "Shall we?";
 	next;
-	mes "^777777You received ^0000FFKusanagi^000000. A shrine maiden waits beside the gate.^000000";
-	close;
+	if (select("Go in together:Not yet") != 1)
+		close;
+	close2;
+	if (!callfunc("F_TF_Memorial", "Twin Flames: The Shrine of Seals"))
+		close;
+	end;
 
 OnInit:
-	questinfo QTYPE_QUEST, QMARK_YELLOW, "Class == JOB_SAMURAI && TF_STEP == 51";
+	questinfo QTYPE_QUEST, QMARK_YELLOW, "Class == JOB_SAMURAI && (TF_STEP == 51 || TF_STEP == 52)";
 	end;
 }
 
-// Tetsuya at the Shrine of Seals: he comes down with the player (shown as they arrive, by
-// TF_Marks), for the gate and Chiyo's fight.
-ama_dun03,123,29,2	script	Tetsuya Takahashi#seal	4_EXJOB_NINJA2,{
-	mes "[Tetsuya]";
-	if (TF_STEP == 51 && checkquest(900141, HUNTING) != 2) {
-		mes "Hear that? The Sarugami are awake. Whatever guards that gate wants a fight before it lets us through.";
-		mes "Muramasa in hand. I'll be right here. Cheering.";
-	} else if (TF_STEP == 51) {
-		mes "The guardian's down. Now the gate: my blood, your curse. Go on, touch it. I'll bleed when you're ready.";
-	} else if (TF_STEP == 52) {
-		mes "The shrine maiden by the gate, Chiyo. She looks like she's about to do something brave and stupid. I like her already.";
-	} else {
-		mes "Let's get out of here. This place makes my tail itch.";
-	}
-	close;
-
-OnInit:
-	cloakonnpc strnpcinfo(0);
-	end;
-}
-
-// Chiyo, the shrine maiden: she renounces the false goddess's shrine and faces her old master.
+// Chiyo, the shrine maiden, after the shrine (tf_md_shrine.txt): she stays by the gate.
 ama_dun03,110,30,4	script	Chiyo#tf	4_F_JPNMU,{
 	mes "[Chiyo]";
-	if (Class != JOB_SAMURAI || TF_STEP < 52) {
+	if (Class != JOB_SAMURAI || TF_STEP <= 52) {
 		mes "This shrine was built for a goddess. I was raised to serve her. I am... less sure of that every day.";
 		close;
 	}
-	if (TF_STEP > 52) {
-		mes "My old talisman was a lie. The one I carved myself is the only one I trust.";
-		close;
-	}
-	if (checkquest(900142, HUNTING) != 2) {
-		mes "You heard her voice too. The goddess. My master, High Priestess Sayo, hears it day and night.";
-		mes "She came to take Kusanagi for the goddess. She will not let you leave with it.";
-		next;
-		mes "[Chiyo]";
-		mes "I cannot fight her alone. Will you stand with me?";
-		next;
-		if (callfunc("F_TF_Arena", 7)) {
-			mes "[High Priestess Sayo]";
-			mes "Chiyo. You have chosen a monkey and a murderer over your goddess. Then you will share their fate.";
-		}
-		close;
-	}
-	mes "Sayo is gone. And her talisman, the one she gave me as a child, has cracked.";
-	next;
-	mes "[Chiyo]";
-	mes "I carved a new one, with my own hands. No goddess's name on it. Only mine.";
-	mes "Take it. It will cut through illusions, I think, and divine bindings too.";
-	next;
-	if (!checkweight(900013, 1)) {
-		mes "[Chiyo]";
-		mes "Your pack is too full. Make room.";
-		close;
-	}
-	getitem 900013, 1;
-	completequest 900142;
-	TF_STEP = 60;
-	callfunc "F_TF_Moved";
-	callfunc "F_TF_Reward", 6000000, 4000000, 150000;
-	mes "^777777You received ^0000FFChiyo's Carved Talisman^000000.^000000";
-	next;
-	mes "^777777Chapter V, The Shrine of Seals, is complete. Tetsuya wants a word, back in Amatsu.^000000";
+	mes "My old talisman was a lie. The one I carved myself is the only one I trust.";
 	close;
-
-OnInit:
-	questinfo QTYPE_QUEST, QMARK_YELLOW, "Class == JOB_SAMURAI && TF_STEP == 52";
-	end;
 }
 
 // ---------------------------------------------------------------- VI. Chains of Light
@@ -452,7 +313,7 @@ function	script	F_TF_Twins	{
 		mes "Because he wants to melt it and I want to drown it.";
 		next;
 		mes "[" + .@me$ + "]";
-		mes "You! Be the tiebreaker. Go to the third floor of the Ice Dungeon and break the frozen seal. Whatever comes out, we'll seal it properly.";
+		mes "You! Be the tiebreaker. Go to the third floor of the Ice Dungeon and break the frozen seal. Whatever comes out, we'll seal it properly. We'll be right there with you. Try to stop us arguing.";
 		close;
 	}
 	mes "It's done? You fought it, and we sealed it... together?";
@@ -486,13 +347,14 @@ ice_dun03,149,45,4	script	Frozen Seal#tf	4_RUNESTONE,{
 	}
 	mes "^777777A great shape coils inside the ice. Break the seal, and it will wake.^000000";
 	next;
-	if (callfunc("F_TF_Arena", 8)) {
+	if (callfunc("F_TF_Arena", 4)) {
 		mes "^777777The ice shatters. The cavern grows colder still.^000000";
 	}
 	close;
 }
 
-// Lady Hanae, an exile, gathers proof of Daimyo Kurozane's pact with Yami's cult.
+// Lady Hanae, an exile, needs proof of Daimyo Kurozane's pact with Yami's cult: she takes the
+// Samurai into his masquerade (the memorial in tf_md_palace.txt).
 ama_in02,196,172,4	script	Lady Hanae#tf	4_F_JPN,{
 	mes "[Lady Hanae]";
 	if (Class != JOB_SAMURAI || TF_STEP < 61) {
@@ -503,76 +365,33 @@ ama_in02,196,172,4	script	Lady Hanae#tf	4_F_JPN,{
 		mes "My name is cleared, and the daimyo's masks are off. Thank you, samurai.";
 		close;
 	}
-	// The Palace of Masks: find her (900152), bring the letters (900153), then the daimyo (900154).
 	if (isbegin_quest(900152) == 1) {
 		mes "So you are the one Tetsuya told me about. Then listen carefully; walls have ears here.";
 		next;
 		mes "[Lady Hanae]";
-		mes "Daimyo Kurozane made a pact with Yami's cult, and had me exiled when I learned of it. I need proof.";
-		if (TF_HANAE) {
-			// Brought the letters before the quest had steps.
-			changequest 900152, 900154;
-			callfunc "F_TF_Moved";
-			mes "And you have already brought it to me. He hides in the inner court, behind a masked steward; confront him there.";
-			close;
-		}
-		mes "The cult sends its orders as ^0000FFsealed letters^000000, carried by the shinobi and Miyabi dolls of the Tatami Maze, the first floor of the Amatsu dungeon. Bring me ^0000FFthree^000000.";
-		changequest 900152, 900153;
-		callfunc "F_TF_Moved";
-		close;
-	}
-	if (isbegin_quest(900153) == 1) {
-		if (countitem(900020) < 3) {
-			mes "Three sealed letters" + (countitem(900020) ? "; you have " + countitem(900020) + " so far" : "") + ". The shinobi and Miyabi dolls of the Tatami Maze, the first floor of the Amatsu dungeon, carry them.";
-			close;
-		}
-		delitem 900020, 3;
-		TF_HANAE = 1;
-		changequest 900153, 900154;
-		callfunc "F_TF_Moved";
-		mes "This is his seal. Now he cannot deny it.";
-		mes "He will hear soon that we know. He hides in the inner court, behind a masked steward; confront him there.";
-		close;
-	}
-	if (checkquest(900154, HUNTING) != 2) {
-		mes "Kurozane hides in the inner court, just there, behind his masked steward. Show him what his pact has bought him.";
-		close;
-	}
-	mes "The daimyo is dead and his letters are in the lord's hands. My exile is over.";
-	next;
-	mes "[Lady Hanae]";
-	mes "Take this jade from my fan. It has seen through many lies at court.";
-	if (!checkweight(900015, 1)) {
+		mes "Daimyo Kurozane made a pact with Yami's cult, and had my father exiled when he learned of it. I need proof.";
+		mes "The cult sends its orders as sealed letters, and tonight the daimyo holds a masquerade. Every guest masked. Every steward masked. Even him.";
 		next;
 		mes "[Lady Hanae]";
-		mes "Your pack is full. Make room.";
+		mes "We go in as guests. We find the letters, we find out which mask is the daimyo, and we make him take it off.";
+		changequest 900152, 900153;
+		callfunc "F_TF_Moved";
+		next;
+	} else {
+		mes "The masquerade is still going. Shall we go back in?";
+		next;
+	}
+	if (select("Put on a mask:Not yet") != 1) {
+		mes "[Lady Hanae]";
+		mes "When you are ready. The masks will wait; they always do.";
 		close;
 	}
-	getitem 900015, 1;
-	TF_BOND |= 16;
-	callfunc "F_TF_Moved";
-	completequest 900154;
-	callfunc "F_TF_Reward", 6000000, 4000000, 150000;
-	mes "^777777You received the ^0000FFJade of the Exile's Fan^000000.^000000";
-	callfunc "F_TF_Bonded", 24, "Tetsuya will want to hear of it, back in Amatsu.";
-	close;
+	close2;
+	if (!callfunc("F_TF_Memorial", "Twin Flames: The Palace of Masks"))
+		close;
+	end;
 
 OnInit:
 	questinfo QTYPE_QUEST, QMARK_YELLOW, "Class == JOB_SAMURAI && TF_STEP >= 61 && !(TF_BOND & 16)";
 	end;
-}
-
-ama_in02,204,168,4	script	Masked Steward#tf	4_M_MASKMAN,{
-	mes "[Masked Steward]";
-	if (Class != JOB_SAMURAI || isbegin_quest(900154) != 1 || checkquest(900154, HUNTING) == 2) {
-		mes "^777777A steward in a smiling white mask stands before the inner door. He does not move, and he does not answer. Someone breathes behind the door.^000000";
-		close;
-	}
-	mes "^777777The steward looks at the letters in your hand and steps aside. Behind the door, the daimyo waits. He knows.^000000";
-	next;
-	if (callfunc("F_TF_Arena", 9)) {
-		mes "[Daimyo Kurozane]";
-		mes "Letters? Proof? Fool. In this palace, the truth is whatever wears the finest mask.";
-	}
-	close;
 }

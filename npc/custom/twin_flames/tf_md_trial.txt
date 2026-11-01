@@ -1,0 +1,245 @@
+//===== rAthena Script =======================================
+//= The Twin Flames Saga: The Trial of Balance (memorial dungeon, Chapter IX)
+//===== Description: =========================================
+//= Tetsuya's own trial (tf_tetsuya.txt). The Sarugami will not give their essence to the forge
+//= until they have judged whether the one who carries it, and the one beside him, can hold
+//= balance. Their spirits test the path; their pillars of light and shadow must fall
+//= together, or each mends the other; and their Judge shields itself with one more pair.
+//= The essence is Tetsuya's relic for the First Forge.            TF_STEP 90 -> 100
+//= Instance "Twin Flames: The Trial of Balance" on tf_trial (a copy of job_ko).
+//=
+//= Instance variables:
+//=   'map$     the instance's copy of tf_trial    'aid   the Samurai's account id
+//=   'stage    0 the spirits, 1 the pillars, 2 the Judge, 3 over
+//=   'pairs    pillar pairs balanced (bits 1, 2; 4 the Judge's)
+//=   'fell[p], 'fellside[p]   when one pillar of pair p fell, and which (1 light, 2 shadow)
+//=   'boss     the Judge's GID while it stands   'phase   bits: 1 its pillars
+//============================================================
+
+tf_trial	mapflag	loadevent
+tf_trial	mapflag	noteleport
+tf_trial	mapflag	nomemo
+tf_trial	mapflag	nobranch
+tf_trial	mapflag	monster_noteleport
+tf_trial	mapflag	nosave	amatsu,192,160
+
+tf_trial,1,1,0	script	#tr_ctrl	-1,{
+	end;
+
+OnPCLoadMapEvent:
+	.@id = instance_id(IM_CHAR);
+	if (.@id > 0) {
+		if (strcharinfo(3) == instance_mapname("tf_trial", .@id))
+			doevent instance_npcname("#tr_ctrl", .@id) + "::OnEnter";
+	}
+	end;
+
+OnInstanceInit:
+	'map$ = instance_mapname("tf_trial");
+	disablenpc instance_npcname("Tetsuya#tr2");
+	areamonster 'map$, 112, 34, 168, 80, "--ja--", 31923, 10, instance_npcname("#tr_ctrl") + "::OnSpiritDead";
+	end;
+
+OnEnter:
+	'aid = getcharid(3);
+	playBGM ('stage >= 2 ? "125" : "77");
+	addtimer 1000, instance_npcname("#tr_ctrl") + "::OnScene";
+	end;
+
+OnScene:
+	if (!'intro) {
+		'intro = 1;
+		npctalk "Tetsuya: The Sarugami's own ground. My mother's people came here to be judged. Most of them didn't like the answer.", instance_npcname("Tetsuya#tr1");
+		sleep2 3000;
+		npctalk "Tetsuya: They'll test the path first. Then they'll test whether we can keep two things in balance. Then they'll test me.", instance_npcname("Tetsuya#tr1");
+		soundeffectall "mime_monkey_stand.wav", 0, 'map$;
+		instance_announce 0, "The Sarugami spirits test the path. Clear them.", bc_map, "0xFFD27F";
+	}
+	callsub L_Marks;
+	end;
+
+OnSpiritDead:
+	if ('stage || mobcount('map$, instance_npcname("#tr_ctrl") + "::OnSpiritDead") > 0)
+		end;
+	'stage = 1;
+	instance_announce 0, "The spirits withdraw. Two pairs of pillars rise, light and shadow. Each pair must fall together, or each will mend the other.", bc_map, "0xFFD27F";
+	callsub L_Pair, 1, 120, 50, 160, 50;
+	callsub L_Pair, 2, 125, 70, 155, 70;
+	donpcevent instance_npcname("#tr_watch") + "::OnStart";
+	end;
+
+// A pair of pillars (getarg(0): its number): light at x1,y1, shadow at x2,y2.
+L_Pair:
+	monster 'map$, getarg(1), getarg(2), "Pillar of Light", 31924, 1, instance_npcname("#tr_ctrl") + "::OnLight" + getarg(0);
+	monster 'map$, getarg(3), getarg(4), "Pillar of Shadow", 31931, 1, instance_npcname("#tr_ctrl") + "::OnShadow" + getarg(0);
+	'fell[getarg(0)] = 0;
+	'fellside[getarg(0)] = 0;
+	return;
+
+OnLight1: callsub L_Fell, 1, 1;
+OnShadow1: callsub L_Fell, 1, 2;
+OnLight2: callsub L_Fell, 2, 1;
+OnShadow2: callsub L_Fell, 2, 2;
+OnLight3: callsub L_Fell, 3, 1;
+OnShadow3: callsub L_Fell, 3, 2;
+// One pillar of pair getarg(0) fell (getarg(1): 1 light, 2 shadow): balanced if its partner
+// fell within five seconds; #tr_watch mends the pair if the partner still stands after that.
+L_Fell:
+	.@p = getarg(0);
+	if ('fellside[.@p] && 'fellside[.@p] != getarg(1) && gettimetick(2) - 'fell[.@p] <= 5) {
+		'pairs |= 1 << (.@p - 1);
+		'fell[.@p] = 0;
+		'fellside[.@p] = 0;
+		specialeffect EF_HOLYHIT, AREA, instance_npcname("#tr_ctrl");
+		instance_announce 0, "Light and shadow fall together. The Sarugami chatter, pleased.", bc_map, "0xFFD27F";
+		donpcevent instance_npcname("#tr_ctrl") + "::OnBalanced";
+		end;
+	}
+	'fell[.@p] = gettimetick(2);
+	'fellside[.@p] = getarg(1);
+	end;
+
+OnBalanced:
+	if ('stage == 1 && ('pairs & 3) == 3) {
+		'stage = 2;
+		monster 'map$, 140, 62, "Sarugami Judge", 31932, 1, instance_npcname("#tr_ctrl") + "::OnJudgeDead";
+		'boss = $@mobid[0];
+		unittalk 'boss, "Sarugami Judge: Blood of the Yamabiko. Bearer of both flames. Show us that you can hold what you carry.";
+		playBGMall "125", 'map$;
+		npctalk "Tetsuya: Here it comes. Grandmother always said it had a lovely voice. She lied.", instance_npcname("Tetsuya#tr1");
+	} else if ('stage == 2 && ('pairs & 4)) {
+		setunitdata 'boss, UMOB_DMGIMMUNE, 0;
+		unittalk 'boss, "Sarugami Judge: Balanced. Again. Hm.";
+	}
+	end;
+
+OnJudgeDead:
+	'boss = 0;
+	if ('stage >= 3)
+		end;
+	'stage = 3;
+	killmonster 'map$, "All";
+	enablenpc instance_npcname("Tetsuya#tr2");
+	instance_announce 0, "The Judge bows its great golden head, and is gone. Where it stood, a small light hangs in the air.", bc_map, "0xFFD27F";
+	if (attachrid('aid))
+		callsub L_Marks;
+	end;
+
+OnMarks:
+	callsub L_Marks;
+	end;
+L_Marks:
+	viewpoint 2, 1, 1, 1, 0xFFFFFF;
+	if ('stage >= 2)
+		viewpoint 1, 140, 60, 1, ('stage == 2 ? 0xFF0000 : 0x66CCFF);
+	return;
+}
+
+// Pillars that stand alone too long mend their fallen partner; the Judge's own pair.
+tf_trial,1,2,0	script	#tr_watch	-1,{
+	end;
+OnStart:
+	initnpctimer;
+	end;
+OnTimer1000:
+	if ('stage >= 3) {
+		stopnpctimer;
+		end;
+	}
+	for (.@p = 1; .@p <= 3; .@p++) {
+		if (!'fellside[.@p] || gettimetick(2) - 'fell[.@p] <= 5)
+			continue;
+		// Out of balance: the fallen pillar rises again, and its partner is made whole.
+		setarray .@x[1], 120, 125, 125;
+		setarray .@y[1], 50, 70, 50;
+		setarray .@x2[1], 160, 155, 155;
+		killmonster 'map$, instance_npcname("#tr_ctrl") + "::OnLight" + .@p;
+		killmonster 'map$, instance_npcname("#tr_ctrl") + "::OnShadow" + .@p;
+		if (.@p == 3)
+			donpcevent instance_npcname("#tr_watch") + "::OnJudgePair";
+		else {
+			monster 'map$, .@x[.@p], .@y[.@p], "Pillar of Light", 31924, 1, instance_npcname("#tr_ctrl") + "::OnLight" + .@p;
+			monster 'map$, .@x2[.@p], .@y[.@p], "Pillar of Shadow", 31931, 1, instance_npcname("#tr_ctrl") + "::OnShadow" + .@p;
+		}
+		'fell[.@p] = 0;
+		'fellside[.@p] = 0;
+		instance_announce 0, "Out of balance! The fallen pillar rises again, and its partner is made whole.", bc_map, "0xFF6666";
+	}
+	if ('stage == 2 && 'boss && unitexists('boss) && !('phase & 1)) {
+		getunitdata 'boss, .@d;
+		if (.@d[UMOB_HP] * 100 / .@d[UMOB_MAXHP] <= 60) {
+			'phase |= 1;
+			setunitdata 'boss, UMOB_DMGIMMUNE, 1;
+			unittalk 'boss, "Sarugami Judge: Strength is easy. Balance is not. Once more.";
+			instance_announce 0, "The Judge hides behind a last pair of pillars. Break them together.", bc_map, "0xFFD27F";
+			donpcevent instance_npcname("#tr_watch") + "::OnJudgePair";
+		}
+	}
+	initnpctimer;
+	end;
+OnJudgePair:
+	monster 'map$, 125, 50, "Pillar of Light", 31924, 1, instance_npcname("#tr_ctrl") + "::OnLight3";
+	monster 'map$, 155, 50, "Pillar of Shadow", 31931, 1, instance_npcname("#tr_ctrl") + "::OnShadow3";
+	end;
+}
+
+// Tetsuya: at the edge of the trial ground, and with the Sarugami's gift after.
+tf_trial,146,25,6	script	Tetsuya#tr1	4_EXJOB_NINJA2,{
+	mes "[Tetsuya]";
+	if ('stage == 0)
+		mes "Spirits first. Don't hurt them too much. They're sort of my cousins.";
+	else if ('stage == 1)
+		mes "Light and shadow, together, or they put each other back together. Sounds like someone we know.";
+	else
+		mes "That's the Judge. Hit it. Respectfully.";
+	close;
+}
+
+tf_trial,140,58,4	script	Tetsuya#tr2	4_EXJOB_NINJA2,{
+	if ('stage < 3)
+		end;
+	setpcblock PCBLOCK_MOVE|PCBLOCK_ATTACK|PCBLOCK_SKILL, true;
+	mes "[Tetsuya]";
+	mes "...They're talking to me. All of them at once. It's like being shouted at by a monastery.";
+	next;
+	mes "[Tetsuya]";
+	mes "^777777His voice changes, and for a moment it is many voices.^000000";
+	mes "'Child of the Yamabiko. You were cast out for your tail, and you came back carrying a curse-bearer on your back.'";
+	mes "'You held the balance. Take what we kept for this.'";
+	next;
+	specialeffect2 EF_HOLYHIT;
+	mes "[Tetsuya]";
+	mes "Sarugami blood broke Kusanagi's seal. Let it seal nothing ever again.";
+	mes "Balance is not obedience. Balance is freedom.";
+	next;
+	if (!countitem(900018) && !checkweight(900018, 1)) {
+		mes "[Tetsuya]";
+		mes "Your pack's too full for even a little essence. Make some room.";
+		close2;
+		setpcblock PCBLOCK_MOVE|PCBLOCK_ATTACK|PCBLOCK_SKILL, false;
+		end;
+	}
+	if (!countitem(900018))
+		getitem 900018, 1;
+	mes "^777777You received the ^0000FFSarugami Essence^000000.^000000";
+	if (TF_STEP == 90) {
+		completequest 900181;
+		setquest 900191;
+		TF_STEP = 100;
+		callfunc "F_TF_Moved";
+		callfunc "F_TF_Reward", 15000000, 10000000, 300000;
+	}
+	next;
+	mes "[Tetsuya]";
+	mes "Masaru waits at the First Forge, on the second level of the Magma Dungeon. Bring both blades in hand, ^0000FF10 Oridecon^000000 and ^0000FF10 Burning Hearts^000000.";
+	mes "And every relic. The forge needs what each of them carried.";
+	next;
+	mes "^777777Chapter IX, The Weaver Unmasked, is complete.^000000";
+	close2;
+	setpcblock PCBLOCK_MOVE|PCBLOCK_ATTACK|PCBLOCK_SKILL, false;
+	if (select("Leave the trial ground:Stay a while") == 1) {
+		warp "amatsu", 192, 160;
+		instance_destroy;
+	}
+	end;
+}

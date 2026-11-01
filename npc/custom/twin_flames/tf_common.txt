@@ -8,74 +8,132 @@
 //=   TF_STEP   progress through the ten chapters (see the doc for each value)
 //=   TF_BOND   companions whose trials are done, as bits:
 //=             1 Kiyoshi, 2 Renga, 4 Ayame, 8 Taro & Jiro, 16 Hanae, 32 the Herald, 64 Masaru
-//=   TF_MERCY  times mercy was shown (the captured raider, General Mibu); colours the ending
+//=   TF_MERCY  times mercy was shown (the captured raider, General Mibu, the villagers of the
+//=             Crimson Fields); colours the ending
 //=   TF_TRUST  1 if the goddess was trusted over Tetsuya in Chapter VI
+//=   TF_DUEL   the Clash of Brothers that follows (1 won, 2 lost)
+//= The memorial dungeons (tf_md_*.txt) are opened by F_TF_Memorial.
 //============================================================
 
-// The saga's arenas. Each boss is called by a player on its quest step (F_TF_Arena) and
-// leaves again after 15 minutes if it still stands. Quest kill credit (db/custom/samurai/
-// quest_db.yml) goes to the killer and the party members on the map.
+// The saga's field arenas: the companions' trials (Chapters IV, VI), the Herald (VII) and the
+// Contract Binder (VIII); the other bosses live in the memorials (tf_md_*.txt). Each boss is
+// called by a player on its quest step (F_TF_Arena), with the companion whose trial it is at
+// their side (seen by that player), and leaves after 15 minutes if it still stands. Boss and
+// companion speak as it weakens; the Glacial Yokai's ritual falters twice, and only the
+// Samurai can talk the twin exorcists round (F_TF_Mediate). Quest kill credit (db/custom/
+// samurai/quest_db.yml) goes to the killer and the party members on the map.
 -	script	TF_Arenas	-1,{
 	end;
 
 OnInit:
-	// arena: quest, monster, blade needed (0 none, 1 Muramasa, 2 Twin Flames, 3 Tenseiga), where it appears
-	setarray .quest[1],  900122, 900131, 900132, 900133, 900134, 900141, 900142, 900151, 900154, 900161, 900171, 900172, 900192, 900192, 900192;
-	setarray .mob[1],    31903,  31904,  31905,  31906,  31907,  31908,  31909,  31910,  31911,  31912,  31913,  31914,  31915,  31916,  31917;
-	setarray .need[1],   1,      1,      0,      0,      0,      1,      0,      0,      0,      2,      0,      2,      3,      3,      3;
-	setarray .map$[1],   "ama_dun02", "ama_fild01", "ice_dun02", "prt_monk", "ama_dun02", "ama_dun03", "ama_dun03", "ice_dun03", "ama_in02", "thor_v02", "pay_fild08", "thor_v03", "tf_goddess", "tf_goddess", "tf_goddess";
-	setarray .x[1],      47,     200,    150,    225,    40,     120,    110,    149,    204,    90,     42,     49,     149,    149,    149;
-	setarray .y[1],      48,     294,    158,    143,    47,     33,     33,     51,     165,    202,    82,     253,    184,    184,    184;
+	// arena: quest, monster, blade needed (0 none, 2 Twin Flames), where, who comes along
+	setarray .quest[1], 900132, 900133, 900134, 900151, 900161, 900171;
+	setarray .mob[1],   31905,  31906,  31907,  31910,  31912,  31913;
+	setarray .need[1],  0,      0,      0,      0,      2,      0;
+	setarray .map$[1],  "ice_dun02", "prt_monk", "ama_dun02", "ice_dun03", "thor_v02", "pay_fild08";
+	setarray .x[1],     150,    225,    40,     149,    90,     42;
+	setarray .y[1],     158,    143,    47,     51,     202,    82;
+	setarray .ally$[1], "Kiyoshi Takeda#arena", "Brother Renga#arena", "Ayame#arena", "Taro#arena", "", "Kohaku#tf";
+	// what the boss says at half health and near the end, and what the companion answers
+	setarray .half$[1],
+		"Usurper General Mibu: Takeda's army was mine the moment he trusted the wrong god!",
+		"Fallen Monk Genkai: Renga prays. I listened. That is the only difference between us.",
+		"Kage: Your kunoichi's clan screamed so beautifully. Shall I tell you how?",
+		"",
+		"Herald of Ashes: Feel them pull? Two gods, one pair of arms. Something will tear.",
+		"Contract Binder: The fox is property. Property does not choose.";
+	setarray .low$[1],
+		"Usurper General Mibu: Mercy... Takeda, you were always the merciful one...",
+		"Fallen Monk Genkai: Brother... is that you? I cannot see...",
+		"Kage: The Hidden Leaf... was supposed to stay buried...",
+		"",
+		"Herald of Ashes: The master... will be so very hungry...",
+		"Contract Binder: The contract... is... burning...";
+	setarray .ahalf$[1],
+		"Kiyoshi Takeda: Steady! He fights like a man who has never lost. Make him learn.",
+		"Brother Renga: Genkai, hear me! There is still a way home!",
+		"Ayame: Don't listen to him. Cut.",
+		"",
+		"",
+		"Kohaku: Burn it! Burn every word of it!";
+	setarray .alow$[1],
+		"Kiyoshi Takeda: Hold. Let him kneel. I want to see it.",
+		"Brother Renga: Go gently, brother. Go gently.",
+		"Ayame: For my mother. For all of them.",
+		"",
+		"",
+		"Kohaku: I am nobody's. Nobody's!";
 	initnpctimer;
 	end;
 
-// Bosses that stood 15 minutes leave (the next player may call them again).
-OnTimer60000:
-	for (.@a = 1; .@a <= 15; .@a++) {
-		if (.gid[.@a] && (!unitexists(.gid[.@a]) || gettimetick(2) - .since[.@a] > 900)) {
+OnTimer1000:
+	for (.@a = 1; .@a <= 6; .@a++) {
+		if (!.gid[.@a])
+			continue;
+		if (!unitexists(.gid[.@a]) || gettimetick(2) - .since[.@a] > 900) {
 			killmonster .map$[.@a], "TF_Arenas::OnDead" + .@a;
-			.gid[.@a] = 0;
+			callsub L_Over, .@a;
+			continue;
+		}
+		getunitdata .gid[.@a], .@d;
+		.@pct = .@d[UMOB_HP] * 100 / .@d[UMOB_MAXHP];
+		if (.@pct <= 50 && !(.said[.@a] & 1)) {
+			.said[.@a] |= 1;
+			callsub L_Lines, .@a, .half$[.@a], .ahalf$[.@a];
+			// The Herald: both blades pull at once, and the Samurai pays for it.
+			if (.@a == 5 && isloggedin(.caller[.@a])) {
+				sc_start SC_CURSE, 5000, 0, 10000, SCSTART_NOAVOID, .caller[.@a];
+				percentheal -20, 0, .caller_cid[.@a];
+				mapannounce .map$[.@a], "Kusanagi blazes white and Muramasa red, and both fight for the same arms.", bc_map, "0xFF8844";
+			}
+		}
+		if (.@pct <= 15 && !(.said[.@a] & 2)) {
+			.said[.@a] |= 2;
+			callsub L_Lines, .@a, .low$[.@a], .alow$[.@a];
+		}
+		// The twins' ritual falters at 60% and at 30%: the ice closes over the yokai.
+		if (.@a == 4 && !.falter) {
+			.@due = (.@pct <= 60 && !(.said[4] & 4)) ? 4 : ((.@pct <= 30 && !(.said[4] & 8)) ? 8 : 0);
+			if (.@due) {
+				.said[4] |= .@due;
+				.falter = 1;
+				setunitdata .gid[4], UMOB_DMGIMMUNE, 1;
+				npctalk "Taro: Melt it, you fool! FIRE!", "Taro#arena";
+				npctalk "Jiro: Drown it, you idiot! WATER!", "Jiro#arena";
+				mapannounce .map$[4], "The twins argue, and their ritual falters: ice closes over the yokai. Talk them round!", bc_map, "0x88CCFF";
+			}
 		}
 	}
 	initnpctimer;
 	end;
 
-OnDead1:  .gid[1] = 0;  end;
-OnDead2:  .gid[2] = 0;  end;
-OnDead3:  .gid[3] = 0;  end;
-OnDead4:  .gid[4] = 0;  end;
-OnDead5:  .gid[5] = 0;  end;
-OnDead6:  .gid[6] = 0;  end;
-OnDead7:  .gid[7] = 0;  end;
-OnDead8:  .gid[8] = 0;  end;
-OnDead9:  .gid[9] = 0;  end;
-OnDead10: .gid[10] = 0; end;
-OnDead11: .gid[11] = 0; end;
-OnDead12:
-	.gid[12] = 0;
-	// The false ending: the god of ashes falls, and the goddess blesses it.
-	mapannounce "thor_v03", "Kagutsuchi-no-Yami has fallen. A pale golden light pours into the Abyssal Pit...", bc_map, "0xFFD27F";
-	end;
+L_Lines:
+	if (getarg(1) != "")
+		unittalk .gid[getarg(0)], getarg(1);
+	if (getarg(2) != "")
+		npctalk getarg(2), .ally$[getarg(0)];
+	return;
 
-// The Weaver: radiance, then eclipse, then both. Each falls into the next.
-OnDead13:
-	.gid[13] = 0;
-	mapannounce "tf_goddess", "Amaterasu-no-Mikazuki: Light alone cannot hold you? Then be swallowed by my shadow.", bc_map, "0xC8A0FF";
-	monster .map$[14], .x[14], .y[14], "Eclipsed Amaterasu", .mob[14], 1, "TF_Arenas::OnDead14";
-	.gid[14] = $@mobid[0];
-	.since[14] = gettimetick(2);
-	end;
-OnDead14:
-	.gid[14] = 0;
-	mapannounce "tf_goddess", "Amaterasu-no-Mikazuki: Moon and sun, mother and jailer. I am both, and you are nothing!", bc_map, "0xFFD27F";
-	monster .map$[15], .x[15], .y[15], "Amaterasu-no-Mikazuki", .mob[15], 1, "TF_Arenas::OnDead15";
-	.gid[15] = $@mobid[0];
-	.since[15] = gettimetick(2);
-	end;
-OnDead15:
-	.gid[15] = 0;
-	mapannounce "tf_goddess", "Amaterasu-no-Mikazuki: Perhaps mortals need no gods... perhaps that is freedom.", bc_map, "0xFFFFFF";
-	end;
+// The arena is free again: its companion leaves the caller's sight.
+L_Over:
+	.@a = getarg(0);
+	.gid[.@a] = 0;
+	.said[.@a] = 0;
+	if (.@a == 4)
+		.falter = 0;
+	if (.@a != 5 && .@a != 6 && .caller_cid[.@a]) {
+		cloakonnpc .ally$[.@a], .caller_cid[.@a];
+		if (.@a == 4)
+			cloakonnpc "Jiro#arena", .caller_cid[.@a];
+	}
+	return;
+
+OnDead1: callsub L_Over, 1; end;
+OnDead2: callsub L_Over, 2; end;
+OnDead3: callsub L_Over, 3; end;
+OnDead4: callsub L_Over, 4; end;
+OnDead5: callsub L_Over, 5; end;
+OnDead6: callsub L_Over, 6; end;
 }
 
 // Calls arena getarg(0)'s boss for the attached player, if their quest is on that step and
@@ -85,13 +143,10 @@ function	script	F_TF_Arena	{
 	.@quest = getvariableofnpc(.quest[.@a], "TF_Arenas");
 	if (Class != JOB_SAMURAI || isbegin_quest(.@quest) != 1 || checkquest(.@quest, HUNTING) == 2)
 		return 0;
-	// The Weaver's arena is busy while any of her three forms stands.
-	for (.@i = .@a; .@i <= (.@a == 13 ? 15 : .@a); .@i++) {
-		.@gid = getvariableofnpc(.gid[.@i], "TF_Arenas");
-		if (.@gid && unitexists(.@gid)) {
-			mes "^777777The battle here has already begun. Wait for it to end.^000000";
-			return 0;
-		}
+	.@gid = getvariableofnpc(.gid[.@a], "TF_Arenas");
+	if (.@gid && unitexists(.@gid)) {
+		mes "^777777The battle here has already begun. Wait for it to end.^000000";
+		return 0;
 	}
 	if (!callfunc("F_TF_Need", getvariableofnpc(.need[.@a], "TF_Arenas")))
 		return 0;
@@ -101,9 +156,74 @@ function	script	F_TF_Arena	{
 	monster .@map$, getvariableofnpc(.x[.@a], "TF_Arenas"), getvariableofnpc(.y[.@a], "TF_Arenas"), "--ja--", getvariableofnpc(.mob[.@a], "TF_Arenas"), 1, "TF_Arenas::OnDead" + .@a;
 	set getvariableofnpc(.gid[.@a], "TF_Arenas"), $@mobid[0];
 	set getvariableofnpc(.since[.@a], "TF_Arenas"), gettimetick(2);
-	specialeffect2 EF_KO_IZAYOI;
+	set getvariableofnpc(.caller[.@a], "TF_Arenas"), getcharid(3);
+	set getvariableofnpc(.caller_cid[.@a], "TF_Arenas"), getcharid(0);
+	.@ally$ = getvariableofnpc(.ally$[.@a], "TF_Arenas");
+	if (.@ally$ != "")
+		cloakoffnpcself .@ally$;
+	if (.@a == 4)
+		cloakoffnpcself "Jiro#arena";
+	specialeffect2 EF_FIREPILLARBOMB;
 	return 1;
 }
+
+// The twin exorcists at the Frozen Seal (getarg(0): "Taro" or "Jiro"). When their ritual
+// falters, only the Samurai can stop them choosing between fire and water.
+function	script	F_TF_Mediate	{
+	.@me$ = getarg(0);
+	.@other$ = (.@me$ == "Taro") ? "Jiro" : "Taro";
+	if (!getvariableofnpc(.falter, "TF_Arenas")) {
+		mes "[" + .@me$ + "]";
+		mes (.@me$ == "Taro") ? "Fire to break the ice! Watch!" : "Water to bind it! Watch!";
+		close;
+	}
+	mes "[" + .@me$ + "]";
+	mes (.@me$ == "Taro") ? "Tell him! Fire breaks ice! Everybody knows that!" : "Tell him! Water binds what is inside! Everybody except him knows that!";
+	next;
+	mes "[" + .@other$ + "]";
+	mes "Don't listen to " + .@me$ + "! Tell us which of us is right!";
+	next;
+	if (select("Fire breaks the ice. Taro is right:Water binds it. Jiro is right:Both of you, together: fire, then water") != 3) {
+		mes "[" + .@other$ + "]";
+		mes "See?! Even the samurai takes sides! This is why we never get anything done!";
+		mes "^777777The ice over the yokai grows thicker. They are not listening yet.^000000";
+		close;
+	}
+	mes "[Taro]";
+	mes "...Together?";
+	mes "[Jiro]";
+	mes "...Fire to break it, water to bind it. That could work. Don't tell him I said so.";
+	close2;
+	set getvariableofnpc(.falter, "TF_Arenas"), 0;
+	setunitdata getvariableofnpc(.gid[4], "TF_Arenas"), UMOB_DMGIMMUNE, 0;
+	npctalk "Taro: Fire!", "Taro#arena";
+	npctalk "Jiro: Water!", "Jiro#arena";
+	specialeffect EF_FIREPILLARBOMB, AREA, "Taro#arena";
+	specialeffect EF_STORMGUST, AREA, "Jiro#arena";
+	mapannounce "ice_dun03", "Fire and water together: the ice over the yokai shatters!", bc_map, "0x88CCFF";
+	end;
+}
+
+// The companions at their trials' arenas, seen only by the Samurai who called the boss.
+ice_dun02,147,156,4	script	Kiyoshi Takeda#arena	8_M_JPNMASTER,{
+	mes "[" + strnpcinfo(1) + "]";
+	mes "^777777Their eyes never leave the fight.^000000";
+	close;
+OnInit:
+	cloakonnpc strnpcinfo(0);
+	end;
+}
+prt_monk,222,141,4	duplicate(Kiyoshi Takeda#arena)	Brother Renga#arena	4_M_MONK
+ama_dun02,37,45,4	duplicate(Kiyoshi Takeda#arena)	Ayame#arena	4_F_EDEN_MASTER
+
+ice_dun03,146,49,4	script	Taro#arena	4_M_JPN,{
+	callfunc "F_TF_Mediate", strnpcinfo(1);
+	end;
+OnInit:
+	cloakonnpc strnpcinfo(0);
+	end;
+}
+ice_dun03,152,49,4	duplicate(Taro#arena)	Jiro#arena	4_M_JPN2
 
 // Whether the attached player holds the blade a step needs (0 none, 1 Muramasa,
 // 2 Kusanagi and Muramasa together, 3 Tenseiga); says what is missing.
@@ -170,6 +290,40 @@ function	script	F_TF_Bonded	{
 	return;
 }
 
+// Opens saga memorial getarg(0) (db/custom/samurai/instance_db.yml) and moves the attached
+// player in at once, so close their dialog first. It is a solo instance (IM_CHAR) that lasts an
+// hour, so a player who falls inside can come back to it. Another memorial still open is let go
+// first, if the player agrees. Returns 1 when the player is in.
+function	script	F_TF_Memorial	{
+	.@md$ = getarg(0);
+	.@id = instance_id(IM_CHAR);
+	if (.@id > 0 && instance_live_info(ILI_NAME, .@id) != .@md$) {
+		mes "^777777Another memory still holds you: " + instance_live_info(ILI_NAME, .@id) + ". Let it go?^000000";
+		if (select("Let it go:Not yet") != 1)
+			return 0;
+		instance_destroy .@id;
+		.@id = 0;
+	}
+	if (.@id <= 0)
+		.@id = instance_create(.@md$, IM_CHAR);
+	if (.@id <= 0) {
+		mes "^777777The memory will not open. Try again in a moment.^000000";
+		return 0;
+	}
+	// instance_enter looks for a party's instance unless it is told which one.
+	if (instance_enter(.@md$, -1, -1, getcharid(0), .@id) != IE_OK) {
+		mes "^777777The memory will not let you in.^000000";
+		return 0;
+	}
+	return 1;
+}
+
+// The attached player says getarg(0) aloud, over their head.
+function	script	F_TF_Say	{
+	unittalk getcharid(3), strcharinfo(0) + ": " + getarg(0);
+	return;
+}
+
 // Minimap marks (viewpoint) on the saga's next step, for the map the player is on: set as a
 // map loads (the loadevent mapflag on every map the saga visits) and after every step
 // (F_TF_Moved, queued until the dialog ends).
@@ -183,13 +337,9 @@ OnInit:
 	end;
 
 OnPCLoadMapEvent:
-	// Tetsuya comes along into the Shrine of Seals and the Celestial Veil.
-	if (Class == JOB_SAMURAI && strcharinfo(3) == "ama_dun03" && (TF_STEP == 51 || TF_STEP == 52))
-		cloakoffnpcself "Tetsuya Takahashi#seal";
-	if (Class == JOB_SAMURAI && strcharinfo(3) == "tf_goddess" && TF_STEP >= 110)
-		cloakoffnpcself "Tetsuya Takahashi#veil";
 OnMark:
-	if (Class != JOB_SAMURAI)
+	// Memorials (instance maps, named "<slot>#<instance>") keep their own marks.
+	if (Class != JOB_SAMURAI || compare(strcharinfo(3), "#"))
 		end;
 	for (.@i = 1; .@i <= 8; .@i++)
 		viewpoint 2, 1, 1, .@i, 0xFFFFFF;
@@ -198,10 +348,11 @@ OnMark:
 	case 0:  callsub L_Mark, "prontera", 158, 179; break;
 	case 1:  callsub L_Mark, "amatsu", 192, 94; break;
 	case 2:
+	case 3:
 		callsub L_Mark, "ama_fild01", 174, 331;	// the shrine's door, up the stone path
 		callsub L_Mark, "ama_in01", 175, 176;
 		break;
-	case 3:
+	case 4:
 		if (checkquest(900102, HUNTING) == 2)
 			callsub L_Mark, "amatsu", 192, 94;
 		break;
@@ -212,7 +363,7 @@ OnMark:
 		break;
 	case 12: callsub L_Mark, "amatsu", 187, 158; break;
 	case 21:
-		if (isbegin_quest(900122) == 1 && checkquest(900122, HUNTING) != 2) {
+		if (isbegin_quest(900122) == 1) {
 			callsub L_Mark, "ama_dun02", 45, 50;
 			break;
 		}
@@ -245,8 +396,8 @@ OnMark:
 				callsub L_Mark, "ama_dun02", 40, 50;
 		}
 		break;
-	case 51: callsub L_Mark, "ama_dun03", 120, 30; break;
-	case 52: callsub L_Mark, "ama_dun03", 110, 30; break;
+	case 51:
+	case 52: callsub L_Mark, "ama_dun03", 120, 30; break;
 	case 61:
 		if ((TF_BOND & 24) == 24) {
 			callsub L_Mark, "amatsu", 192, 163;
@@ -257,13 +408,10 @@ OnMark:
 			if (isbegin_quest(900151) == 1 && checkquest(900151, HUNTING) != 2)
 				callsub L_Mark, "ice_dun03", 149, 45;
 		}
-		// Hanae, or the steward before Kurozane; not while the letters are still out there.
-		if (!(TF_BOND & 16) && !(isbegin_quest(900153) == 1 && countitem(900020) < 3)) {
+		// Hanae, who takes the Samurai into the masquerade.
+		if (!(TF_BOND & 16)) {
 			callsub L_Mark, "amatsu", 85, 235;	// the palace gate
-			if (isbegin_quest(900154) == 1 && checkquest(900154, HUNTING) != 2)
-				callsub L_Mark, "ama_in02", 204, 168;
-			else
-				callsub L_Mark, "ama_in02", 196, 172;
+			callsub L_Mark, "ama_in02", 196, 172;
 		}
 		break;
 	case 71:
@@ -279,10 +427,7 @@ OnMark:
 	case 81:  callsub L_Mark, "pay_fild08", 40, 80; break;
 	case 82:  callsub L_Mark, "thor_v03", 49, 250; break;
 	case 100: callsub L_Mark, "mag_dun02", 49, 40; break;
-	case 110:
-		callsub L_Mark, "mag_dun02", 53, 44;
-		callsub L_Mark, "tf_goddess", 149, 187;
-		break;
+	case 110: callsub L_Mark, "mag_dun02", 53, 44; break;
 	}
 	end;
 

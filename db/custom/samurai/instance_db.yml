@@ -1,0 +1,66 @@
+# The Twin Flames Saga's memorial dungeons (doc/custom_jobs/twin_flames.md), imported by
+# db/instance_db.yml. Each is a solo instance (IM_CHAR) of a saga map, a stock map copied
+# under its own name by tools/twin_flames_maps.py. Their scripts are npc/custom/twin_flames/
+# tf_md_*.txt; the saga NPCs that open them call F_TF_Memorial (tf_common.txt).
+
+Header:
+  Type: INSTANCE_DB
+  Version: 2
+
+Body:
+  - Id: 900
+    Name: "Twin Flames: Kagemori Burning"
+    TimeLimit: 3600
+    Enter:
+      Map: tf_kagemori
+      X: 197
+      Y: 100
+  - Id: 901
+    Name: "Twin Flames: Kurogane's Fortress"
+    TimeLimit: 3600
+    Enter:
+      Map: tf_fortress
+      X: 75
+      Y: 20
+  - Id: 902
+    Name: "Twin Flames: The Crimson Fields"
+    TimeLimit: 3600
+    Enter:
+      Map: tf_crimson
+      X: 70
+      Y: 40
+  - Id: 903
+    Name: "Twin Flames: The Shrine of Seals"
+    TimeLimit: 3600
+    Enter:
+      Map: tf_shrine
+      X: 120
+      Y: 12
+  - Id: 904
+    Name: "Twin Flames: The Palace of Masks"
+    TimeLimit: 3600
+    Enter:
+      Map: tf_palace
+      X: 190
+      Y: 14
+  - Id: 905
+    Name: "Twin Flames: The Abyssal Pit"
+    TimeLimit: 3600
+    Enter:
+      Map: tf_abyss
+      X: 40
+      Y: 265
+  - Id: 906
+    Name: "Twin Flames: The Trial of Balance"
+    TimeLimit: 3600
+    Enter:
+      Map: tf_trial
+      X: 150
+      Y: 22
+  - Id: 907
+    Name: "Twin Flames: The Celestial Veil"
+    TimeLimit: 3600
+    Enter:
+      Map: tf_goddess
+      X: 60
+      Y: 85

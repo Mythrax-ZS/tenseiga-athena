@@ -47,4 +47,5 @@ Footer:
     Mode: Prerenewal
   - Path: db/re/instance_db.yml
     Mode: Renewal
+  - Path: db/custom/samurai/instance_db.yml
   - Path: db/import/instance_db.yml

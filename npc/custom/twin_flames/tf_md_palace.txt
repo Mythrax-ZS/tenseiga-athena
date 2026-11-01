@@ -1,0 +1,319 @@
+//===== rAthena Script =======================================
+//= The Twin Flames Saga: The Palace of Masks (memorial dungeon, Chapter VI)
+//===== Description: =========================================
+//= Lady Hanae (tf_ch04_06.txt) brings the Samurai into Daimyo Kurozane's masquerade. The cult
+//= sends its orders as sealed letters; three are hidden among the chests of the guest wing,
+//= and some chests hide the daimyo's masked guards instead. Each letter rules out one of the
+//= four masked stewards of the inner court, and one of them is Kurozane himself. Accuse the
+//= right one and he fights, splitting into masked doubles; accuse the wrong one and his
+//= assassins strike. Hanae's jade is the relic.       TF_BOND |= 16, quest 900153.
+//= Instance "Twin Flames: The Palace of Masks" on tf_palace (a copy of ama_in02).
+//=
+//= Instance variables:
+//=   'map$     the instance's copy of tf_palace    'aid      the Samurai's account id
+//=   'stage    0 the letters, 1 the stewards, 2 Kurozane, 3 over
+//=   'letters  letters found      'hidden  chests holding letters (bits)   'opened  chests opened (bits)
+//=   (which steward is the daimyo is drawn anew for each masquerade)
+//=   'lord     which steward is Kurozane (0-3)   'clue[1..3]  the steward each letter rules out
+//=   'boss     Kurozane's GID while he stands    'phase   bits: 1 his doubles, 2 Hanae
+//============================================================
+
+tf_palace	mapflag	loadevent
+tf_palace	mapflag	noteleport
+tf_palace	mapflag	nomemo
+tf_palace	mapflag	nobranch
+tf_palace	mapflag	monster_noteleport
+tf_palace	mapflag	nosave	ama_in02,196,168
+
+tf_palace,1,1,0	script	#pm_ctrl	-1,{
+	end;
+
+OnPCLoadMapEvent:
+	.@id = instance_id(IM_CHAR);
+	if (.@id > 0) {
+		if (strcharinfo(3) == instance_mapname("tf_palace", .@id))
+			doevent instance_npcname("#pm_ctrl", .@id) + "::OnEnter";
+	}
+	end;
+
+OnInstanceInit:
+	'map$ = instance_mapname("tf_palace");
+	disablenpc instance_npcname("Inner Door#pm");
+	disablenpc instance_npcname("Lady Hanae#pm2");
+	// The letters lie in the second, fourth and fifth chests; two of the rest hide guards.
+	'hidden = (1 << 1) | (1 << 3) | (1 << 4);
+	// One steward is the daimyo; each letter rules out one of the others.
+	'lord = rand(4);
+	setarray .@o[0], 0, 1, 2, 3;
+	deletearray .@o['lord], 1;
+	for (.@i = 2; .@i > 0; .@i--) {
+		.@j = rand(.@i + 1);
+		.@t = .@o[.@i];
+		.@o[.@i] = .@o[.@j];
+		.@o[.@j] = .@t;
+	}
+	for (.@i = 0; .@i < 3; .@i++)
+		'clue[.@i + 1] = .@o[.@i];
+	end;
+
+OnEnter:
+	'aid = getcharid(3);
+	playBGM ('stage == 2 ? "129" : "117");
+	addtimer 1000, instance_npcname("#pm_ctrl") + "::OnScene";
+	end;
+
+OnScene:
+	if (!'intro) {
+		'intro = 1;
+		npctalk "Lady Hanae: Smile behind your mask. Everyone here is lying; the trick is to lie better.", instance_npcname("Lady Hanae#pm1");
+		sleep2 3000;
+		npctalk "Lady Hanae: The cult's letters are hidden in this wing's chests. Find three. Mind the guards.", instance_npcname("Lady Hanae#pm1");
+		instance_announce 0, "Search the guest wing's chests for three sealed letters.", bc_map, "0xC8A0FF";
+	}
+	callsub L_Marks;
+	end;
+
+OnGuardDead:
+	end;
+
+// Kurozane, unmasked where his steward stood.
+OnUnmask:
+	'stage = 2;
+	setarray .@x[0], 194, 198, 202, 206;
+	monster 'map$, .@x['lord], 172, "Daimyo Kurozane", 31911, 1, instance_npcname("#pm_ctrl") + "::OnBossDead";
+	'boss = $@mobid[0];
+	unittalk 'boss, "Daimyo Kurozane: Letters? Proof? Fool. In this palace, the truth is whatever wears the finest mask.";
+	playBGMall "129", 'map$;
+	donpcevent instance_npcname("#pm_watch") + "::OnStart";
+	end;
+
+OnDoubleDead:
+	if (mobcount('map$, instance_npcname("#pm_ctrl") + "::OnDoubleDead") > 0 || !'boss)
+		end;
+	setunitdata 'boss, UMOB_DMGIMMUNE, 0;
+	unittalk 'boss, "Daimyo Kurozane: My faces... you broke my faces!";
+	end;
+
+OnBossDead:
+	'boss = 0;
+	'stage = 3;
+	killmonster 'map$, instance_npcname("#pm_ctrl") + "::OnDoubleDead";
+	killmonster 'map$, instance_npcname("#pm_ctrl") + "::OnGuardDead";
+	enablenpc instance_npcname("Lady Hanae#pm2");
+	instance_announce 0, "Daimyo Kurozane falls. His mask cracks down the middle, and there is only an old man behind it.", bc_map, "0xC8A0FF";
+	npctalk "Lady Hanae: It's over. Come, samurai. I owe you a debt.", instance_npcname("Lady Hanae#pm2");
+	if (attachrid('aid))
+		callsub L_Marks;
+	end;
+
+OnMarks:
+	callsub L_Marks;
+	end;
+L_Marks:
+	for (.@i = 1; .@i <= 6; .@i++)
+		viewpoint 2, 1, 1, .@i, 0xFFFFFF;
+	if ('stage == 0) {
+		if ('letters < 3) {
+			setarray .@x[0], 160, 175, 200, 215, 165, 205;
+			setarray .@y[0], 20, 33, 26, 40, 60, 62;
+			for (.@i = 0; .@i < 6; .@i++)
+				if (!('opened & (1 << .@i)))
+					viewpoint 1, .@x[.@i], .@y[.@i], .@i + 1, 0xC8A0FF;
+		} else
+			viewpoint 1, 190, 74, 1, 0xFF6600;
+	} else if ('stage == 1)
+		viewpoint 1, 200, 172, 1, 0xFF6600;
+	else if ('stage == 2)
+		viewpoint 1, 200, 172, 1, 0xFF0000;
+	else
+		viewpoint 1, 196, 166, 1, 0x66CCFF;
+	return;
+}
+
+// Kurozane's phases, every second while he stands.
+tf_palace,1,2,0	script	#pm_watch	-1,{
+	end;
+OnStart:
+	initnpctimer;
+	end;
+OnTimer1000:
+	if (!'boss || !unitexists('boss)) {
+		stopnpctimer;
+		end;
+	}
+	getunitdata 'boss, .@d;
+	.@pct = .@d[UMOB_HP] * 100 / .@d[UMOB_MAXHP];
+	if (.@pct <= 50 && !('phase & 1)) {
+		'phase |= 1;
+		setunitdata 'boss, UMOB_DMGIMMUNE, 1;
+		unittalk 'boss, "Daimyo Kurozane: A hundred masks, and every one of them is me!";
+		instance_announce 0, "Kurozane's doubles step out of the screens. While they stand, no blade can find the real one.", bc_map, "0xC8A0FF";
+		.@ev$ = instance_npcname("#pm_ctrl") + "::OnDoubleDead";
+		monster 'map$, .@d[UMOB_X] - 4, .@d[UMOB_Y], "Daimyo Kurozane", 31927, 1, .@ev$;
+		monster 'map$, .@d[UMOB_X] + 4, .@d[UMOB_Y], "Daimyo Kurozane", 31927, 1, .@ev$;
+		monster 'map$, .@d[UMOB_X], .@d[UMOB_Y] - 4, "Daimyo Kurozane", 31927, 1, .@ev$;
+	}
+	if (.@pct <= 20 && !('phase & 2)) {
+		'phase |= 2;
+		enablenpc instance_npcname("Lady Hanae#pm2");
+		npctalk "Lady Hanae: Kurozane! You exiled my father for speaking the truth. Look at me while you lose!", instance_npcname("Lady Hanae#pm2");
+		unittalk 'boss, "Daimyo Kurozane: Hanae... you should have stayed in exile.";
+	}
+	initnpctimer;
+	end;
+}
+
+// The chests of the guest wing: three letters, and guards in some of the rest.
+tf_palace,160,20,4	script	Crane Chest#pm1	4_WOODBOX,{
+	.@n = atoi(charat(strnpcinfo(2), 2)) - 1;
+	if ('opened & (1 << .@n)) {
+		mes "^777777The chest stands open and empty.^000000";
+		close;
+	}
+	if ('letters >= 3) {
+		mes "^777777You have the three letters. No need to rummage further.^000000";
+		close;
+	}
+	setarray .@lid$[0], "cranes in flight", "plum blossoms", "a tiger in bamboo", "pine trees in snow", "a black sun", "breaking waves";
+	mes "^777777A lacquered chest, its lid painted with " + .@lid$[.@n] + ". Something rustles inside, or someone outside is coming.^000000";
+	next;
+	if (select("Search it:Leave it") != 1)
+		close;
+	close2;
+	progressbar "c8a0ff", 2;
+	'opened |= 1 << .@n;
+	if ('hidden & (1 << .@n)) {
+		'letters++;
+		callfunc "F_TF_PalaceLetter", 'letters;
+	} else if (.@n != 2) {
+		mes "^777777Empty. Behind you, a shout: \"Thief! In the guest wing!\"^000000";
+		close2;
+		getmapxy(.@m$, .@x, .@y, BL_NPC);
+		areamonster 'map$, .@x - 3, .@y - 3, .@x + 3, .@y + 3, "--ja--", 31926, 2, instance_npcname("#pm_ctrl") + "::OnGuardDead";
+	} else {
+		mes "^777777Silk, incense, and a love poem in a terrible hand. No letter.^000000";
+		close2;
+	}
+	if ('letters == 3 && !'door) {
+		'door = 1;
+		enablenpc instance_npcname("Inner Door#pm");
+		instance_announce 0, "Three letters. The door to the inner court, at the north end of the wing, is no longer watched.", bc_map, "0xC8A0FF";
+	}
+	doevent instance_npcname("#pm_ctrl") + "::OnMarks";
+	end;
+}
+tf_palace,175,33,4	duplicate(Crane Chest#pm1)	Plum Chest#pm2	4_WOODBOX
+tf_palace,200,26,4	duplicate(Crane Chest#pm1)	Tiger Chest#pm3	4_STEELBOX
+tf_palace,215,40,4	duplicate(Crane Chest#pm1)	Pine Chest#pm4	4_WOODBOX
+tf_palace,165,60,4	duplicate(Crane Chest#pm1)	Black Sun Chest#pm5	4_STEELBOX
+tf_palace,205,62,4	duplicate(Crane Chest#pm1)	Wave Chest#pm6	4_WOODBOX
+
+// A letter is read: it rules out one steward (getarg(0): the letter's number, 1-3).
+function	script	F_TF_PalaceLetter	{
+	setarray .@mask$[0], "Smiling", "Weeping", "Fox", "Blank";
+	setarray .@ring$[0], "silver", "jade", "black iron", "plain gold";
+	setarray .@holds$[0], "a folding fan", "a tea tray", "a sealed scroll", "an incense burner";
+	.@s = 'clue[getarg(0)];
+	mes "^777777A letter, sealed in black wax with the cult's crest: a burning mask.^000000";
+	mes "^777777Sealed Letter " + getarg(0) + " of 3:^000000";
+	switch (getarg(0)) {
+	case 1: mes "\"...our lord the daimyo will not wear the ^0000FF" + .@mask$[.@s] + " Mask^000000 tonight. That face belongs to a servant.\""; break;
+	case 2: mes "\"...the steward with the ^0000FF" + .@ring$[.@s] + " ring^000000 is ours, but only a servant. Do not bow to him.\""; break;
+	case 3: mes "\"...whoever carries ^0000FF" + .@holds$[.@s] + "^000000 tonight is a decoy. The daimyo's hands will be empty of it.\""; break;
+	}
+	close2;
+	return;
+}
+
+tf_palace,190,74,0	script	Inner Door#pm	HIDDEN_WARP_NPC,2,2,{
+	end;
+OnTouch:
+	if ('letters < 3)
+		end;
+	if (!'stage) {
+		'stage = 1;
+		instance_announce 0, "The inner court. Four masked stewards stand before the daimyo's screens. One of them is not a steward.", bc_map, "0xC8A0FF";
+	}
+	warp 'map$, 199, 163;
+	doevent instance_npcname("#pm_ctrl") + "::OnMarks";
+	end;
+}
+
+// The four stewards of the inner court. The one the letters do not rule out is Kurozane.
+tf_palace,194,172,2	script	Steward in a Smiling Mask#pm0	4_M_MASK,{
+	.@n = atoi(charat(strnpcinfo(2), 2));
+	setarray .@ring$[0], "silver", "jade", "black iron", "plain gold";
+	setarray .@holds$[0], "a folding fan", "a tea tray", "a sealed scroll", "an incense burner";
+	mes "[" + strnpcinfo(1) + "]";
+	mes "^777777The steward bows without a word. On his hand, a ^0000FF" + .@ring$[.@n] + "^777777 ring. In his hands, " + .@holds$[.@n] + ".^000000";
+	if ('stage != 1)
+		close;
+	next;
+	if (select("Accuse him:Let him be") != 1)
+		close;
+	if (.@n == 'lord) {
+		mes "[" + strnpcinfo(1) + "]";
+		mes "...Clever. Very clever.";
+		mes "^777777The steward straightens. His bow was never a bow. He pulls a lacquered sword from the screen behind him.^000000";
+		close2;
+		disablenpc;
+		donpcevent instance_npcname("#pm_ctrl") + "::OnUnmask";
+		doevent instance_npcname("#pm_ctrl") + "::OnMarks";
+		end;
+	}
+	mes "^777777The steward laughs, high and thin, and drops his tray. The mask was a servant's. The knife in his sleeve is not.^000000";
+	close2;
+	disablenpc;
+	getmapxy(.@m$, .@x, .@y, BL_NPC);
+	areamonster 'map$, .@x - 2, .@y - 2, .@x + 2, .@y + 2, "--ja--", 31926, 2, instance_npcname("#pm_ctrl") + "::OnGuardDead";
+	instance_announce 0, "The wrong steward! Masked assassins!", bc_map, "0xC8A0FF";
+	end;
+}
+tf_palace,198,172,2	duplicate(Steward in a Smiling Mask#pm0)	Steward in a Weeping Mask#pm1	4_M_MASK1
+tf_palace,202,172,2	duplicate(Steward in a Smiling Mask#pm0)	Steward in a Fox Mask#pm2	4_M_TWMASKMAN
+tf_palace,206,172,2	duplicate(Steward in a Smiling Mask#pm0)	Steward in a Blank Mask#pm3	4_M_MASKMAN
+
+// Lady Hanae: masked at the Samurai's side in the guest wing, herself again in the court.
+tf_palace,186,16,4	script	Lady Hanae#pm1	4_F_JPN,{
+	mes "[Lady Hanae]";
+	if ('letters < 3) {
+		mes "Three letters, sealed in black wax. Search the chests, and keep your face pleasant. Guards notice frowns.";
+		close;
+	}
+	mes "Three! Then each tells us who Kurozane is not. The inner court is through the door to the north. Choose carefully.";
+	close;
+}
+
+tf_palace,196,166,4	script	Lady Hanae#pm2	4_F_JPN,{
+	mes "[Lady Hanae]";
+	if ('stage < 3) {
+		mes "Which mask is the man? The letters know. So do you, if you read them.";
+		close;
+	}
+	mes "The daimyo is dead and his letters are in my hands. The lord will read them tomorrow, and my father's name will be clean.";
+	next;
+	mes "[Lady Hanae]";
+	mes "Take this jade from my fan. My family's heirloom: it has seen through many lies at court.";
+	if (!countitem(900015) && !checkweight(900015, 1)) {
+		next;
+		mes "[Lady Hanae]";
+		mes "Your pack is full. Make room.";
+		close;
+	}
+	if (!countitem(900015))
+		getitem 900015, 1;
+	if (!(TF_BOND & 16)) {
+		TF_BOND |= 16;
+		completequest 900153;
+		callfunc "F_TF_Moved";
+		callfunc "F_TF_Reward", 6000000, 4000000, 150000;
+	}
+	mes "^777777You received the ^0000FFJade of the Exile's Fan^000000.^000000";
+	callfunc "F_TF_Bonded", 24, "Tetsuya will want to hear of it, back in Amatsu.";
+	next;
+	if (select("Leave the palace:Stay a while") == 1) {
+		warp "ama_in02", 196, 168;
+		instance_destroy;
+	}
+	close;
+}

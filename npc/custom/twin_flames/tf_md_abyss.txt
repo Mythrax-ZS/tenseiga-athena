@@ -1,0 +1,271 @@
+//===== rAthena Script =======================================
+//= The Twin Flames Saga: The Abyssal Pit (memorial dungeon, Chapter VIII)
+//===== Description: =========================================
+//= Through the Abyssal Gate at the bottom of Thor's volcano (tf_ch07_10.txt), with Kohaku the
+//= fox lighting the way. Yami's chains are fixed to four anchors on the way down; break them,
+//= and the god of ashes rises to take back his blade. He rains ash on the Samurai, calls his
+//= cultists to be devoured, and at the last reaches for Muramasa itself, until Kohaku's
+//= foxfire burns the chain. When he falls, the goddess blesses it.     TF_STEP 82 -> 90
+//= Instance "Twin Flames: The Abyssal Pit" on tf_abyss (a copy of thor_v03).
+//=
+//= Instance variables:
+//=   'map$     the instance's copy of tf_abyss   'aid, 'name$   the Samurai
+//=   'anchors  anchors broken (bits)             'stage   0 the chains, 1 the pit, 2 Yami, 3 over
+//=   'boss     Yami's GID while he stands        'phase   bits: 1 ash rain, 2 the feast, 4 the chain
+//=   'rain     ash falls left in the rain        'eater[] cultists walking to be devoured
+//============================================================
+
+tf_abyss	mapflag	loadevent
+tf_abyss	mapflag	noteleport
+tf_abyss	mapflag	nomemo
+tf_abyss	mapflag	nobranch
+tf_abyss	mapflag	monster_noteleport
+tf_abyss	mapflag	nosave	thor_v03,49,247
+
+tf_abyss,1,1,0	script	#ab_ctrl	-1,{
+	end;
+
+OnPCLoadMapEvent:
+	.@id = instance_id(IM_CHAR);
+	if (.@id > 0) {
+		if (strcharinfo(3) == instance_mapname("tf_abyss", .@id))
+			doevent instance_npcname("#ab_ctrl", .@id) + "::OnEnter";
+	}
+	end;
+
+OnInstanceInit:
+	'map$ = instance_mapname("tf_abyss");
+	disablenpc instance_npcname("Kohaku#ab2");
+	setarray .@ax[0], 60, 150, 110, 230;
+	setarray .@ay[0], 211, 205, 140, 230;
+	for (.@i = 0; .@i < 4; .@i++) {
+		monster 'map$, .@ax[.@i], .@ay[.@i], "Chain Anchor", 31928, 1, instance_npcname("#ab_ctrl") + "::OnAnchor" + (.@i + 1);
+		areamonster 'map$, .@ax[.@i] - 5, .@ay[.@i] - 5, .@ax[.@i] + 5, .@ay[.@i] + 5, "--ja--", 31929, 2, instance_npcname("#ab_ctrl") + "::OnMinionDead";
+	}
+	areamonster 'map$, 30, 100, 270, 260, "--ja--", 31902, 8, instance_npcname("#ab_ctrl") + "::OnMinionDead";
+	end;
+
+OnEnter:
+	'aid = getcharid(3);
+	'name$ = strcharinfo(0);
+	playBGM ('stage >= 2 ? "156" : "106");
+	addtimer 1000, instance_npcname("#ab_ctrl") + "::OnScene";
+	end;
+
+OnScene:
+	if (!'intro) {
+		'intro = 1;
+		npctalk "Kohaku: Four chains hold him to this world, and each is fixed to an anchor of black stone.", instance_npcname("Kohaku#ab1");
+		sleep2 3000;
+		npctalk "Kohaku: Break the anchors, and he must come up to meet you. I will light the way.", instance_npcname("Kohaku#ab1");
+		specialeffect EF_FIREPILLARBOMB, AREA, instance_npcname("Kohaku#ab1");
+		instance_announce 0, "Break the four Chain Anchors on the way down into the pit.", bc_map, "0xFF8844";
+	}
+	callsub L_Marks;
+	end;
+
+OnMinionDead:
+	end;
+
+OnAnchor1: callsub L_Anchor, 1;
+OnAnchor2: callsub L_Anchor, 2;
+OnAnchor3: callsub L_Anchor, 4;
+OnAnchor4: callsub L_Anchor, 8;
+L_Anchor:
+	'anchors |= getarg(0);
+	soundeffectall "se_chain01.wav", 0, 'map$;
+	if ('anchors != 15) {
+		setarray .@line$[0],
+			"Kagutsuchi-no-Yami (from far below): Little ronin, you are breaking my house.",
+			"Kagutsuchi-no-Yami (from far below): You carry my blade and her blade both. Bring them down to me.",
+			"Kagutsuchi-no-Yami (from far below): The fox. Of course. She always did like strays.";
+		instance_announce 0, .@line$[rand(3)], bc_map, "0xFF4422";
+	} else {
+		'stage = 1;
+		instance_announce 0, "The last chain snaps. Far below, in the heart of the pit, something enormous begins to rise.", bc_map, "0xFF8844";
+		soundeffectall "earth_quake.wav", 0, 'map$;
+	}
+	if (playerattached())
+		callsub L_Marks;
+	end;
+
+// Yami rises as the Samurai reaches the heart of the pit.
+OnYami:
+	'stage = 2;
+	monster 'map$, 220, 60, "Kagutsuchi-no-Yami", 31914, 1, instance_npcname("#ab_ctrl") + "::OnYamiDead";
+	'boss = $@mobid[0];
+	unittalk 'boss, "Kagutsuchi-no-Yami: My blade, and her blade, in one mortal's hands. You have carried them to me like a good servant.";
+	playBGMall "156", 'map$;
+	donpcevent instance_npcname("#ab_watch") + "::OnStart";
+	end;
+
+OnEaterDead:
+	end;
+
+// The false ending (the Samurai attached): the god falls, and the goddess blesses it.
+OnYamiDead:
+	'boss = 0;
+	if ('stage >= 3)
+		end;
+	'stage = 3;
+	killmonster 'map$, "All";
+	if (!playerattached()) {
+		if (!attachrid('aid))
+			end;
+	}
+	setpcblock PCBLOCK_MOVE|PCBLOCK_ATTACK|PCBLOCK_SKILL, true;
+	mes "^777777Kagutsuchi-no-Yami falls. Muramasa screams in your hand, and a crack runs down its length.^000000";
+	next;
+	specialeffect2 EF_ANGEL;
+	cutin "se_sun01", 2;
+	mes "[A Voice of Light]";
+	mes "It is done, my child. The dark flame is quenched. Balance is restored.";
+	mes "Rest now. You are free.";
+	next;
+	cutin "", 255;
+	mes "^777777Golden light fills the Abyssal Pit. It is warm, and kind, and you could almost believe it.^000000";
+	mes "^777777Almost.^000000";
+	close2;
+	setpcblock PCBLOCK_MOVE|PCBLOCK_ATTACK|PCBLOCK_SKILL, false;
+	if (TF_STEP == 82) {
+		completequest 900172;
+		TF_STEP = 90;
+		callfunc "F_TF_Moved";
+		callfunc "F_TF_Reward", 25000000, 18000000, 500000;
+		announce strcharinfo(0) + " has defeated Kagutsuchi-no-Yami, the God of Ashes and Chains.", bc_all, "0xFFD27F";
+	}
+	enablenpc instance_npcname("Kohaku#ab2");
+	npctalk "Kohaku: ...It is quiet. Too quiet. Come, before the light decides it wants us too.", instance_npcname("Kohaku#ab2");
+	callsub L_Marks;
+	end;
+
+OnMarks:
+	callsub L_Marks;
+	end;
+L_Marks:
+	for (.@i = 1; .@i <= 4; .@i++)
+		viewpoint 2, 1, 1, .@i, 0xFFFFFF;
+	if ('stage == 0) {
+		setarray .@x[0], 60, 150, 110, 230;
+		setarray .@y[0], 211, 205, 140, 230;
+		for (.@i = 0; .@i < 4; .@i++)
+			if (!('anchors & (1 << .@i)))
+				viewpoint 1, .@x[.@i], .@y[.@i], .@i + 1, 0xFF6600;
+	} else if ('stage < 3)
+		viewpoint 1, 220, 60, 1, 0xFF0000;
+	else
+		viewpoint 1, 224, 66, 1, 0x66CCFF;
+	return;
+}
+
+// Yami's phases, every second while he stands.
+tf_abyss,1,2,0	script	#ab_watch	-1,{
+	end;
+OnStart:
+	initnpctimer;
+	end;
+OnTimer1000:
+	if (!'boss || !unitexists('boss)) {
+		stopnpctimer;
+		end;
+	}
+	getunitdata 'boss, .@d;
+	.@pct = .@d[UMOB_HP] * 100 / .@d[UMOB_MAXHP];
+	if (.@pct <= 75 && !('phase & 1)) {
+		'phase |= 1;
+		'rain = 6;
+		unittalk 'boss, "Kagutsuchi-no-Yami: Ash! Ash and fire! Let the sky fall on the little ronin!";
+		instance_announce 0, "Ash rains from the roof of the pit. Keep moving!", bc_map, "0xFF4422";
+	}
+	// Ash rain: every five seconds a meteor falls where the Samurai stands.
+	'tick++;
+	if ('rain > 0 && 'tick % 5 == 0) {
+		'rain--;
+		if (getmapxy(.@m$, .@x, .@y, BL_PC, 'name$) == 0 && .@m$ == 'map$)
+			unitskillusepos 'boss, "WZ_METEOR", 5, .@x, .@y, 0, false, 0, true;
+	}
+	if (.@pct <= 50 && !('phase & 2)) {
+		// The feast: cultists walk to their god to be devoured; each that arrives mends him.
+		'phase |= 2;
+		unittalk 'boss, "Kagutsuchi-no-Yami: Come, my faithful. Come and be fuel.";
+		instance_announce 0, "Cultists are walking into the god's fire. Each one he devours mends him: cut them down!", bc_map, "0xFF4422";
+		setarray .@sx[0], 185, 255, 190, 250;
+		setarray .@sy[0], 80, 80, 40, 40;
+		for (.@i = 0; .@i < 4; .@i++) {
+			monster 'map$, .@sx[.@i], .@sy[.@i], "Cultist of Ashes", 31902, 1, instance_npcname("#ab_ctrl") + "::OnEaterDead";
+			'eater[.@i] = $@mobid[0];
+			setunitdata 'eater[.@i], UMOB_MODE, 0x81;
+			unitwalk 'eater[.@i], .@d[UMOB_X], .@d[UMOB_Y];
+		}
+		'feast_x = .@d[UMOB_X];
+		'feast_y = .@d[UMOB_Y];
+	}
+	if ('phase & 2) {
+		for (.@i = 0; .@i < 4; .@i++) {
+			if (!'eater[.@i] || !unitexists('eater[.@i]))
+				continue;
+			getunitdata 'eater[.@i], .@b;
+			if (distance(.@b[UMOB_X], .@b[UMOB_Y], 'feast_x, 'feast_y) <= 2) {
+				unitkill 'eater[.@i];
+				'eater[.@i] = 0;
+				setunitdata 'boss, UMOB_HP, min(.@d[UMOB_MAXHP], .@d[UMOB_HP] + .@d[UMOB_MAXHP] / 20);
+				specialeffect EF_FIREPILLARBOMB, AREA, instance_npcname("#ab_ctrl");
+				unittalk 'boss, "Kagutsuchi-no-Yami: Ahh. Faith tastes of smoke.";
+			}
+		}
+	}
+	if (.@pct <= 25 && !('phase & 4)) {
+		// The chain: he reaches for Muramasa through the curse itself, and Kohaku burns it.
+		'phase |= 4;
+		setunitdata 'boss, UMOB_DMGIMMUNE, 1;
+		unittalk 'boss, "Kagutsuchi-no-Yami: Enough. Come back to me, blade. COME BACK.";
+		instance_announce 0, "Muramasa wrenches toward the god. A chain of fire runs from the blade to his chest, and nothing can touch him.", bc_map, "0xFF2222";
+		sc_start SC_STOP, 3000, 0, 10000, SCSTART_NOAVOID, 'aid;
+		enablenpc instance_npcname("Kohaku#ab2");
+		npctalk "Kohaku: Not this one, old flame. Foxfire!", instance_npcname("Kohaku#ab2");
+		specialeffect EF_FIREDANCE, AREA, instance_npcname("Kohaku#ab2");
+		'chain_at = gettimetick(2);
+	}
+	if (('phase & 4) && 'chain_at && gettimetick(2) - 'chain_at >= 8) {
+		'chain_at = 0;
+		setunitdata 'boss, UMOB_DMGIMMUNE, 0;
+		disablenpc instance_npcname("Kohaku#ab2");
+		instance_announce 0, "The foxfire burns through the chain. Muramasa cracks, but stays in your hand. Strike now!", bc_map, "0xFF8844";
+		unittalk 'boss, "Kagutsuchi-no-Yami: The fox... the FOX...";
+	}
+	initnpctimer;
+	end;
+}
+
+// The heart of the pit: Yami rises when the Samurai arrives.
+tf_abyss,222,80,0	script	#ab_heart	-1,10,4,{
+	end;
+OnTouch:
+	if ('stage != 1)
+		end;
+	donpcevent instance_npcname("#ab_ctrl") + "::OnYami";
+	doevent instance_npcname("#ab_ctrl") + "::OnMarks";
+	end;
+}
+
+// Kohaku: at the gate, and at the heart of the pit.
+tf_abyss,42,262,4	script	Kohaku#ab1	1180,{
+	mes "[Kohaku]";
+	if (strnpcinfo(2) == "ab2" && 'stage >= 3) {
+		mes "Free. The god is gone, and I am free, and the light is singing. Why do I want to hide?";
+		next;
+		mes "^777777Chapter VIII, The Fall of Yami, is complete... or is it? Tetsuya is waiting in Amatsu.^000000";
+		next;
+		if (select("Leave the pit:Not yet") == 1) {
+			warp "thor_v03", 49, 247;
+			instance_destroy;
+		}
+		close;
+	}
+	if ('stage == 0)
+		mes "Four anchors of black stone, all the way down. I can smell them burning from here.";
+	else
+		mes "He is rising. The heart of the pit is at the bottom, to the south-east. Keep both blades close.";
+	close;
+}
+tf_abyss,224,66,4	duplicate(Kohaku#ab1)	Kohaku#ab2	1180

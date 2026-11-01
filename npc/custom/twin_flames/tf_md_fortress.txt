@@ -1,0 +1,288 @@
+//===== rAthena Script =======================================
+//= The Twin Flames Saga: Kurogane's Fortress (memorial dungeon, Chapter III)
+//===== Description: =========================================
+//= Through the Iron Gate in the Battle Fortress (tf_ch01_03.txt), with Tetsuya on the walls.
+//= Kurogane keeps his pride in three iron banners: cut them down, and he comes out to defend
+//= his hall. He calls his retainers, then his banner bearers, and when he is beaten he begs.
+//= Whatever the Samurai answers, Muramasa answers first. Completes quest 900122; Tetsuya,
+//= back in Amatsu, closes the chapter.
+//= Instance "Twin Flames: Kurogane's Fortress" on tf_fortress (a copy of ama_dun02).
+//=
+//= Instance variables:
+//=   'map$     the instance's copy of tf_fortress      'aid    the Samurai's account id
+//=   'banners  banners cut down (bits 1, 2, 4)         'stage  0 banners, 1 the hall, 2 Kurogane, 3 over
+//=   'boss     Kurogane's GID while he stands          'phase  bits: 1 retainers, 2 bearers, 4 he begs
+//============================================================
+
+tf_fortress	mapflag	loadevent
+tf_fortress	mapflag	noteleport
+tf_fortress	mapflag	nomemo
+tf_fortress	mapflag	nobranch
+tf_fortress	mapflag	monster_noteleport
+tf_fortress	mapflag	nosave	ama_dun02,47,47
+
+tf_fortress,1,1,0	script	#kf_ctrl	-1,{
+	end;
+
+OnPCLoadMapEvent:
+	.@id = instance_id(IM_CHAR);
+	if (.@id > 0) {
+		if (strcharinfo(3) == instance_mapname("tf_fortress", .@id))
+			doevent instance_npcname("#kf_ctrl", .@id) + "::OnEnter";
+	}
+	end;
+
+OnInstanceInit:
+	'map$ = instance_mapname("tf_fortress");
+	cloakonnpc instance_npcname("Tetsuya#kf1");
+	disablenpc instance_npcname("Tetsuya#kf2");
+	disablenpc instance_npcname("Tetsuya#kf3");
+	// Each banner stands among its guards; more of Kurogane's men walk the halls.
+	setarray .@bx[0], 40, 130, 115;
+	setarray .@by[0], 45, 70, 112;
+	for (.@i = 0; .@i < 3; .@i++) {
+		monster 'map$, .@bx[.@i], .@by[.@i], "Iron Banner", 31920, 1, instance_npcname("#kf_ctrl") + "::OnBanner" + (.@i + 1);
+		areamonster 'map$, .@bx[.@i] - 4, .@by[.@i] - 4, .@bx[.@i] + 4, .@by[.@i] + 4, "--ja--", 31919, 1, instance_npcname("#kf_ctrl") + "::OnGuardDead";
+		areamonster 'map$, .@bx[.@i] - 5, .@by[.@i] - 5, .@bx[.@i] + 5, .@by[.@i] + 5, "--ja--", 31900, 2, instance_npcname("#kf_ctrl") + "::OnGuardDead";
+	}
+	areamonster 'map$, 53, 60, 60, 150, "--ja--", 31900, 4, instance_npcname("#kf_ctrl") + "::OnGuardDead";
+	areamonster 'map$, 117, 37, 160, 120, "--ja--", 31900, 4, instance_npcname("#kf_ctrl") + "::OnGuardDead";
+	end;
+
+OnEnter:
+	'aid = getcharid(3);
+	playBGM ('stage >= 2 ? "48" : "77");
+	addtimer 1000, instance_npcname("#kf_ctrl") + "::OnScene";
+	end;
+
+OnScene:
+	if (!'intro) {
+		'intro = 1;
+		cloakoffnpc instance_npcname("Tetsuya#kf1");
+		npctalk "Tetsuya: Psst. Up here. Three iron banners: Kurogane keeps his pride in them.", instance_npcname("Tetsuya#kf1");
+		sleep2 2500;
+		npctalk "Tetsuya: Cut them down, and he'll come out of his hall to sulk. I'll keep to the walls.", instance_npcname("Tetsuya#kf1");
+		instance_announce 0, "Cut down Kurogane's three Iron Banners.", bc_map, "0xFFAA66";
+	}
+	callsub L_Marks;
+	end;
+
+OnGuardDead:
+	end;
+
+OnBanner1: callsub L_Banner, 1;
+OnBanner2: callsub L_Banner, 2;
+OnBanner3: callsub L_Banner, 4;
+L_Banner:
+	'banners |= getarg(0);
+	soundeffectall "_stone_explosion.wav", 0, 'map$;
+	if ('banners != 7) {
+		setarray .@line$[0],
+			"Kurogane (from somewhere above): Who dares touch my banners?!",
+			"Kurogane (from somewhere above): My grandfather's banner! You will pay for that in blood!";
+		instance_announce 0, .@line$[rand(2)], bc_map, "0xD08040";
+	} else {
+		'stage = 1;
+		instance_announce 0, "The last banner falls. A great door groans open somewhere to the north: Kurogane's hall.", bc_map, "0xFFAA66";
+		cloakonnpc instance_npcname("Tetsuya#kf1");
+		enablenpc instance_npcname("Tetsuya#kf2");
+		npctalk "Tetsuya: Hear that? He's coming out. The hall's north, up the long corridor.", instance_npcname("Tetsuya#kf2");
+	}
+	if (playerattached())
+		callsub L_Marks;
+	end;
+
+// Kurogane comes out to defend his hall.
+OnHall:
+	'stage = 2;
+	monster 'map$, 100, 178, "Warlord Kurogane", 31903, 1, instance_npcname("#kf_ctrl") + "::OnBossDead";
+	'boss = $@mobid[0];
+	unittalk 'boss, "Warlord Kurogane: A ronin, with a cursed sword and a monkey for a friend? You burned my banners. I will burn you.";
+	playBGMall "48", 'map$;
+	donpcevent instance_npcname("#kf_watch") + "::OnStart";
+	end;
+
+OnRetainerDead:
+OnBearerDead:
+	end;
+
+OnBossDead:
+	'boss = 0;
+	if ('stage == 3)
+		end;
+	// Cut down before he could even beg.
+	'stage = 3;
+	killmonster 'map$, instance_npcname("#kf_ctrl") + "::OnRetainerDead";
+	killmonster 'map$, instance_npcname("#kf_ctrl") + "::OnBearerDead";
+	instance_announce 0, "Kurogane falls before he can open his mouth to beg. Muramasa drinks, and hums.", bc_map, "0xFF4444";
+	enablenpc instance_npcname("Tetsuya#kf3");
+	npctalk "Tetsuya: ...Well. He didn't get to say much, did he. Come on, let's go.", instance_npcname("Tetsuya#kf3");
+	if (!playerattached()) {
+		if (!attachrid('aid))
+			end;
+	}
+	completequest 900122;
+	callsub L_Marks;
+	end;
+
+// Kurogane on his knees (#kf_watch attaches the Samurai). Whatever they answer, the blade
+// answers first.
+OnBeg:
+	setpcblock PCBLOCK_MOVE|PCBLOCK_ATTACK|PCBLOCK_SKILL, true;
+	mes "[Warlord Kurogane]";
+	mes "Wait! Wait! Gold, land, a name! Name your price, ronin!";
+	mes "I only paid the raiders. I never held a torch! Mercy!";
+	next;
+	mes "^FF0000...he paid them. He paid them in rice and gold, and they burned your lord. Feed me.^000000";
+	next;
+	if (select("Spare him:End it") == 1) {
+		mes "^777777You start to lower the blade.^000000";
+		mes "^777777Muramasa does not lower with it. It moves, and your arm moves with it, and Kurogane's plea ends in a wet cough.^000000";
+	} else {
+		mes "^777777You bring the blade down. It is very easy. It is much too easy.^000000";
+	}
+	close2;
+	'stage = 3;
+	specialeffect2 EF_BLOODDRAIN;
+	unitkill 'boss;
+	'boss = 0;
+	killmonster 'map$, instance_npcname("#kf_ctrl") + "::OnRetainerDead";
+	killmonster 'map$, instance_npcname("#kf_ctrl") + "::OnBearerDead";
+	completequest 900122;
+	sleep2 1500;
+	enablenpc instance_npcname("Tetsuya#kf3");
+	npctalk "Tetsuya: ...", instance_npcname("Tetsuya#kf3");
+	sleep2 2000;
+	npctalk "Tetsuya: Well. That's that, then. Come on. Let's get out of here before his men find their courage.", instance_npcname("Tetsuya#kf3");
+	setpcblock PCBLOCK_MOVE|PCBLOCK_ATTACK|PCBLOCK_SKILL, false;
+	callsub L_Marks;
+	end;
+
+OnMarks:
+	callsub L_Marks;
+	end;
+L_Marks:
+	for (.@i = 1; .@i <= 3; .@i++)
+		viewpoint 2, 1, 1, .@i, 0xFFFFFF;
+	switch ('stage) {
+	case 0:
+		setarray .@x[0], 40, 130, 115;
+		setarray .@y[0], 45, 70, 112;
+		for (.@i = 0; .@i < 3; .@i++)
+			if (!('banners & (1 << .@i)))
+				viewpoint 1, .@x[.@i], .@y[.@i], .@i + 1, 0xFF6600;
+		break;
+	case 1:
+	case 2: viewpoint 1, 100, 176, 1, 0xFF0000; break;
+	case 3: viewpoint 1, 104, 176, 1, 0x66CCFF; break;
+	}
+	return;
+}
+
+// Kurogane's phases, every second while he stands.
+tf_fortress,1,2,0	script	#kf_watch	-1,{
+	end;
+OnStart:
+	initnpctimer;
+	end;
+OnTimer1000:
+	if (!'boss || !unitexists('boss)) {
+		stopnpctimer;
+		end;
+	}
+	getunitdata 'boss, .@d;
+	.@pct = .@d[UMOB_HP] * 100 / .@d[UMOB_MAXHP];
+	if (.@pct <= 75 && !('phase & 1)) {
+		'phase |= 1;
+		unittalk 'boss, "Warlord Kurogane: Retainers! To me! Show this dog what a house is!";
+		areamonster 'map$, .@d[UMOB_X] - 6, .@d[UMOB_Y] - 6, .@d[UMOB_X] + 6, .@d[UMOB_Y] + 6, "--ja--", 31919, 3, instance_npcname("#kf_ctrl") + "::OnRetainerDead";
+	}
+	if (.@pct <= 50 && !('phase & 2)) {
+		// Two bearers march his last banners to him; each that arrives restores him.
+		'phase |= 2;
+		unittalk 'boss, "Warlord Kurogane: Bring my banners! While they fly, I cannot fall!";
+		instance_announce 0, "Banner bearers march toward Kurogane. Cut them down before they reach him!", bc_map, "0xFFAA66";
+		setarray .@sx[0], 60, 140;
+		setarray .@sy[0], 170, 170;
+		for (.@i = 0; .@i < 2; .@i++) {
+			monster 'map$, .@sx[.@i], .@sy[.@i], "Banner Bearer", 31921, 1, instance_npcname("#kf_ctrl") + "::OnBearerDead";
+			'bearer[.@i] = $@mobid[0];
+			unitwalk 'bearer[.@i], .@d[UMOB_X], .@d[UMOB_Y];
+		}
+		'bearer_at = gettimetick(2);
+		'bearer_x = .@d[UMOB_X];
+		'bearer_y = .@d[UMOB_Y];
+	}
+	if ('phase & 2) {
+		// The bearers march to where Kurogane stood when he called them, and plant his banner
+		// there.
+		for (.@i = 0; .@i < 2; .@i++) {
+			if (!'bearer[.@i] || !unitexists('bearer[.@i]))
+				continue;
+			getunitdata 'bearer[.@i], .@b;
+			if (distance(.@b[UMOB_X], .@b[UMOB_Y], 'bearer_x, 'bearer_y) <= 2) {
+				unitkill 'bearer[.@i];
+				'bearer[.@i] = 0;
+				setunitdata 'boss, UMOB_HP, min(.@d[UMOB_MAXHP], .@d[UMOB_HP] + .@d[UMOB_MAXHP] / 10);
+				specialeffect EF_LORD, AREA, instance_npcname("#kf_ctrl");
+				unittalk 'boss, "Warlord Kurogane: Ha! My banner flies! I am Kurogane!";
+			}
+		}
+		// Tetsuya trips the first bearer, once.
+		if (!'tripped && gettimetick(2) - 'bearer_at >= 6 && 'bearer[0] && unitexists('bearer[0])) {
+			'tripped = 1;
+			npctalk "Tetsuya: Oops! Watch your feet, friend.", instance_npcname("Tetsuya#kf2");
+			unitkill 'bearer[0];
+			'bearer[0] = 0;
+		}
+	}
+	if (.@pct <= 20 && !('phase & 4)) {
+		// He drops his sword: no more fighting, only the plea.
+		'phase |= 4;
+		setunitdata 'boss, UMOB_DMGIMMUNE, 1;
+		setunitdata 'boss, UMOB_MODE, 0;
+		unitstopattack 'boss;
+		killmonster 'map$, instance_npcname("#kf_ctrl") + "::OnRetainerDead";
+		killmonster 'map$, instance_npcname("#kf_ctrl") + "::OnBearerDead";
+		unittalk 'boss, "Warlord Kurogane: Enough! Enough! I yield!";
+		stopnpctimer;
+		if (attachrid('aid))
+			doevent instance_npcname("#kf_ctrl") + "::OnBeg";
+		end;
+	}
+	initnpctimer;
+	end;
+}
+
+// The hall: Kurogane comes out once his banners are down.
+tf_fortress,100,172,0	script	#kf_hall	-1,14,8,{
+	end;
+OnTouch:
+	if ('stage != 1)
+		end;
+	donpcevent instance_npcname("#kf_ctrl") + "::OnHall";
+	doevent instance_npcname("#kf_ctrl") + "::OnMarks";
+	end;
+}
+
+// Tetsuya on the walls: at the gate, by the hall, and after.
+tf_fortress,70,20,6	script	Tetsuya#kf1	4_EXJOB_NINJA2,{
+	mes "[Tetsuya]";
+	if (strnpcinfo(2) == "kf3") {
+		mes "He was going to burn a village tomorrow. Probably. Most likely. Let's say he was.";
+		mes "...Let's go home, ronin. I'll meet you back in Amatsu.";
+		next;
+		if (select("Leave the fortress:Not yet") == 1) {
+			warp "amatsu", 192, 160;
+			instance_destroy;
+		}
+		close;
+	}
+	if ('stage == 0)
+		mes "Three banners, one west, one east, one north of the barracks. I'd help, but I'm very busy being on this wall.";
+	else
+		mes "Up the long corridor, north. He's in his hall. I'll be right behind you. Well behind you.";
+	close;
+}
+tf_fortress,57,153,4	duplicate(Tetsuya#kf1)	Tetsuya#kf2	4_EXJOB_NINJA2
+tf_fortress,104,176,4	duplicate(Tetsuya#kf1)	Tetsuya#kf3	4_EXJOB_NINJA2

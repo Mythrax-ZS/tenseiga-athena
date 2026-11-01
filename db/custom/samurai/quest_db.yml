@@ -8,6 +8,8 @@ Header:
 Body:
   - Id: 900101
     Title: "Twin Flames I: Ashes of Honor"
+  - Id: 900103
+    Title: "Twin Flames I: Kagemori Burning"
   - Id: 900102
     Title: "Twin Flames I: Ash on the Wind"
     Targets:
@@ -23,15 +25,12 @@ Body:
   - Id: 900121
     Title: "Twin Flames III: The Trickster's Tail"
   - Id: 900122
-    Title: "Twin Flames III: Warlord Kurogane"
-    Targets:
-      - Mob: TF_KUROGANE
-        Count: 1
+    Title: "Twin Flames III: Kurogane's Fortress"
   - Id: 900131
-    Title: "Twin Flames IV: Whispers in Steel"
+    Title: "Twin Flames IV: The Crimson Fields"
     Targets:
       - Mob: TF_CRIMSON_SOLDIER
-        Count: 40
+        Count: 30
       - Mob: TF_SHADE_OF_YAMI
         Count: 1
   - Id: 900132
@@ -67,19 +66,7 @@ Body:
   - Id: 900152
     Title: "Twin Flames VI: The Palace of Masks"
   - Id: 900153
-    Title: "Twin Flames VI: Sealed Letters"
-    Drops:
-      - Mob: SHINOBI
-        Item: TF_Sealed_Letter
-        Rate: 2500
-      - Mob: MIYABI_NINGYO
-        Item: TF_Sealed_Letter
-        Rate: 2500
-  - Id: 900154
-    Title: "Twin Flames VI: Behind the Masks"
-    Targets:
-      - Mob: TF_KUROZANE
-        Count: 1
+    Title: "Twin Flames VI: The Palace of Masks"
   - Id: 900161
     Title: "Twin Flames VII: Return of the Ashes"
     Targets:

@@ -1,0 +1,440 @@
+//===== rAthena Script =======================================
+//= The Twin Flames Saga: The Shrine of Seals (memorial dungeon, Chapter V)
+//===== Description: =========================================
+//= Through the Sealed Gate on the deepest floor of the Amatsu dungeon (tf_ch04_06.txt), with
+//= Tetsuya. The Sarugami sealed Kusanagi under three locks: one for the curse (it drinks from
+//= Muramasa's bearer), one for Sarugami blood (Tetsuya's), one for the truth (a riddle). Then
+//= the Guardian of the Seal, shielded by its lanterns; Kusanagi in its hall of moonlight and
+//= the goddess's voice; and High Priestess Sayo, come to take the blade for the goddess, with
+//= Chiyo at the Samurai's side.                                   TF_STEP 51 -> 52 -> 60
+//= Instance "Twin Flames: The Shrine of Seals" on tf_shrine (a copy of ama_dun03).
+//=
+//= Instance variables:
+//=   'map$     the instance's copy of tf_shrine     'aid     the Samurai's account id
+//=   'seals    seals opened (bits: 1 curse, 2 blood, 4 truth)
+//=   'stage    0 the seals, 1 the guardian, 2 Kusanagi, 3 Sayo, 4 Chiyo, 5 over
+//=   'boss     the guardian's or Sayo's GID while they stand
+//=   'phase    bits: 1, 2 the guardian's shields; 4 Sayo's grace, 8 Chiyo's talisman
+//============================================================
+
+tf_shrine	mapflag	loadevent
+tf_shrine	mapflag	noteleport
+tf_shrine	mapflag	nomemo
+tf_shrine	mapflag	nobranch
+tf_shrine	mapflag	monster_noteleport
+tf_shrine	mapflag	nosave	ama_dun03,120,26
+
+tf_shrine,1,1,0	script	#sh_ctrl	-1,{
+	end;
+
+OnPCLoadMapEvent:
+	.@id = instance_id(IM_CHAR);
+	if (.@id > 0) {
+		if (strcharinfo(3) == instance_mapname("tf_shrine", .@id))
+			doevent instance_npcname("#sh_ctrl", .@id) + "::OnEnter";
+	}
+	end;
+
+OnInstanceInit:
+	'map$ = instance_mapname("tf_shrine");
+	disablenpc instance_npcname("Tetsuya#sh2");
+	disablenpc instance_npcname("Tetsuya#sh3");
+	disablenpc instance_npcname("Chiyo#sh");
+	disablenpc instance_npcname("Kusanagi-no-Tsurugi#sh");
+	// The shrine's way up stays shut until the three seals are open.
+	setarray .@wx[0], 34, 66, 118, 168, 204;
+	setarray .@ww[0], 4, 10, 8, 10, 4;
+	for (.@i = 0; .@i < 5; .@i++)
+		setwall 'map$, .@wx[.@i], 110, .@ww[.@i], 6, 0, "sh_up" + .@i + "_" + instance_id();
+	end;
+
+OnEnter:
+	'aid = getcharid(3);
+	playBGM ('stage >= 3 ? "129" : "124");
+	addtimer 1000, instance_npcname("#sh_ctrl") + "::OnScene";
+	end;
+
+OnScene:
+	if (!'intro) {
+		'intro = 1;
+		npctalk "Tetsuya: Hear that? The Sarugami are awake. Monkey spirits, and they don't like visitors.", instance_npcname("Tetsuya#sh1");
+		sleep2 3000;
+		npctalk "Tetsuya: Three seals in this hall. One wants your curse, one wants my blood, and one wants the truth. Lovely.", instance_npcname("Tetsuya#sh1");
+		soundeffectall "mime_monkey_stand.wav", 0, 'map$;
+		instance_announce 0, "Open the three seals of the Sarugami: the Curse, the Blood and the Truth.", bc_map, "0xFFAA66";
+	}
+	callsub L_Marks;
+	end;
+
+// A seal opens: its Sarugami come to test whoever opened it.
+OnSeal:
+	if ('seals != 7) {
+		instance_announce 0, "A seal opens. Sarugami spirits pour out of the stone, chattering.", bc_map, "0xFFAA66";
+		end;
+	}
+	'stage = 1;
+	for (.@i = 0; .@i < 5; .@i++)
+		delwall "sh_up" + .@i + "_" + instance_id();
+	instance_announce 0, "The third seal opens. Stone grinds somewhere above: the way to the inner shrine is open.", bc_map, "0xFFAA66";
+	soundeffectall "earth_quake.wav", 0, 'map$;
+	end;
+
+OnSpiritDead:
+	end;
+
+// The guardian wakes as the Samurai reaches the inner shrine.
+OnGuardian:
+	'stage = 1;
+	'guardian = 1;
+	monster 'map$, 122, 145, "Guardian of the Seal", 31908, 1, instance_npcname("#sh_ctrl") + "::OnGuardianDead";
+	'boss = $@mobid[0];
+	unittalk 'boss, "Guardian of the Seal: CURSE-BEARER. BLOOD OF THE MONKEY. YOU MAY NOT PASS UNTESTED.";
+	donpcevent instance_npcname("#sh_watch") + "::OnStart";
+	end;
+
+OnLanternDead:
+	if (mobcount('map$, instance_npcname("#sh_ctrl") + "::OnLanternDead") > 0 || !'boss)
+		end;
+	setunitdata 'boss, UMOB_DMGIMMUNE, 0;
+	unittalk 'boss, "Guardian of the Seal: THE LANTERNS... GO DARK...";
+	instance_announce 0, "The last lantern gutters out. The guardian can be harmed again.", bc_map, "0xFFAA66";
+	end;
+
+OnGuardianDead:
+	'boss = 0;
+	'stage = 2;
+	killmonster 'map$, instance_npcname("#sh_ctrl") + "::OnLanternDead";
+	enablenpc instance_npcname("Kusanagi-no-Tsurugi#sh");
+	enablenpc instance_npcname("Tetsuya#sh3");
+	disablenpc instance_npcname("Tetsuya#sh2");
+	instance_announce 0, "The guardian crumbles into gold dust. Above, in the highest hall, something shines like dawn.", bc_map, "0xFFFFCC";
+	npctalk "Tetsuya: It's done. Go on up. Whatever's shining up there, it's been waiting a long time.", instance_npcname("Tetsuya#sh3");
+	if (attachrid('aid))
+		callsub L_Marks;
+	end;
+
+// The priestess comes for the blade (the Samurai attached, after Kusanagi).
+OnSayo:
+	'stage = 3;
+	enablenpc instance_npcname("Chiyo#sh");
+	monster 'map$, 122, 194, "High Priestess Sayo", 31909, 1, instance_npcname("#sh_ctrl") + "::OnSayoDead";
+	'boss = $@mobid[0];
+	areamonster 'map$, 112, 188, 132, 198, "--ja--", 31925, 4, instance_npcname("#sh_ctrl") + "::OnAcolyteDead";
+	unittalk 'boss, "High Priestess Sayo: That blade belongs to the goddess. And so do you, Chiyo.";
+	sleep 2000;
+	npctalk "Chiyo: Master... no. Not anymore. I'll stand with them!", instance_npcname("Chiyo#sh");
+	playBGMall "129", 'map$;
+	donpcevent instance_npcname("#sh_watch") + "::OnStart";
+	donpcevent instance_npcname("Chiyo#sh") + "::OnHeal";
+	end;
+
+OnAcolyteDead:
+	if (!('phase & 4) || mobcount('map$, instance_npcname("#sh_ctrl") + "::OnAcolyteDead") > 0 || !'boss)
+		end;
+	setunitdata 'boss, UMOB_DMGIMMUNE, 0;
+	unittalk 'boss, "High Priestess Sayo: My acolytes... Goddess, why are you silent?";
+	end;
+
+OnSayoDead:
+	'boss = 0;
+	'stage = 4;
+	killmonster 'map$, instance_npcname("#sh_ctrl") + "::OnAcolyteDead";
+	instance_announce 0, "High Priestess Sayo falls. The light around her goes out like a snuffed lamp.", bc_map, "0xFFFFCC";
+	npctalk "Chiyo: ...it's over. Come here. I have something for you.", instance_npcname("Chiyo#sh");
+	if (attachrid('aid))
+		callsub L_Marks;
+	end;
+
+OnMarks:
+	callsub L_Marks;
+	end;
+L_Marks:
+	for (.@i = 1; .@i <= 3; .@i++)
+		viewpoint 2, 1, 1, .@i, 0xFFFFFF;
+	switch ('stage) {
+	case 0:
+		setarray .@x[0], 60, 180, 120;
+		setarray .@y[0], 60, 60, 90;
+		for (.@i = 0; .@i < 3; .@i++)
+			if (!('seals & (1 << .@i)))
+				viewpoint 1, .@x[.@i], .@y[.@i], .@i + 1, 0xFF6600;
+		break;
+	case 1: viewpoint 1, 122, 145, 1, 0xFF0000; break;
+	case 2: viewpoint 1, 122, 202, 1, 0xFFFFCC; break;
+	case 3: viewpoint 1, 122, 194, 1, 0xFF0000; break;
+	case 4: viewpoint 1, 116, 196, 1, 0x66CCFF; break;
+	}
+	return;
+}
+
+// The guardian's and Sayo's phases, every second while they stand.
+tf_shrine,1,2,0	script	#sh_watch	-1,{
+	end;
+OnStart:
+	initnpctimer;
+	end;
+OnTimer1000:
+	if (!'boss || !unitexists('boss)) {
+		stopnpctimer;
+		end;
+	}
+	getunitdata 'boss, .@d;
+	.@pct = .@d[UMOB_HP] * 100 / .@d[UMOB_MAXHP];
+	if ('stage == 1) {
+		// Twice the guardian draws on its lanterns: shielded while any burns, and mended by them.
+		for (.@p = 0; .@p < 2; .@p++) {
+			if (.@pct <= (.@p ? 35 : 70) && !('phase & (1 << .@p))) {
+				'phase |= 1 << .@p;
+				setunitdata 'boss, UMOB_DMGIMMUNE, 1;
+				unittalk 'boss, "Guardian of the Seal: LANTERNS OF THE SARUGAMI, BURN!";
+				instance_announce 0, "Seal Lanterns flare up around the guardian, shielding it. Put them out!", bc_map, "0xFFAA66";
+				.@ev$ = instance_npcname("#sh_ctrl") + "::OnLanternDead";
+				monster 'map$, .@d[UMOB_X] - 6, .@d[UMOB_Y], "Seal Lantern", 31924, 1, .@ev$;
+				monster 'map$, .@d[UMOB_X] + 6, .@d[UMOB_Y], "Seal Lantern", 31924, 1, .@ev$;
+				monster 'map$, .@d[UMOB_X], .@d[UMOB_Y] + 6, "Seal Lantern", 31924, 1, .@ev$;
+			}
+		}
+		.@lit = mobcount('map$, instance_npcname("#sh_ctrl") + "::OnLanternDead");
+		if (.@lit)
+			setunitdata 'boss, UMOB_HP, min(.@d[UMOB_MAXHP], .@d[UMOB_HP] + .@d[UMOB_MAXHP] * .@lit / 200);
+	} else if ('stage == 3) {
+		if (.@pct <= 50 && !('phase & 4)) {
+			// The goddess's grace: no harm reaches her while her acolytes pray.
+			'phase |= 4;
+			setunitdata 'boss, UMOB_DMGIMMUNE, 1;
+			unittalk 'boss, "High Priestess Sayo: Goddess of the moon and sun, shelter your servant!";
+			instance_announce 0, "A veil of light wraps the priestess. Her acolytes are praying it into being: silence them.", bc_map, "0xFFFFCC";
+			areamonster 'map$, .@d[UMOB_X] - 7, .@d[UMOB_Y] - 5, .@d[UMOB_X] + 7, .@d[UMOB_Y] + 5, "--ja--", 31925, 3, instance_npcname("#sh_ctrl") + "::OnAcolyteDead";
+		}
+		if (.@pct <= 15 && !('phase & 8)) {
+			'phase |= 8;
+			npctalk "Chiyo: Master! Your goddess gave me this talisman, and I give it back!", instance_npcname("Chiyo#sh");
+			specialeffect EF_HOLYHIT, AREA, instance_npcname("Chiyo#sh");
+			unittalk 'boss, "High Priestess Sayo: Chiyo... you would break it? Then you are nothing!";
+		}
+	}
+	initnpctimer;
+	end;
+}
+
+// The three seals of the Sarugami, in the great hall.
+tf_shrine,60,60,4	script	Seal of the Curse#sh	4_4JOB_SEALSTONE,{
+	mes "[Seal of the Curse]";
+	if ('seals & 1) {
+		mes "^777777The seal is open. The carved monkeys look away from you.^000000";
+		close;
+	}
+	mes "^777777Monkeys are carved into every block, their mouths open. Muramasa twitches toward them.^000000";
+	mes "^777777This seal opens for a curse. It wants to drink.^000000";
+	if (!callfunc("F_TF_Need", 1))
+		close;
+	next;
+	if (select("Let it drink:Not yet") != 1)
+		close;
+	close2;
+	progressbar "ff0000", 3;
+	specialeffect2 EF_BLOODDRAIN;
+	percentheal -20, 0;
+	callfunc "F_TF_Say", "Ngh... it's drinking from me. From the blade, through me.";
+	callsub L_Open, 1, 60, 60;
+	end;
+L_Open:
+	'seals |= getarg(0);
+	soundeffectall "mime_monkey_stand.wav", 0, 'map$;
+	areamonster 'map$, getarg(1) - 5, getarg(2) - 5, getarg(1) + 5, getarg(2) + 5, "--ja--", 31923, 4, instance_npcname("#sh_ctrl") + "::OnSpiritDead";
+	donpcevent instance_npcname("#sh_ctrl") + "::OnSeal";
+	doevent instance_npcname("#sh_ctrl") + "::OnMarks";
+	end;
+}
+
+tf_shrine,180,60,4	script	Seal of the Blood#sh	4_4JOB_SEALSTONE,{
+	mes "[Seal of the Blood]";
+	if ('seals & 2) {
+		mes "^777777The seal is open. A smear of Tetsuya's blood is drying on the stone.^000000";
+		close;
+	}
+	mes "^777777The carvings on this seal are worn smooth by hands. Monkey hands.^000000";
+	mes "^777777It opens for the blood of the Sarugami.^000000";
+	next;
+	if (select("Call Tetsuya:Not yet") != 1)
+		close;
+	close2;
+	disablenpc instance_npcname("Tetsuya#sh1");
+	enablenpc instance_npcname("Tetsuya#sh2");
+	npctalk "Tetsuya: My blood. Of course it's my blood. I hate this part.", instance_npcname("Tetsuya#sh2");
+	sleep2 2500;
+	specialeffect EF_BLOODDRAIN, AREA, instance_npcname("Tetsuya#sh2");
+	npctalk "Tetsuya: Ow. There. Happy, you old rock?", instance_npcname("Tetsuya#sh2");
+	'seals |= 2;
+	soundeffectall "mime_monkey_stand.wav", 0, 'map$;
+	areamonster 'map$, 175, 55, 185, 65, "--ja--", 31923, 4, instance_npcname("#sh_ctrl") + "::OnSpiritDead";
+	donpcevent instance_npcname("#sh_ctrl") + "::OnSeal";
+	doevent instance_npcname("#sh_ctrl") + "::OnMarks";
+	end;
+}
+
+tf_shrine,120,90,4	script	Seal of the Truth#sh	4_RUNESTONE,{
+	mes "[Seal of the Truth]";
+	if ('seals & 4) {
+		mes "^777777The seal is open. Its runes have gone dark.^000000";
+		close;
+	}
+	mes "^777777A voice like many monkeys speaking at once:^000000";
+	mes "I bind what is wild. I am broken by what is true. I am spoken to the grieving, and they thank me for it. What am I?";
+	next;
+	if (select("A seal:A lie:A promise") != 2) {
+		mes "[Seal of the Truth]";
+		mes "^777777The runes flare, offended. Chattering fills the hall.^000000";
+		close2;
+		areamonster 'map$, 115, 85, 125, 95, "--ja--", 31923, 2, instance_npcname("#sh_ctrl") + "::OnSpiritDead";
+		end;
+	}
+	mes "[Seal of the Truth]";
+	mes "A lie. Remember that, curse-bearer, when the next god speaks kindly to you.";
+	close2;
+	specialeffect EF_HOLYHIT;
+	'seals |= 4;
+	soundeffectall "mime_monkey_stand.wav", 0, 'map$;
+	areamonster 'map$, 115, 85, 125, 95, "--ja--", 31923, 4, instance_npcname("#sh_ctrl") + "::OnSpiritDead";
+	donpcevent instance_npcname("#sh_ctrl") + "::OnSeal";
+	doevent instance_npcname("#sh_ctrl") + "::OnMarks";
+	end;
+}
+
+// The inner shrine: the guardian wakes when the Samurai steps in.
+tf_shrine,122,140,0	script	#sh_inner	-1,10,6,{
+	end;
+OnTouch:
+	if ('stage != 1 || 'guardian)
+		end;
+	disablenpc instance_npcname("Tetsuya#sh1");
+	enablenpc instance_npcname("Tetsuya#sh2");
+	donpcevent instance_npcname("#sh_ctrl") + "::OnGuardian";
+	doevent instance_npcname("#sh_ctrl") + "::OnMarks";
+	end;
+}
+
+// Kusanagi in the hall of moonlight.
+tf_shrine,120,204,4	script	Kusanagi-no-Tsurugi#sh	4_TREASURE_BOX,{
+	if ('stage != 2)
+		end;
+	setpcblock PCBLOCK_MOVE|PCBLOCK_ATTACK|PCBLOCK_SKILL, true;
+	mes "^777777A hall of moonlight. At its heart, a sword rests on a stone, shining like dawn: ^0000FFKusanagi-no-Tsurugi^000000, the Grass-Cutter.^000000";
+	mes "^777777The blade the storm god drew from the serpent Orochi, the Sarugami's grandmothers said. The blade of balance.^000000";
+	next;
+	cutin "se_sun01", 2;
+	mes "[A Voice of Light]";
+	mes "Child of grief. You have suffered so much.";
+	mes "When the blade of curses rises, so too shall the blade of balance return.";
+	next;
+	mes "[A Voice of Light]";
+	mes "^0000FFTake this blade, and your curse will end.^000000";
+	next;
+	cutin "", 255;
+	if (!countitem(900001) && !checkweight(900001, 1)) {
+		mes "^777777Your pack is too full to carry another blade. Make room and come back.^000000";
+		close2;
+		setpcblock PCBLOCK_MOVE|PCBLOCK_ATTACK|PCBLOCK_SKILL, false;
+		end;
+	}
+	if (!countitem(900001))
+		getitem 900001, 1;
+	specialeffect2 EF_ANGEL;
+	mes "^777777You received ^0000FFKusanagi^000000. It is cool in your hand, and quiet. Muramasa goes very still.^000000";
+	next;
+	mes "[Tetsuya]";
+	mes "...Huh. She sounds lovely. Why does that make my tail itch?";
+	close2;
+	setpcblock PCBLOCK_MOVE|PCBLOCK_ATTACK|PCBLOCK_SKILL, false;
+	disablenpc;
+	if (TF_STEP == 51) {
+		completequest 900141;
+		setquest 900142;
+		TF_STEP = 52;
+		callfunc "F_TF_Moved";
+		callfunc "F_TF_Reward", 10000000, 7000000, 250000;
+	}
+	doevent instance_npcname("#sh_ctrl") + "::OnSayo";
+	end;
+}
+
+// Tetsuya: at the door, at the guardian, and by the stairs to the high hall.
+tf_shrine,117,15,6	script	Tetsuya#sh1	4_EXJOB_NINJA2,{
+	mes "[Tetsuya]";
+	switch ('stage) {
+	case 0:
+		mes "Curse, blood, truth. Two of those are your problem. One of them is mine, unfortunately.";
+		break;
+	case 1:
+		mes "The way up's open. Something big is snoring up there. Golden snoring.";
+		break;
+	case 2:
+		mes "Go on up. Whatever's shining up there, it's been waiting a long time.";
+		break;
+	default:
+		mes "Muramasa in one hand and a goddess's sword in the other. You collect trouble like I collect fleas.";
+		break;
+	}
+	close;
+}
+tf_shrine,178,58,4	duplicate(Tetsuya#sh1)	Tetsuya#sh2	4_EXJOB_NINJA2
+tf_shrine,116,186,4	duplicate(Tetsuya#sh1)	Tetsuya#sh3	4_EXJOB_NINJA2
+
+// Chiyo, the shrine maiden, who came with her master and stays with the Samurai.
+tf_shrine,116,196,4	script	Chiyo#sh	4_F_JPNMU,{
+	cutin "jpnmu01", 2;
+	if ('stage < 4) {
+		mes "[Chiyo]";
+		mes "I won't let her take it. Fight! I'll keep you on your feet!";
+		close3;
+	}
+	mes "[Chiyo]";
+	mes "Sayo is gone. And the talisman she gave me as a child... look. It cracked in two.";
+	next;
+	mes "[Chiyo]";
+	mes "I carved a new one, with my own hands. No goddess's name on it. Only mine.";
+	mes "Take it. It will cut through illusions, I think, and divine bindings too.";
+	next;
+	if (!countitem(900013) && !checkweight(900013, 1)) {
+		mes "[Chiyo]";
+		mes "Your pack is too full. Make room.";
+		close3;
+	}
+	if (!countitem(900013))
+		getitem 900013, 1;
+	mes "^777777You received ^0000FFChiyo's Carved Talisman^000000.^000000";
+	if (TF_STEP == 52) {
+		completequest 900142;
+		TF_STEP = 60;
+		callfunc "F_TF_Moved";
+		callfunc "F_TF_Reward", 6000000, 4000000, 150000;
+	}
+	next;
+	mes "[Chiyo]";
+	mes "Tetsuya wants a word with you. I can see it in his tail. Shall we go?";
+	next;
+	mes "^777777Chapter V, The Shrine of Seals, is complete.^000000";
+	if (select("Back to Amatsu:Stay a while") == 1) {
+		close2;
+		cutin "", 255;
+		warp "amatsu", 192, 160;
+		instance_destroy;
+		end;
+	}
+	close3;
+
+// While Sayo stands, Chiyo mends the Samurai every twelve seconds.
+OnHeal:
+	initnpctimer;
+	end;
+OnTimer12000:
+	if ('stage != 3)
+		end;
+	if (attachrid('aid)) {
+		npcskill "AL_HEAL", 10, 99, 175;
+		npctalk "Chiyo: Hold on! Kami of the hearth, mend them!";
+		detachrid;
+	}
+	initnpctimer;
+	end;
+}
