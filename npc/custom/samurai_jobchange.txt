@@ -8,6 +8,13 @@ prontera,164,179,4	script	Samurai Mentor	4_M_NINJA_RED,{
 	}
 	if (Class == JOB_SAMURAI) {
 		mes "Walk with discipline. Heaven's Severance begins the defensive path; Blood Covenant begins the sacrifice path.";
+		if (getlook(LOOK_HAIR) != .samurai_hair) {
+			next;
+			mes "[Samurai Mentor]";
+			mes "Shall I tie your hair back, as a Samurai wears it?";
+			if (select("Tie it back:Leave it") == 1)
+				setlook LOOK_HAIR, .samurai_hair;
+		}
 		if (!SamuraiKatanaClaimed) {
 			next;
 			mes "[Samurai Mentor]";
@@ -37,7 +44,9 @@ prontera,164,179,4	script	Samurai Mentor	4_M_NINJA_RED,{
 		mes "Your training could not begin. Please speak to an administrator.";
 		close;
 	}
-	mes "Your training begins now.";
+	// The Samurai's tied-back hair (a client hairstyle; any stylist can change it later).
+	setlook LOOK_HAIR, .samurai_hair;
+	mes "Your training begins now. I have tied your hair back, as a Samurai wears it.";
 	if (SamuraiKatanaClaimed)
 		close;
 L_Katana:
@@ -49,4 +58,8 @@ L_Katana:
 	SamuraiKatanaClaimed = 1;
 	mes "Take this katana. You can refine it as your training advances.";
 	close;
+
+OnInit:
+	.samurai_hair = 43;
+	end;
 }

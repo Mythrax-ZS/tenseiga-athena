@@ -299,6 +299,11 @@ Body:
         Value: 42
         CostsHuman:
             Price: 3000000
+      # Tenseiga: the Samurai's tied-back hair.
+      - Index: 43
+        Value: 43
+        CostsHuman:
+            Price: 3000000
   - Look: Clothes_Color
     Options:
       - Index: 1
