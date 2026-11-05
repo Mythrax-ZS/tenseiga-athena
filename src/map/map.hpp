@@ -640,7 +640,7 @@ enum e_mapflag : int16 {
 	MF_FOG,
 	MF_SAKURA,
 	MF_LEAVES,
-	//MF_RAIN,	//20 - No longer available, keeping here just in case it's back someday. [Ind]
+	MF_RAIN = 20,	// Back for Tenseiga, which draws EF_RAIN (official clients show nothing)
 	// 21 free
 	MF_NOGO = 22,
 	MF_CLOUDS,
