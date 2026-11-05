@@ -415,10 +415,11 @@ Duration defaults to 'player_invincible_time' in '/conf/battle/player.conf' if t
 *fireworks
 *fog
 *leaves
+*rain
 *sakura
 *snow
 
-Displays a weather effect on a map.
+Displays a weather effect on a map. Rain shows in the Tenseiga client only.
 
 ---------------------------------------
 

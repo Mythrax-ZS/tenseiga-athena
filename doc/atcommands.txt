@@ -193,6 +193,7 @@ Plays the specified sound.
 
 ---------------------------------------
 
+@rain
 @snow
 @clouds
 @clouds2
@@ -201,7 +202,8 @@ Plays the specified sound.
 @sakura
 @leaves
 
-Toggles weather effects on your map.
+Toggles weather effects on your map. Rain shows in the Tenseiga client only
+(official clients draw nothing for it).
 
 ---------------------------------------
 

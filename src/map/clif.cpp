@@ -1596,8 +1596,11 @@ static void clif_weather_check(map_session_data *sd)
 		|| map_getmapflag(m, MF_FIREWORKS)
 		|| map_getmapflag(m, MF_SAKURA)
 		|| map_getmapflag(m, MF_LEAVES)
-		|| map_getmapflag(m, MF_CLOUDS2))
+		|| map_getmapflag(m, MF_CLOUDS2)
+		|| map_getmapflag(m, MF_RAIN))
 	{
+		if (map_getmapflag(m, MF_RAIN))
+			clif_specialeffect_single(sd, EF_RAIN, fd);
 		if (map_getmapflag(m, MF_SNOW))
 			clif_specialeffect_single(sd, EF_SNOW, fd);
 		if (map_getmapflag(m, MF_CLOUDS))
